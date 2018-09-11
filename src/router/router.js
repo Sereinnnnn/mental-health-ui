@@ -1,11 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import { routerMode } from '@/config/env'
 import store from '@/store'
 import { formatRoutes } from '@/utils/util'
 // import Layout from '@/page/index/'
 import baseRouter from './_router'
-const _import = require('./_import')
 
 Vue.use(VueRouter)
 

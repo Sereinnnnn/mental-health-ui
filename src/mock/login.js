@@ -1,34 +1,39 @@
-import { param2Obj } from '@/utils'
-
-const userMap = {
-  admin: {
-    roles: ['admin'],
-    token: 'admin',
-    introduction: '我是超级管理员',
-    avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-    name: 'Super Admin'
+import Mock from 'mockjs'
+export const userInfo = {
+  userInfo: {
+    username: 'admin',
+    name: 'avue'
   },
-  editor: {
-    roles: ['editor'],
-    token: 'editor',
-    introduction: '我是编辑',
-    avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-    name: 'Normal Editor'
-  }
+  roles: ['admin'],
+  permission: [
+    'sys_crud_btn_add',
+    'sys_crud_btn_export',
+    'sys_menu_btn_add',
+    'sys_menu_btn_edit',
+    'sys_menu_btn_del',
+    'sys_role_btn1',
+    'sys_role_btn2',
+    'sys_role_btn3',
+    'sys_role_btn4',
+    'sys_role_btn5',
+    'sys_role_btn6'
+  ]
 }
-
-export default {
-  loginByUsername: config => {
-    const { username } = JSON.parse(config.body)
-    return userMap[username]
-  },
-  getUserInfo: config => {
-    const { token } = param2Obj(config.url)
-    if (userMap[token]) {
-      return userMap[token]
-    } else {
-      return false
-    }
-  },
-  logout: () => 'success'
+const List = []
+for (let i = 0; i < 5; i++) {
+  List.push(Mock.mock({
+    id: '@increment',
+    name: Mock.mock('@cname'),
+    username: Mock.mock('@last'),
+    'type|0-1': 0,
+    'sex|0-1': 0,
+    grade: [0, 1],
+    address: Mock.mock('@cparagraph(1, 3)'),
+    check: [1, 3, 4]
+  }))
+}
+export const tableData = {
+  total: 11,
+  pageSize: 10,
+  tableData: List
 }

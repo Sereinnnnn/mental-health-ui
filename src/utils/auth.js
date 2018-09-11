@@ -1,5 +1,4 @@
 import Cookies from 'js-cookie'
-import store from '@/store'
 const TokenKey = 'Admin-Token'
 
 export function getToken() {

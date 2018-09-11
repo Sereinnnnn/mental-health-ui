@@ -1,5 +1,4 @@
 import request from '@/router/axios'
-import { baseUrl } from '@/config/env'
 
 export function loginByUsername(username, password, code, randomStr) {
   const grant_type = 'password'
@@ -7,7 +6,7 @@ export function loginByUsername(username, password, code, randomStr) {
   return request({
     url: '/auth/oauth/token',
     headers: {
-      'Authorization': 'Basic '
+      'Authorization': 'Basic b25saW5lLWV4YW06b25saW5lLWV4YW0='
     },
     method: 'post',
     params: { username, password, randomStr, code, grant_type, scope }
@@ -23,7 +22,7 @@ export function logout() {
 
 export function getUserInfo(token) {
   return request({
-    url: '/user/info',
+    url: '/admin/user/info',
     method: 'get',
     params: { token }
   })

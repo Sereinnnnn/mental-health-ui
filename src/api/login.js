@@ -13,10 +13,11 @@ export function loginByUsername(username, password, code, randomStr) {
   })
 }
 
-export function logout() {
+export function logout(accesstoken, refreshToken) {
   return request({
-    url: '/login/logout',
-    method: 'post'
+    url: '/auth/authentication/removeToken',
+    method: 'post',
+    params: { accesstoken, refreshToken }
   })
 }
 

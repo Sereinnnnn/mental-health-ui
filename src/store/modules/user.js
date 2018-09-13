@@ -2,6 +2,8 @@ import { loginByUsername, logout, getUserInfo } from '@/api/login'
 import { setToken, removeToken } from '@/utils/auth'
 import { setStore, getStore } from '@/utils/store'
 import { encryption } from '@/utils/util'
+import { GetMenu } from '@/api/menu'
+import { validatenull } from '@/util/validate'
 
 const user = {
   state: {
@@ -73,9 +75,9 @@ const user = {
     }) {
       return new Promise((resolve, reject) => {
         getUserInfo(state.token).then(response => {
-          const data = response.data.data
+          const data = response.data
           commit('SET_ROLES', data.roles)
-          commit('SET_USER_INFO', data.sysUser)
+          commit('SET_USER_INFO', data.user)
           commit('SET_PERMISSIONS', data.permissions)
           resolve(response)
         }).catch(error => {
@@ -124,6 +126,21 @@ const user = {
         commit('DEL_ALL_TAG')
         removeToken()
         resolve()
+      })
+    },
+    // 获取系统菜单
+    GetMenu({ commit }) {
+      return new Promise(resolve => {
+        GetMenu().then((res) => {
+          const data = res.data
+          data.forEach(ele => {
+            ele.children.forEach(child => {
+              if (!validatenull(child.component)) child.path = `${ele.path}/${child.path}`
+            })
+          })
+          commit('SET_MENU', data)
+          resolve(data)
+        })
       })
     }
   },

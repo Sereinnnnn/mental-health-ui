@@ -3,7 +3,7 @@ import { setToken, removeToken } from '@/utils/auth'
 import { setStore, getStore } from '@/utils/store'
 import { encryption } from '@/utils/util'
 import { GetMenu } from '@/api/menu'
-import { validatenull } from '@/util/validate'
+import { validatenull } from '@/utils/validate'
 
 const user = {
   state: {
@@ -75,7 +75,7 @@ const user = {
     }) {
       return new Promise((resolve, reject) => {
         getUserInfo(state.token).then(response => {
-          const data = response.data
+          const data = response.data.data
           commit('SET_ROLES', data.roles)
           commit('SET_USER_INFO', data.user)
           commit('SET_PERMISSIONS', data.permissions)

@@ -1,5 +1,7 @@
 import { asyncRouterMap, constantRouterMap } from '@/router'
 import { setStore, getStore } from '@/utils/store'
+import { initMenu } from "@/utils/util";
+import { GetMenu } from '@/api/menu'
 
 /**
  * 通过meta.role判断是否与当前用户权限匹配
@@ -52,16 +54,10 @@ const permission = {
   },
   actions: {
     GenerateRoutes({ commit }, data) {
-      return new Promise(resolve => {
-        const { roles } = data
-        let accessedRouters
-        if (roles.indexOf('admin') >= 0) {
-          accessedRouters = asyncRouterMap
-        } else {
-          accessedRouters = filterAsyncRouter(asyncRouterMap, roles)
-        }
+      let accessedRouters
+      GetMenu().then(data => {
+        accessedRouters = initMenu(data.data);
         commit('SET_ROUTERS', accessedRouters)
-        resolve()
       })
     }
   }

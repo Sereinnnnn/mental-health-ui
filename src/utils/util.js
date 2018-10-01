@@ -35,11 +35,11 @@ export const encryption = (params) => {
   return result
 }
 
-export const initMenu = (router, menu) => {
+export const initMenu = (menu) => {
   if (menu.length === 0) {
     return
   }
-  router.addRoutes(formatRoutes(menu))
+  return formatRoutes(menu)
 }
 
 export const formatRoutes = (aMenu) => {

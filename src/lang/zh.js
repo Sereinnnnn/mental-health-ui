@@ -1,10 +1,16 @@
 export default {
   route: {
     dashboard: '首页',
+    system_management: '系统管理',
+    permission: '权限管理',
+    user_management: '用户管理',
+    role_management: '角色管理',
+    dept_management: '部门管理',
+    menu_management: '菜单管理',
+    system_monitor: '系统监控',
     introduction: '简述',
     documentation: '文档',
     guide: '引导页',
-    permission: '权限测试页',
     pagePermission: '页面权限',
     directivePermission: '指令权限',
     icons: '图标',
@@ -61,7 +67,8 @@ export default {
     theme: '换肤',
     clipboardDemo: 'Clipboard',
     i18n: '国际化',
-    externalLink: '外链'
+    externalLink: '外链',
+    test: '测试菜单'
   },
   navbar: {
     logOut: '退出登录',

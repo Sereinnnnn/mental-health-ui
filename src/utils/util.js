@@ -50,11 +50,20 @@ export const formatRoutes = (aMenu) => {
       component,
       name,
       icon,
-      children
+      children,
+      redirect
     } = oMenu
     if (!validatenull(component)) {
       const oRouter = {
         path: path,
+        name: name,
+        icon: icon,
+        redirect: redirect,
+        children: validatenull(children) ? [] : formatRoutes(children),
+        meta: {
+          icon: icon,
+          title: name
+        },
         component(resolve) {
           let componentPath = ''
           if (component === 'Layout') {
@@ -64,10 +73,7 @@ export const formatRoutes = (aMenu) => {
             componentPath = component
           }
           require([`../${componentPath}.vue`], resolve)
-        },
-        name: name,
-        icon: icon,
-        children: validatenull(children) ? [] : formatRoutes(children)
+        }
       }
       aRouter.push(oRouter)
     }

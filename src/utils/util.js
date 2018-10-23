@@ -54,8 +54,19 @@ export const formatRoutes = (aMenu) => {
       redirect
     } = oMenu
     if (!validatenull(component)) {
+      console.log(component)
       const oRouter = {
         path: path,
+        component(resolve) {
+          let componentPath = ''
+          if (component === 'Layout') {
+            require(['../views/layout/Layout.vue'], resolve)
+            return
+          } else {
+            componentPath = component
+          }
+          require([`../${componentPath}.vue`], resolve)
+        },
         name: name,
         icon: icon,
         redirect: redirect,
@@ -63,16 +74,6 @@ export const formatRoutes = (aMenu) => {
         meta: {
           icon: icon,
           title: name
-        },
-        component(resolve) {
-          let componentPath = ''
-          if (component === 'Layout') {
-            require(['../page/index'], resolve)
-            return
-          } else {
-            componentPath = component
-          }
-          require([`../${componentPath}.vue`], resolve)
         }
       }
       aRouter.push(oRouter)
@@ -80,6 +81,7 @@ export const formatRoutes = (aMenu) => {
   })
   return aRouter
 }
+
 /**
  * 设置浏览器头部标题
  */

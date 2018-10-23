@@ -2,6 +2,8 @@ import { asyncRouterMap, constantRouterMap } from '@/router'
 import { setStore, getStore } from '@/utils/store'
 import { initMenu } from "@/utils/util";
 import { GetMenu } from '@/api/menu'
+import router from '../../router'
+import store from '../index'
 
 /**
  * 通过meta.role判断是否与当前用户权限匹配
@@ -44,21 +46,20 @@ const permission = {
   mutations: {
     SET_ROUTERS: (state, routers) => {
       state.addRouters = routers
-      console.log(constantRouterMap)
       state.routers = constantRouterMap.concat(routers)
-      console.log(routers)
       setStore({
         name: 'routers',
         content: state.routers,
         type: 'session'
       })
+      router.addRoutes(state.routers) // 动态添加可访问路由表
     }
   },
   actions: {
     GenerateRoutes({ commit }, data) {
       let accessedRouters
       GetMenu().then(data => {
-        accessedRouters = initMenu(data.data);
+        accessedRouters = initMenu(data.data)
         commit('SET_ROUTERS', accessedRouters)
       })
     }

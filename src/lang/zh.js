@@ -2,7 +2,7 @@ export default {
   route: {
     dashboard: '首页',
     system_management: '系统管理',
-    permission: '权限管理',
+    permission_management: '权限管理',
     user_management: '用户管理',
     role_management: '角色管理',
     dept_management: '部门管理',
@@ -47,6 +47,7 @@ export default {
     dragTable: '拖拽Table',
     inlineEditTable: 'Table内编辑',
     complexTable: '综合Table',
+    userManagement: '用戶管理',
     treeTable: '树形表格',
     customTreeTable: '自定义树表',
     tab: 'Tab',
@@ -116,7 +117,7 @@ export default {
     title: '标题',
     importance: '重要性',
     type: '类型',
-    remark: '点评',
+    remark: '备注',
     search: '搜索',
     add: '添加',
     export: '导出',
@@ -132,7 +133,12 @@ export default {
     draft: '草稿',
     delete: '删除',
     cancel: '取 消',
-    confirm: '确 定'
+    confirm: '确 定',
+    username: '用户名',
+    email: '邮箱',
+    phone: '电话号码',
+    sex: '性别',
+    born: '出生日期'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',

@@ -41,6 +41,7 @@ export default {
     dragTable: 'Drag Table',
     inlineEditTable: 'Inline Edit',
     complexTable: 'Complex Table',
+    userManagement: 'User Management',
     treeTable: 'Tree Table',
     customTreeTable: 'Custom TreeTable',
     tab: 'Tab',

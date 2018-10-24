@@ -71,8 +71,10 @@ export const constantRouterMap = [
       {
         path: 'dashboard',
         component: () => import('@/views/dashboard/index'),
-        name: 'Dashboard',
-        meta: { title: 'dashboard', icon: 'dashboard', noCache: true }
+        name: '首页',
+        title: '首页',
+        icon: 'dashboard',
+        noCache: true
       }
     ]
   },
@@ -84,8 +86,10 @@ export const constantRouterMap = [
       {
         path: 'index',
         component: () => import('@/views/documentation/index'),
-        name: 'Documentation',
-        meta: { title: 'documentation', icon: 'documentation', noCache: true }
+        name: '文档',
+        title: '文档',
+        icon: 'documentation',
+        noCache: true
       }
     ]
   }

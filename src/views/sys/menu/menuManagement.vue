@@ -3,7 +3,6 @@
     <div class="filter-container">
       <el-button-group>
         <el-button type="primary" icon="plus" @click="handlerAdd">添加</el-button>
-        <el-button type="primary" icon="edit" @click="handlerEdit">编辑</el-button>
         <el-button type="primary" icon="delete" @click="handleDelete">删除</el-button>
       </el-button-group>
 
@@ -28,61 +27,57 @@
             <el-form ref="form" :label-position="labelPosition" :model="form" label-width="80px">
               <el-row>
                 <el-col :span="12">
-                  <el-form-item label="菜单名称" prop="title">
-                    <el-input v-model="form.title" :disabled="formEdit" placeholder="请输入菜单名称"/>
+                  <el-form-item label="菜单名称" prop="name">
+                    <el-input v-model="form.name" placeholder="请输入菜单名称"/>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
                   <el-form-item label="菜单标识" prop="permission">
-                    <el-input v-model="form.permission" :disabled="formEdit" placeholder="请输入菜单标识"/>
+                    <el-input v-model="form.permission" placeholder="请输入菜单标识"/>
                   </el-form-item>
                 </el-col>
               </el-row>
               <el-row>
                 <el-col :span="24">
-                  <el-form-item label="资源路径" prop="url">
-                    <el-input v-model="form.url" :disabled="formEdit" placeholder="请输入资源路径"/>
+                  <el-form-item label="菜单URL" prop="url">
+                    <el-input v-model="form.url" placeholder="请输入菜单URL"/>
                   </el-form-item>
                 </el-col>
               </el-row>
               <el-row>
                 <el-col :span="12">
-                  <el-form-item label="排序" prop="sort">
-                    <el-input v-model="form.sort" :disabled="formEdit" placeholder="请输入排序"/>
+                  <el-form-item label="排序号" prop="sort">
+                    <el-input v-model="form.sort" placeholder="请输入排序号"/>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
                   <el-form-item label="图标" prop="icon">
-                    <el-input v-model="form.icon" :disabled="formEdit" placeholder="请输入图标"/>
+                    <el-input v-model="form.icon" placeholder="请选择"/>
                   </el-form-item>
                 </el-col>
               </el-row>
               <el-row>
                 <el-col :span="12">
                   <el-form-item label="类型" prop="type">
-                    <el-select v-model="form.type" :disabled="formEdit" class="filter-item" placeholder="请输入资源请求类型">
+                    <el-select v-model="form.type" class="filter-item" placeholder="请输入资源请求类型">
                       <el-option v-for="item in typeOptions" :key="item" :label="item | typeFilter" :value="item"/>
                     </el-select>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
                   <el-form-item label="组件名称" prop="component">
-                    <el-input v-model="form.component" :disabled="formEdit" placeholder="请输入描述"/>
+                    <el-input v-model="form.component" placeholder="请输入组件名称"/>
                   </el-form-item>
                 </el-col>
               </el-row>
               <el-row>
                 <el-col :span="24">
                   <el-form-item label="组件地址" prop="component">
-                    <el-input v-model="form.path" :disabled="formEdit" placeholder="组件地址"/>
+                    <el-input v-model="form.path" placeholder="组件地址"/>
                   </el-form-item>
                 </el-col>
               </el-row>
-              <el-form-item v-if="formStatus == 'update'">
-                <el-button type="primary" @click="update">更新</el-button>
-                <el-button @click="onCancel">取消</el-button>
-              </el-form-item>
-              <el-form-item v-if="formStatus == 'create'">
+              <el-form-item>
                 <el-button type="primary" @click="create">保存</el-button>
                 <el-button @click="onCancel">取消</el-button>
               </el-form-item>
@@ -113,12 +108,10 @@ export default {
     return {
       list: null,
       total: null,
-      formEdit: true,
       formAdd: true,
       formStatus: '',
       showElement: false,
       typeOptions: ['0', '1'],
-      methodOptions: ['GET', 'POST', 'PUT', 'DELETE'],
       listQuery: {
         name: undefined
       },
@@ -133,20 +126,19 @@ export default {
       aExpandedKeys: [],
       defaultProps: {
         children: 'children',
-        label: 'displayName'
+        label: 'name'
       },
       labelPosition: 'right',
       form: {
         permission: undefined,
         name: undefined,
-        menuId: undefined,
-        parentId: undefined,
+        id: undefined,
+        parentId: -1,
         url: undefined,
-        icon: undefined,
-        sort: undefined,
+        icon: 'example',
+        sort: 30,
         component: undefined,
-        type: undefined,
-        method: undefined,
+        type: '0',
         path: undefined
       },
       currentId: -1,
@@ -154,7 +146,7 @@ export default {
       menuManager_btn_edit: false,
       menuManager_btn_del: false,
       rules: {
-        title: [{ required: true, message: 'title is required', trigger: 'change' }],
+        name: [{ required: true, message: 'name is required', trigger: 'change' }],
         permission: [{ required: true, message: 'permission is required', trigger: 'change' }],
         url: [{ required: true, message: 'url is required', trigger: 'blur' }],
       }
@@ -219,9 +211,7 @@ export default {
     },
 
     getNodeData(data) {
-      if (!this.formEdit) {
-        this.formStatus = 'update'
-      }
+      this.formStatus = 'update'
       getObj(data.id).then(response => {
         this.form = response.data
       })
@@ -230,13 +220,11 @@ export default {
     },
     handlerEdit() {
       if (this.form.id) {
-        this.formEdit = false
         this.formStatus = 'update'
       }
     },
     handlerAdd() {
       this.resetForm()
-      this.formEdit = false
       this.formStatus = 'create'
     },
     handleDelete() {
@@ -258,44 +246,43 @@ export default {
         })
       })
     },
-    update() {
-      putObj(this.form).then(() => {
-        this.getList()
-        this.$notify({
-          title: '成功',
-          message: '更新成功',
-          type: 'success',
-          duration: 2000
-        })
-      })
-    },
     create() {
-      addObj(this.form).then(() => {
-        this.getList()
-        this.$notify({
-          title: '成功',
-          message: '创建成功',
-          type: 'success',
-          duration: 2000
+      if (this.form.id) {
+        putObj(this.form).then(() => {
+          this.getList()
+          this.$notify({
+            title: '成功',
+            message: '更新成功',
+            type: 'success',
+            duration: 2000
+          })
         })
-      })
+      } else {
+        addObj(this.form).then(() => {
+          this.getList()
+          this.$notify({
+            title: '成功',
+            message: '创建成功',
+            type: 'success',
+            duration: 2000
+          })
+        })
+      }
     },
     onCancel() {
-      this.formEdit = true
       this.formStatus = ''
     },
     resetForm() {
       this.form = {
         permission: undefined,
         name: undefined,
-        menuId: undefined,
-        parentId: this.currentId,
+        id: undefined,
+        parentId: -1,
         url: undefined,
-        icon: undefined,
-        sort: undefined,
+        icon: 'example',
+        sort: 30,
         component: undefined,
-        type: undefined,
-        method: undefined,
+        type: '0',
         path: undefined
       }
     }

@@ -54,7 +54,6 @@ export const formatRoutes = (aMenu) => {
       redirect
     } = oMenu
     if (!validatenull(component)) {
-      console.log(component)
       const oRouter = {
         path: path,
         component(resolve) {
@@ -71,10 +70,7 @@ export const formatRoutes = (aMenu) => {
         icon: icon,
         redirect: redirect,
         children: validatenull(children) ? [] : formatRoutes(children),
-        meta: {
-          icon: icon,
-          title: name
-        }
+        title: name
       }
       aRouter.push(oRouter)
     }

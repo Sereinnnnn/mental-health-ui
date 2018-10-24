@@ -141,7 +141,10 @@ export default {
     sex: '性别',
     born: '出生日期',
     enable: '启用',
-    disable: '禁用'
+    disable: '禁用',
+    roleName: '角色名称',
+    roleCode: '角色代码',
+    roleDesc: '角色描述'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',

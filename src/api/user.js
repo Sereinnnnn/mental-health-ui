@@ -10,7 +10,7 @@ export function fetchList(query) {
 
 export function addObj(obj) {
   return request({
-    url: '/admin/user/',
+    url: '/admin/user',
     method: 'post',
     data: obj
   })

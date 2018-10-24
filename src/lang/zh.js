@@ -134,11 +134,14 @@ export default {
     delete: '删除',
     cancel: '取 消',
     confirm: '确 定',
-    username: '用户名',
+    username: '账号',
+    name: '姓名',
     email: '邮箱',
     phone: '电话号码',
     sex: '性别',
-    born: '出生日期'
+    born: '出生日期',
+    enable: '启用',
+    disable: '禁用'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',

@@ -10,7 +10,7 @@ export function GetMenu() {
 
 export function fetchTree(query) {
   return request({
-    url: '/admin/menu/allTree',
+    url: '/admin/menu/menus',
     method: 'get',
     params: query
   })

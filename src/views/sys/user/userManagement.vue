@@ -17,12 +17,17 @@
       style="width: 100%;">
       <el-table-column :label="$t('table.id')" align="center" width="65px">
         <template slot-scope="scope">
-          <span>{{ scope.row.delFlag }}</span>
+          <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.username')" min-width="110">
         <template slot-scope="scope">
           <span>{{ scope.row.username }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('table.name')" min-width="110">
+        <template slot-scope="scope">
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.email')" width="210px" align="center">
@@ -35,15 +40,19 @@
           <span>{{ scope.row.phone }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.sex')" align="center" width="95px">
+      <el-table-column :label="$t('table.status')" align="center" width="95px">
         <template slot-scope="scope">
-          <el-tag>{{ scope.row.sex | sexFilter }}</el-tag>
+          <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" class-name="status-col" width="200px">
+      <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button v-if="scope.row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">{{ $t('table.delete') }}
+          <el-button v-if="scope.row.status != '1'" size="mini" @click="handleModifyStatus(scope.row,'1')">{{ $t('table.disable') }}
+          </el-button>
+          <el-button v-if="scope.row.status != '0'" size="mini" @click="handleModifyStatus(scope.row,'0')">{{ $t('table.enable') }}
+          </el-button>
+          <el-button v-if="scope.row.delFlag != '1'" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
           </el-button>
         </template>
       </el-table-column>
@@ -56,19 +65,31 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
         <el-form-item :label="$t('table.username')" prop="username">
-          <el-input v-model="temp.username"/>
+          <el-input v-model="temp.username" :readonly="temp.readonly"/>
         </el-form-item>
-        <el-form-item :label="$t('table.born')" prop="born">
-          <el-date-picker v-model="temp.born" type="datetime" placeholder="Please pick a date"/>
+        <el-form-item :label="$t('table.name')" prop="name">
+          <el-input v-model="temp.name"/>
         </el-form-item>
         <el-form-item :label="$t('table.phone')" prop="phone">
           <el-input v-model="temp.phone"/>
+        </el-form-item>
+        <el-form-item :label="$t('table.born')" prop="born">
+          <el-date-picker v-model="temp.born" type="datetime" format="yyyy-MM-dd" placeholder="Please pick a date"/>
         </el-form-item>
         <el-form-item :label="$t('table.email')">
           <el-input v-model="temp.email"/>
         </el-form-item>
         <el-form-item :label="$t('table.sex')">
-          <el-rate v-model="temp.sex" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;"/>
+          <el-radio-group v-model="temp.sex">
+            <el-radio :label="0">男</el-radio>
+            <el-radio :label="1">女</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item :label="$t('table.status')">
+          <el-radio-group v-model="temp.status">
+            <el-radio :label="0">启用</el-radio>
+            <el-radio :label="1">禁用</el-radio>
+          </el-radio-group>
         </el-form-item>
         <el-form-item :label="$t('table.remark')">
           <el-input :autosize="{ minRows: 2, maxRows: 4}" v-model="temp.remark" type="textarea" placeholder="Please input"/>
@@ -95,8 +116,8 @@
 </template>
 
 <script>
-import { fetchList, fetchPv, addObj, putObj } from '@/api/user'
-import waves from '@/directive/waves' // 水波纹指令
+import { fetchList, fetchPv, addObj, putObj, delObj } from '@/api/user'
+import waves from '@/directive/waves'
 import { parseTime } from '@/utils'
 
 const calendarTypeOptions = [
@@ -118,16 +139,15 @@ export default {
     waves
   },
   filters: {
-    statusFilter(status) {
+    statusTypeFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
+        0: 'success',
+        1: 'danger'
       }
       return statusMap[status]
     },
-    sexFilter(sex) {
-      return sex === '0' ? '男' : '女'
+    statusFilter(status) {
+      return status === '0' ? '启用' : '禁用'
     },
     typeFilter(type) {
       return calendarTypeKeyValue[type]
@@ -142,24 +162,18 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        importance: undefined,
-        title: undefined,
-        type: undefined,
+        username: undefined,
         sort: '+id'
       },
-      importanceOptions: [1, 2, 3],
-      calendarTypeOptions,
-      sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
-      statusOptions: ['published', 'draft', 'deleted'],
-      showReviewer: false,
       temp: {
-        id: undefined,
+        id: '',
         username: 1,
-        remark: '',
-        born: new Date(),
-        sex: '',
+        name: '',
         phone: '',
-        status: 'published'
+        email: '',
+        born: new Date(),
+        sex: 0,
+        status: 0
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -170,9 +184,11 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
+        name: [{ required: true, message: 'name is required', trigger: 'change' }],
         username: [{ required: true, message: 'username is required', trigger: 'change' }],
         born: [{ type: 'date', required: true, message: 'born is required', trigger: 'change' }],
-        phone: [{ required: true, message: 'phone is required', trigger: 'blur' }]
+        phone: [{ required: true, message: 'phone is required', trigger: 'blur' }],
+        email: [{ type: 'email', message: 'email is not validate', trigger: 'blur' }]
       },
       downloadLoading: false
     }
@@ -206,21 +222,24 @@ export default {
       this.getList()
     },
     handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作成功',
-        type: 'success'
-      })
       row.status = status
+      putObj(row).then(() => {
+        this.dialogFormVisible = false
+        this.$message({
+          message: '操作成功',
+          type: 'success'
+        })
+      })
     },
     resetTemp() {
       this.temp = {
-        id: undefined,
+        id: '',
         username: '',
+        sex: 0,
         remark: '',
         born: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
+        status: 0,
+        readonly: false
       }
     },
     handleCreate() {
@@ -234,8 +253,6 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
           addObj(this.temp).then(() => {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
@@ -251,7 +268,10 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.born = new Date(this.temp.born)
+      this.temp.born = new Date(parseInt(this.temp.born))
+      this.temp.sex = parseInt(this.temp.sex)
+      this.temp.status = parseInt(this.temp.status)
+      this.temp.readonly = true
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -283,11 +303,14 @@ export default {
       })
     },
     handleDelete(row) {
-      this.$notify({
-        title: '成功',
-        message: '删除成功',
-        type: 'success',
-        duration: 2000
+      delObj(row.id).then(() => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: '成功',
+          message: '删除成功',
+          type: 'success',
+          duration: 2000
+        })
       })
       const index = this.list.indexOf(row)
       this.list.splice(index, 1)
@@ -301,8 +324,8 @@ export default {
     handleDownload() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['born', 'title', 'type', 'importance', 'status']
-        const filterVal = ['born', 'title', 'type', 'importance', 'status']
+        const tHeader = ['username', 'name', 'email', 'phone', 'status']
+        const filterVal = ['username', 'name', 'email', 'phone', 'status']
         const data = this.formatJson(filterVal, this.list)
         excel.export_json_to_excel({
           header: tHeader,

@@ -79,7 +79,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item :label="$t('table.ownDept')" prop="deptId">
-          <el-input v-model="temp.deptId"/>
+          <el-input v-model="temp.deptId" @click="handleSelectDept"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -87,6 +87,26 @@
         <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
         <el-button v-else type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
       </div>
+    </el-dialog>
+
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogDeptVisible">
+      <el-row>
+        <el-col :span="5" style ="margin-top:10px;">
+          <el-tree
+            :data="treeData"
+            :default-expanded-keys="aExpandedKeys"
+            :filter-node-method="filterNode"
+            :props="defaultProps"
+            class="filter-tree"
+            node-key="id"
+            default-expand-all="true"
+            highlight-current
+            @node-click="getNodeData"
+            @node-expand="nodeExpand"
+            @node-collapse="nodeCollapse"
+          />
+        </el-col>
+      </el-row>
     </el-dialog>
 
     <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
@@ -104,6 +124,7 @@
 
 <script>
 import { fetchList, addObj, putObj, delObj } from '@/api/role'
+import { fetchTree, getObj} from '@/api/dept'
 import waves from '@/directive/waves'
 import { parseTime } from '@/utils'
 
@@ -160,11 +181,13 @@ export default {
         status: 0,
         deptId: ''
       },
+      treeData: [],
       dialogFormVisible: false,
+      dialogDeptVisible: false,
       dialogStatus: '',
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        update: '编辑',
+        create: '新建'
       },
       dialogPvVisible: false,
       pvData: [],
@@ -283,7 +306,6 @@ export default {
       })
     },
     handleDelete(row) {
-      debugger
       delObj(row.id).then(() => {
         this.dialogFormVisible = false
         this.$notify({
@@ -295,6 +317,10 @@ export default {
       })
       const index = this.list.indexOf(row)
       this.list.splice(index, 1)
+    },
+    handleSelectDept() {
+      debugger
+      this.dialogDeptVisible = true
     }
   }
 }

@@ -38,31 +38,24 @@
                 </el-col>
               </el-row>
               <el-row>
-                <el-col :span="24">
-                  <el-form-item label="部门负责人" prop="deptLeader">
+                <el-col :span="12">
+                  <el-form-item label="负责人" prop="deptLeader">
                     <el-input v-model="form.deptLeader" placeholder="请输入部门负责人"/>
                   </el-form-item>
                 </el-col>
-              </el-row>
-              <el-row>
                 <el-col :span="12">
                   <el-form-item label="排序号" prop="sort">
                     <el-input v-model="form.sort" placeholder="请输入排序号"/>
                   </el-form-item>
                 </el-col>
+              </el-row>
+              <el-row>
                 <el-col :span="12">
                   <el-form-item :label="$t('table.status')">
                     <el-radio-group v-model="form.status">
                       <el-radio :label="0">启用</el-radio>
                       <el-radio :label="1">禁用</el-radio>
                     </el-radio-group>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-              <el-row>
-                <el-col :span="24">
-                  <el-form-item :label="$t('table.remark')">
-                    <el-input :autosize="{ minRows: 2, maxRows: 4}" v-model="form.remark" type="textarea" placeholder="备注"/>
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -125,8 +118,7 @@ export default {
         deptDesc: undefined,
         deptLeader: undefined,
         sort: 30,
-        status: 0,
-        remark: undefined
+        status: 0
       },
       currentId: -1,
       rules: {
@@ -150,7 +142,6 @@ export default {
       })
     },
     filterNode(value, data) {
-      // console.log(value);
       if (!value) return true
       return data.label.indexOf(value) !== -1
     },
@@ -204,7 +195,6 @@ export default {
       }
     },
     handlerAdd() {
-      debugger
       this.resetForm()
       this.formStatus = 'create'
     },
@@ -254,15 +244,21 @@ export default {
       this.formStatus = ''
     },
     resetForm() {
+      debugger
+      let parentId
+      if (this.form.id === undefined) {
+        parentId = -1
+      } else {
+        parentId = this.form.id
+      }
       this.form = {
         id: undefined,
-        parentId: -1,
+        parentId: parentId,
         deptName: undefined,
         deptDesc: undefined,
         deptLeader: undefined,
         sort: 30,
-        status: 0,
-        remark: undefined
+        status: 0
       }
     }
   }

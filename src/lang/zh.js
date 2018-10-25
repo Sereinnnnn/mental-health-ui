@@ -144,7 +144,9 @@ export default {
     disable: '禁用',
     roleName: '角色名称',
     roleCode: '角色代码',
-    roleDesc: '角色描述'
+    roleDesc: '角色描述',
+    ownDept: '所属部门',
+    role: '角色'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',

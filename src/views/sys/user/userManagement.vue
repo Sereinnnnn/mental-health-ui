@@ -30,14 +30,9 @@
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.email')" width="210px" align="center">
+      <el-table-column :label="$t('table.ownDept')" width="210px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.email }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('table.phone')" width="210px">
-        <template slot-scope="scope">
-          <span>{{ scope.row.phone }}</span>
+          <span>{{ scope.row.deptId }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.status')" align="center" width="95px">
@@ -90,6 +85,12 @@
             <el-radio :label="0">启用</el-radio>
             <el-radio :label="1">禁用</el-radio>
           </el-radio-group>
+        </el-form-item>
+        <el-form-item :label="$t('table.ownDept')">
+          <el-input v-model="temp.deptId"/>
+        </el-form-item>
+        <el-form-item :label="$t('table.role')">
+          <el-input v-model="temp.roleId"/>
         </el-form-item>
         <el-form-item :label="$t('table.remark')">
           <el-input :autosize="{ minRows: 2, maxRows: 4}" v-model="temp.remark" type="textarea" placeholder="Please input"/>
@@ -173,7 +174,9 @@ export default {
         email: '',
         born: new Date(),
         sex: 0,
-        status: 0
+        status: 0,
+        deptId: -1,
+        roleId: -1
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -239,7 +242,9 @@ export default {
         remark: '',
         born: new Date(),
         status: 0,
-        readonly: false
+        readonly: false,
+        deptId: -1,
+        roleId: -1
       }
     },
     handleCreate() {

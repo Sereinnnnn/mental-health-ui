@@ -77,6 +77,13 @@
                   </el-form-item>
                 </el-col>
               </el-row>
+              <el-row>
+                <el-col :span="24">
+                  <el-form-item :label="$t('table.remark')">
+                    <el-input :autosize="{ minRows: 2, maxRows: 4}" v-model="form.remark" type="textarea" placeholder="备注"/>
+                  </el-form-item>
+                </el-col>
+              </el-row>
               <el-form-item>
                 <el-button type="primary" @click="create">保存</el-button>
                 <el-button @click="onCancel">取消</el-button>
@@ -139,7 +146,8 @@ export default {
         sort: 30,
         component: undefined,
         type: '0',
-        path: undefined
+        path: undefined,
+        remark: undefined
       },
       currentId: -1,
       menuManager_btn_add: false,
@@ -283,7 +291,8 @@ export default {
         sort: 30,
         component: undefined,
         type: '0',
-        path: undefined
+        path: undefined,
+        remark: undefined
       }
     }
   }

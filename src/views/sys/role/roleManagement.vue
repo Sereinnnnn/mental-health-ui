@@ -39,6 +39,11 @@
           <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
         </template>
       </el-table-column>
+      <el-table-column :label="$t('table.ownDept')" min-width="110">
+        <template slot-scope="scope">
+          <span>{{ scope.row.deptId }}</span>
+        </template>
+      </el-table-column>
       <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
@@ -72,6 +77,9 @@
             <el-radio :label="0">启用</el-radio>
             <el-radio :label="1">禁用</el-radio>
           </el-radio-group>
+        </el-form-item>
+        <el-form-item :label="$t('table.ownDept')" prop="deptId">
+          <el-input v-model="temp.deptId"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -149,7 +157,8 @@ export default {
         roleName: 1,
         roleCode: '',
         roleDesc: '',
-        status: 0
+        status: 0,
+        deptId: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -209,7 +218,8 @@ export default {
         roleName: '',
         roleCode: 0,
         roleDesc: '',
-        status: 0
+        status: 0,
+        deptId: ''
       }
     },
     handleCreate() {

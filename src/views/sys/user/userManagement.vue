@@ -32,7 +32,12 @@
       </el-table-column>
       <el-table-column :label="$t('table.ownDept')" width="210px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.deptId }}</span>
+          <span>{{ scope.row.deptName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('table.role')" width="210px" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.roleName }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.status')" align="center" width="95px">
@@ -58,42 +63,79 @@
     </div>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
-        <el-form-item :label="$t('table.username')" prop="username">
-          <el-input v-model="temp.username" :readonly="temp.readonly"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.name')" prop="name">
-          <el-input v-model="temp.name"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.phone')" prop="phone">
-          <el-input v-model="temp.phone"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.born')" prop="born">
-          <el-date-picker v-model="temp.born" type="datetime" format="yyyy-MM-dd" placeholder="Please pick a date"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.email')">
-          <el-input v-model="temp.email"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.sex')">
-          <el-radio-group v-model="temp.sex">
-            <el-radio :label="0">男</el-radio>
-            <el-radio :label="1">女</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item :label="$t('table.status')">
-          <el-radio-group v-model="temp.status">
-            <el-radio :label="0">启用</el-radio>
-            <el-radio :label="1">禁用</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item :label="$t('table.ownDept')">
-          <el-input v-model="temp.deptId"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.role')">
-          <el-input v-model="temp.roleId"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.remark')">
-          <el-input :autosize="{ minRows: 2, maxRows: 4}" v-model="temp.remark" type="textarea" placeholder="Please input"/>
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 90%; margin-left:50px;">
+        <el-row>
+          <el-col :span="11">
+            <el-form-item :label="$t('table.username')" prop="username">
+              <el-input v-model="temp.username" :readonly="temp.readonly" placeholder="账号"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="11" :offset="1">
+            <el-form-item :label="$t('table.name')" prop="name">
+              <el-input v-model="temp.name" placeholder="姓名"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="11">
+            <el-form-item :label="$t('table.phone')" prop="phone">
+              <el-input v-model="temp.phone" placeholder="电话号码"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="11" :offset="1">
+            <el-form-item :label="$t('table.sex')">
+              <el-radio-group v-model="temp.sex">
+                <el-radio :label="0">男</el-radio>
+                <el-radio :label="1">女</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="11">
+            <el-form-item :label="$t('table.born')" prop="born">
+              <el-date-picker v-model="temp.born" type="datetime" format="yyyy-MM-dd" placeholder="出生日期"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="11" :offset="1">
+            <el-form-item :label="$t('table.status')">
+              <el-radio-group v-model="temp.status">
+                <el-radio :label="0">启用</el-radio>
+                <el-radio :label="1">禁用</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="23">
+            <el-form-item :label="$t('table.ownDept')" prop="deptName">
+              <el-input v-model="temp.deptName" placeholder="请选择所属部门" @focus="handleSelectDept"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="23">
+            <el-form-item :label="$t('table.role')" prop="role">
+              <el-select v-model="temp.role" class="filter-item" placeholder="请选择角色" multiple>
+                <el-option v-for="item in roleData" :key="item.id" :label="item.roleName" :value="item.id">
+                  <span style="float: left">{{ item.roleName }}</span>
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="23">
+            <el-form-item :label="$t('table.remark')">
+              <el-input :autosize="{ minRows: 4, maxRows: 6}" v-model="temp.remark" type="textarea" placeholder="备注"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item>
+          <el-input v-model="temp.deptId" type="hidden"/>
+          <el-input v-model="temp.roleId" type="hidden"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -101,6 +143,26 @@
         <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
         <el-button v-else type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
       </div>
+    </el-dialog>
+
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogDeptVisible">
+      <el-row>
+        <el-col :span="5" style ="margin-top:10px;">
+          <el-tree
+            :data="treeDeptData"
+            :default-expanded-keys="aExpandedKeys"
+            :filter-node-method="filterNode"
+            :props="defaultDeptProps"
+            class="filter-tree"
+            node-key="id"
+            default-expand-all="true"
+            highlight-current
+            @node-click="getDeptNodeData"
+            @node-expand="nodeExpand"
+            @node-collapse="nodeCollapse"
+          />
+        </el-col>
+      </el-row>
     </el-dialog>
 
     <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
@@ -120,6 +182,8 @@
 import { fetchList, fetchPv, addObj, putObj, delObj } from '@/api/user'
 import waves from '@/directive/waves'
 import { parseTime } from '@/utils'
+import { fetchTree } from '@/api/dept'
+import { deptRoleList } from '@/api/role'
 
 const calendarTypeOptions = [
   { key: 'CN', display_name: 'China' },
@@ -179,21 +243,30 @@ export default {
         roleId: -1
       },
       dialogFormVisible: false,
+      dialogDeptVisible: false,
+      dialogRoleVisible: false,
       dialogStatus: '',
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        update: '编辑',
+        create: '新建'
       },
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        name: [{ required: true, message: 'name is required', trigger: 'change' }],
-        username: [{ required: true, message: 'username is required', trigger: 'change' }],
-        born: [{ type: 'date', required: true, message: 'born is required', trigger: 'change' }],
-        phone: [{ required: true, message: 'phone is required', trigger: 'blur' }],
-        email: [{ type: 'email', message: 'email is not validate', trigger: 'blur' }]
+        name: [{ required: true, message: '请输入账号', trigger: 'change' }],
+        username: [{ required: true, message: '请输入姓名', trigger: 'change' }],
+        born: [{ type: 'date', required: true, message: '请选择出生日期', trigger: 'change' }],
+        phone: [{ required: true, message: '请输入电话号码', trigger: 'blur' }],
+        email: [{ type: 'email', message: '请输入邮箱', trigger: 'blur' }]
       },
-      downloadLoading: false
+      downloadLoading: false,
+      treeDeptData: [],
+      roleData: [],
+      role: '',
+      defaultDeptProps: {
+        children: 'children',
+        label: 'deptName'
+      }
     }
   },
   created() {
@@ -348,6 +421,24 @@ export default {
           return v[j]
         }
       }))
+    },
+    handleSelectDept() {
+      fetchTree().then(response => {
+        this.treeDeptData = response.data
+        this.dialogDeptVisible = true
+        this.role = ''
+        deptRoleList(this.treeDeptData.id).then(response => {
+          this.roleData = response.data
+        })
+      })
+    },
+    getDeptNodeData(data) {
+      this.dialogDeptVisible = false
+      this.temp.deptId = data.id
+      this.temp.deptName = data.deptName
+      deptRoleList(data.id).then(response => {
+        this.roleData = response.data
+      })
     }
   }
 }

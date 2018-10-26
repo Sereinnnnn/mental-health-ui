@@ -244,7 +244,6 @@ export default {
       this.formStatus = ''
     },
     resetForm() {
-      debugger
       let parentId
       if (this.form.id === undefined) {
         parentId = -1

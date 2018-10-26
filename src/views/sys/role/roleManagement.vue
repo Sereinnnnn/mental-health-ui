@@ -34,14 +34,14 @@
           <span>{{ scope.row.roleDesc }}</span>
         </template>
       </el-table-column>
+      <el-table-column :label="$t('table.ownDept')" min-width="110">
+        <template slot-scope="scope">
+          <span>{{ scope.row.deptName }}</span>
+        </template>
+      </el-table-column>
       <el-table-column :label="$t('table.status')" align="center" width="120px">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('table.ownDept')" min-width="110">
-        <template slot-scope="scope">
-          <span>{{ scope.row.deptId }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
@@ -78,8 +78,9 @@
             <el-radio :label="1">禁用</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item :label="$t('table.ownDept')" prop="deptId">
-          <el-input v-model="temp.deptId" @click="handleSelectDept"/>
+        <el-form-item :label="$t('table.ownDept')" prop="deptName">
+          <el-input v-model="temp.deptName" @focus="handleSelectDept"/>
+          <el-input v-model="temp.deptId" type="hidden"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -93,7 +94,7 @@
       <el-row>
         <el-col :span="5" style ="margin-top:10px;">
           <el-tree
-            :data="treeData"
+            :data="treeDeptData"
             :default-expanded-keys="aExpandedKeys"
             :filter-node-method="filterNode"
             :props="defaultProps"
@@ -179,9 +180,11 @@ export default {
         roleCode: '',
         roleDesc: '',
         status: 0,
-        deptId: ''
+        deptId: '',
+        deptName: ''
       },
       treeData: [],
+      treeDeptData: [],
       dialogFormVisible: false,
       dialogDeptVisible: false,
       dialogStatus: '',
@@ -195,7 +198,11 @@ export default {
         roleName: [{ required: true, message: 'name is required', trigger: 'change' }],
         roleCode: [{ required: true, message: 'username is required', trigger: 'change' }]
       },
-      downloadLoading: false
+      downloadLoading: false,
+      defaultProps: {
+        children: 'children',
+        label: 'deptName'
+      }
     }
   },
   created() {
@@ -242,7 +249,8 @@ export default {
         roleCode: 0,
         roleDesc: '',
         status: 0,
-        deptId: ''
+        deptId: '',
+        deptName: ''
       }
     },
     handleCreate() {
@@ -319,8 +327,15 @@ export default {
       this.list.splice(index, 1)
     },
     handleSelectDept() {
-      debugger
-      this.dialogDeptVisible = true
+      fetchTree().then(response => {
+        this.treeDeptData = response.data
+        this.dialogDeptVisible = true
+      })
+    },
+    getNodeData(data) {
+      this.dialogDeptVisible = false
+      this.temp.deptId = data.id
+      this.temp.deptName = data.deptName
     }
   }
 }

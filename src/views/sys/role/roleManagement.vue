@@ -19,12 +19,12 @@
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.roleCode')" min-width="110">
+      <el-table-column :label="$t('table.roleCode')" min-width="110" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.roleCode }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.roleName')" min-width="110">
+      <el-table-column :label="$t('table.roleName')" min-width="110" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.roleName }}</span>
         </template>
@@ -34,7 +34,7 @@
           <span>{{ scope.row.roleDesc }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.ownDept')" min-width="110">
+      <el-table-column :label="$t('table.ownDept')" min-width="110" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.deptName }}</span>
         </template>

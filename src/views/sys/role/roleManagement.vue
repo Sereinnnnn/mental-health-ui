@@ -14,27 +14,24 @@
       fit
       highlight-current-row
       style="width: 100%;">
-      <el-table-column :label="$t('table.id')" align="center" width="65px">
-        <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
-        </template>
+      <el-table-column type="selection" width="55">
       </el-table-column>
-      <el-table-column :label="$t('table.roleCode')" min-width="110" align="center">
+      <el-table-column :label="$t('table.roleCode')" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.roleCode }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.roleName')" min-width="110" align="center">
+      <el-table-column :label="$t('table.roleName')" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.roleName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.roleDesc')" min-width="110" align="center">
+      <el-table-column :label="$t('table.roleDesc')" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.roleDesc }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.ownDept')" min-width="110" align="center">
+      <el-table-column :label="$t('table.ownDept')" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.deptName }}</span>
         </template>
@@ -52,6 +49,8 @@
           <el-button v-if="scope.row.status != '0'" size="mini" @click="handleModifyStatus(scope.row,'0')">{{ $t('table.enable') }}
           </el-button>
           <el-button v-if="scope.row.delFlag != '1'" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
+          </el-button>
+          <el-button size="mini" @click="handlePermission(scope.row)">{{ $t('table.permission') }}
           </el-button>
         </template>
       </el-table-column>
@@ -95,19 +94,38 @@
         <el-col :span="5" style ="margin-top:10px;">
           <el-tree
             :data="treeDeptData"
-            :default-expanded-keys="aExpandedKeys"
-            :filter-node-method="filterNode"
             :props="defaultProps"
             class="filter-tree"
             node-key="id"
-            default-expand-all="true"
+            default-expand-all
             highlight-current
             @node-click="getNodeData"
-            @node-expand="nodeExpand"
-            @node-collapse="nodeCollapse"
           />
         </el-col>
       </el-row>
+    </el-dialog>
+
+    <el-dialog :visible.sync="dialogPermissionVisible" title="角色权限">
+      <el-row>
+        <el-col :span="5" style ="margin-top:10px;">
+          <el-tree
+            ref="menuTree"
+            :data="treePermissionData"
+            :props="permissionProps"
+            :default-checked-keys="checkedKeys"
+            show-checkbox
+            class="filter-tree"
+            node-key="id"
+            default-expand-all
+            highlight-current
+            check-strictly
+            @node-click="getNodeData"
+          />
+        </el-col>
+      </el-row>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="savePermission(id, roleCode)">保存</el-button>
+      </div>
     </el-dialog>
 
     <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
@@ -124,10 +142,9 @@
 </template>
 
 <script>
-import { fetchList, addObj, putObj, delObj } from '@/api/role'
-import { fetchTree, getObj} from '@/api/dept'
+import { fetchList, addObj, putObj, delObj, fetchDeptTree, fetchRoleTree, permissionUpdate } from '@/api/role'
+import { fetchTree } from '@/api/menu'
 import waves from '@/directive/waves'
-import { parseTime } from '@/utils'
 
 const calendarTypeOptions = [
   { key: 'CN', display_name: 'China' },
@@ -185,8 +202,11 @@ export default {
       },
       treeData: [],
       treeDeptData: [],
+      treePermissionData: [],
+      checkedKeys: [],
       dialogFormVisible: false,
       dialogDeptVisible: false,
+      dialogPermissionVisible: false,
       dialogStatus: '',
       textMap: {
         update: '编辑',
@@ -202,6 +222,10 @@ export default {
       defaultProps: {
         children: 'children',
         label: 'deptName'
+      },
+      permissionProps: {
+        children: 'children',
+        lable: 'name'
       }
     }
   },
@@ -217,7 +241,7 @@ export default {
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
-        }, 1.5 * 1000)
+        }, 500)
       })
     },
     handleFilter() {
@@ -267,6 +291,7 @@ export default {
           addObj(this.temp).then(() => {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
+            this.getList()
             this.$notify({
               title: '成功',
               message: '创建成功',
@@ -303,6 +328,7 @@ export default {
               }
             }
             this.dialogFormVisible = false
+            this.getList()
             this.$notify({
               title: '成功',
               message: '更新成功',
@@ -313,9 +339,11 @@ export default {
         }
       })
     },
+    // 删除
     handleDelete(row) {
       delObj(row.id).then(() => {
         this.dialogFormVisible = false
+        this.getList()
         this.$notify({
           title: '成功',
           message: '删除成功',
@@ -326,8 +354,9 @@ export default {
       const index = this.list.indexOf(row)
       this.list.splice(index, 1)
     },
+    // 所属部门
     handleSelectDept() {
-      fetchTree().then(response => {
+      fetchDeptTree().then(response => {
         this.treeDeptData = response.data
         this.dialogDeptVisible = true
       })
@@ -336,6 +365,49 @@ export default {
       this.dialogDeptVisible = false
       this.temp.deptId = data.id
       this.temp.deptName = data.deptName
+    },
+    // 分配权限
+    handlePermission(row) {
+      fetchRoleTree(row.roleCode)
+        .then(response => {
+          this.checkedKeys = response.data
+          return fetchTree()
+        })
+        .then(response => {
+          this.treePermissionData = response.data
+          this.dialogPermissionVisible = true
+          this.id = row.id
+          this.roleCode = row.roleCode
+        })
+    },
+    // 保存权限
+    savePermission(id, roleCode) {
+      const keys = this.$refs.menuTree.getCheckedKeys()
+      let menus = ''
+      if (keys.length > 0) {
+        for (let i = 0; i < keys.length; i++) {
+          menus = menus + keys[i] + ','
+        }
+      }
+      // 更新
+      permissionUpdate(id, menus).then(() => {
+        this.dialogPermissionVisible = false
+        // 重新加载
+        fetchTree()
+          .then(response => {
+            this.treePermissionData = response.data
+            return fetchRoleTree(roleCode)
+          })
+          .then(response => {
+            this.checkedKeys = response.data
+            this.$notify({
+              title: '成功',
+              message: '修改成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+      })
     }
   }
 }

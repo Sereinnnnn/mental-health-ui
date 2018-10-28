@@ -15,7 +15,7 @@
             :props="defaultProps"
             class="filter-tree"
             node-key="id"
-            default-expand-all="true"
+            default-expand-all
             highlight-current
             @node-click="getNodeData"
             @node-expand="nodeExpand"
@@ -162,9 +162,6 @@ export default {
   },
   created() {
     this.getList()
-    this.menuManager_btn_add = this.permissions['sys_menu_add']
-    this.menuManager_btn_edit = this.permissions['sys_menu_edit']
-    this.menuManager_btn_del = this.permissions['sys_menu_del']
   },
   computed: {
     ...mapGetters([

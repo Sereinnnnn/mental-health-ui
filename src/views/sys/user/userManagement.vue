@@ -15,10 +15,7 @@
       fit
       highlight-current-row
       style="width: 100%;">
-      <el-table-column :label="$t('table.id')" align="center" width="65px">
-        <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
-        </template>
+      <el-table-column type="selection" width="55">
       </el-table-column>
       <el-table-column :label="$t('table.username')" min-width="110">
         <template slot-scope="scope">
@@ -37,7 +34,7 @@
       </el-table-column>
       <el-table-column :label="$t('table.role')" width="210px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.roleName }}</span>
+          <span v-for="role in scope.row.roleList" :key="role.id">{{ role.roleName }} </span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.status')" align="center" width="95px">
@@ -117,7 +114,7 @@
         <el-row>
           <el-col :span="23">
             <el-form-item :label="$t('table.role')" prop="role">
-              <el-select v-model="temp.role" class="filter-item" placeholder="请选择角色" multiple>
+              <el-select v-model="temp.role" class="filter-item" placeholder="请选择角色" multiple width="100%">
                 <el-option v-for="item in roleData" :key="item.id" :label="item.roleName" :value="item.id">
                   <span style="float: left">{{ item.roleName }}</span>
                 </el-option>
@@ -153,9 +150,10 @@
             :default-expanded-keys="aExpandedKeys"
             :filter-node-method="filterNode"
             :props="defaultDeptProps"
+            :unique-opened="true"
             class="filter-tree"
             node-key="id"
-            default-expand-all="true"
+            default-expand-all
             highlight-current
             @node-click="getDeptNodeData"
             @node-expand="nodeExpand"
@@ -240,7 +238,8 @@ export default {
         sex: 0,
         status: 0,
         deptId: -1,
-        roleId: -1
+        roleId: -1,
+        roleList: []
       },
       dialogFormVisible: false,
       dialogDeptVisible: false,
@@ -262,17 +261,47 @@ export default {
       downloadLoading: false,
       treeDeptData: [],
       roleData: [],
-      role: '',
+      role: [],
       defaultDeptProps: {
         children: 'children',
         label: 'deptName'
-      }
+      },
+      aExpandedKeys: []
     }
   },
   created() {
     this.getList()
   },
   methods: {
+    nodeCollapse(data) {
+      this.oExpandedKey[data.id] = false
+      // 如果有子节点
+      this.treeRecursion(this.oTreeNodeChildren[data.id], (oNode) => {
+        this.oExpandedKey[oNode.id] = false
+      })
+      this.setExpandedKeys()
+    },
+    setExpandedKeys() {
+      const oTemp = this.oExpandedKey
+      this.aExpandedKeys = []
+      for (const sKey in oTemp) {
+        if (oTemp[sKey]) {
+          this.aExpandedKeys.push(parseInt(sKey))
+        }
+      }
+    },
+    filterNode(value, data) {
+      if (!value) return true
+      return data.label.indexOf(value) !== -1
+    },
+    nodeExpand(data) {
+      const aChildren = data.children
+      if (aChildren.length > 0) {
+        this.oExpandedKey[data.id] = true
+        this.oTreeNodeChildren[data.id] = aChildren
+      }
+      this.setExpandedKeys()
+    },
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
@@ -282,7 +311,7 @@ export default {
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
-        }, 1.5 * 1000)
+        }, 500)
       })
     },
     handleFilter() {
@@ -317,7 +346,9 @@ export default {
         status: 0,
         readonly: false,
         deptId: -1,
-        roleId: -1
+        roleId: -1,
+        roleData: [],
+        role: []
       }
     },
     handleCreate() {
@@ -334,6 +365,7 @@ export default {
           addObj(this.temp).then(() => {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
+            this.getList()
             this.$notify({
               title: '成功',
               message: '创建成功',
@@ -345,22 +377,34 @@ export default {
       })
     },
     handleUpdate(row) {
+      row.role = []
       this.temp = Object.assign({}, row) // copy obj
       this.temp.born = new Date(parseInt(this.temp.born))
       this.temp.sex = parseInt(this.temp.sex)
       this.temp.status = parseInt(this.temp.status)
       this.temp.readonly = true
       this.dialogStatus = 'update'
+      this.role = []
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
+      })
+      // 根据部门ID获取角色
+      deptRoleList(row.deptId).then(response => {
+        if (row.roleList !== null && row.roleList !== undefined) {
+          for (let i = 0; i < row.roleList.length; i++) {
+            this.role[i] = row.roleList[i].id
+          }
+        }
+        this.temp.role = this.role
+        this.roleData = response.data
       })
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          tempData.born = + new Date(tempData.born) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          tempData.born = +new Date(tempData.born) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           putObj(tempData).then(() => {
             for (const v of this.list) {
               if (v.id === this.temp.id) {
@@ -370,6 +414,7 @@ export default {
               }
             }
             this.dialogFormVisible = false
+            this.getList()
             this.$notify({
               title: '成功',
               message: '更新成功',

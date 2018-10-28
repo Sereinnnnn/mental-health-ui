@@ -146,7 +146,8 @@ export default {
     roleCode: '角色代码',
     roleDesc: '角色描述',
     ownDept: '所属部门',
-    role: '角色'
+    role: '角色',
+    permission: '权限'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',

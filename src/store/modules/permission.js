@@ -52,7 +52,7 @@ const permission = {
         content: state.routers,
         type: 'session'
       })
-      router.addRoutes(state.routers) // 动态添加可访问路由表
+      router.addRoutes(state.addRouters) // 动态添加可访问路由表
     }
   },
   actions: {

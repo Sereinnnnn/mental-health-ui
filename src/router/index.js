@@ -77,21 +77,6 @@ export const constantRouterMap = [
         noCache: true
       }
     ]
-  },
-  {
-    path: '/documentation',
-    component: Layout,
-    redirect: '/documentation/index',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/documentation/index'),
-        name: '文档',
-        title: '文档',
-        icon: 'documentation',
-        noCache: true
-      }
-    ]
   }
 ]
 

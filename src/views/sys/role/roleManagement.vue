@@ -60,8 +60,8 @@
       <el-pagination v-show="total>0" :current-page="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="60%" top="10vh">
+      <el-form ref="dataForm" :rules="rules" :model="temp" :label-position="labelPosition" label-width="100px">
         <el-form-item :label="$t('table.roleCode')" prop="roleCode">
           <el-input v-model="temp.roleCode" :readonly="temp.readonly"/>
         </el-form-item>
@@ -90,52 +90,34 @@
     </el-dialog>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogDeptVisible">
-      <el-row>
-        <el-col :span="5" style ="margin-top:10px;">
-          <el-tree
-            :data="treeDeptData"
-            :props="defaultProps"
-            class="filter-tree"
-            node-key="id"
-            default-expand-all
-            highlight-current
-            @node-click="getNodeData"
-          />
-        </el-col>
-      </el-row>
+      <el-tree
+        :data="treeDeptData"
+        :props="defaultProps"
+        class="filter-tree"
+        node-key="id"
+        default-expand-all
+        highlight-current
+        @node-click="getNodeData"
+      />
     </el-dialog>
 
-    <el-dialog :visible.sync="dialogPermissionVisible" title="角色权限">
-      <el-row>
-        <el-col :span="5" style ="margin-top:10px;">
-          <el-tree
-            ref="menuTree"
-            :data="treePermissionData"
-            :props="permissionProps"
-            :default-checked-keys="checkedKeys"
-            show-checkbox
-            class="filter-tree"
-            node-key="id"
-            default-expand-all
-            highlight-current
-            check-strictly
-            @node-click="getNodeData"
-          />
-        </el-col>
-      </el-row>
+    <el-dialog :visible.sync="dialogPermissionVisible" title="角色权限" top="10vh">
+      <el-tree
+        ref="menuTree"
+        :data="treePermissionData"
+        :props="permissionProps"
+        :default-checked-keys="checkedKeys"
+        show-checkbox
+        class="filter-tree"
+        node-key="id"
+        default-expand-all
+        highlight-current
+        check-strictly
+        @node-click="getNodeData"
+      />
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="savePermission(id, roleCode)">保存</el-button>
       </div>
-    </el-dialog>
-
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
-      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="Channel"/>
-        <el-table-column prop="pv" label="Pv"/>
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">{{ $t('table.confirm') }}</el-button>
-      </span>
     </el-dialog>
 
   </div>
@@ -193,7 +175,7 @@ export default {
       },
       temp: {
         id: '',
-        roleName: 1,
+        roleName: '',
         roleCode: '',
         roleDesc: '',
         status: 0,
@@ -212,11 +194,10 @@ export default {
         update: '编辑',
         create: '新建'
       },
-      dialogPvVisible: false,
       pvData: [],
       rules: {
-        roleName: [{ required: true, message: 'name is required', trigger: 'change' }],
-        roleCode: [{ required: true, message: 'username is required', trigger: 'change' }]
+        roleName: [{ required: true, message: '请输入角色名称', trigger: 'change' }],
+        roleCode: [{ required: true, message: '请输入角色代码', trigger: 'change' }]
       },
       downloadLoading: false,
       defaultProps: {
@@ -270,7 +251,7 @@ export default {
       this.temp = {
         id: '',
         roleName: '',
-        roleCode: 0,
+        roleCode: '',
         roleDesc: '',
         status: 0,
         deptId: '',
@@ -318,7 +299,6 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          tempData.born = + new Date(tempData.born) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           putObj(tempData).then(() => {
             for (const v of this.list) {
               if (v.id === this.temp.id) {

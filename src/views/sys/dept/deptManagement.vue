@@ -24,7 +24,7 @@
         </el-col>
         <el-col :span="19" style="margin-top:10px;">
           <el-card class="box-card">
-            <el-form ref="form" :label-position="labelPosition" :model="form" label-width="80px">
+            <el-form ref="form" :rules="rules" :label-position="labelPosition" :model="form" label-width="100px">
               <el-row>
                 <el-col :span="12">
                   <el-form-item label="部门名称" prop="deptName">
@@ -218,27 +218,31 @@ export default {
       })
     },
     create() {
-      if (this.form.id) {
-        putObj(this.form).then(() => {
-          this.getList()
-          this.$notify({
-            title: '成功',
-            message: '更新成功',
-            type: 'success',
-            duration: 2000
-          })
-        })
-      } else {
-        addObj(this.form).then(() => {
-          this.getList()
-          this.$notify({
-            title: '成功',
-            message: '创建成功',
-            type: 'success',
-            duration: 2000
-          })
-        })
-      }
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          if (this.form.id) {
+            putObj(this.form).then(() => {
+              this.getList()
+              this.$notify({
+                title: '成功',
+                message: '更新成功',
+                type: 'success',
+                duration: 2000
+              })
+            })
+          } else {
+            addObj(this.form).then(() => {
+              this.getList()
+              this.$notify({
+                title: '成功',
+                message: '创建成功',
+                type: 'success',
+                duration: 2000
+              })
+            })
+          }
+        }
+      })
     },
     onCancel() {
       this.formStatus = ''

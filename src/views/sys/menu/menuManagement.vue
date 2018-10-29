@@ -24,7 +24,7 @@
         </el-col>
         <el-col :span="19" style="margin-top:10px;">
           <el-card class="box-card">
-            <el-form ref="form" :label-position="labelPosition" :model="form" label-width="80px">
+            <el-form ref="form" :rules="rules" :label-position="labelPosition" :model="form" label-width="100px" style="width: 90%;">
               <el-row>
                 <el-col :span="12">
                   <el-form-item label="菜单名称" prop="name">
@@ -38,9 +38,16 @@
                 </el-col>
               </el-row>
               <el-row>
-                <el-col :span="24">
+                <el-col :span="12">
                   <el-form-item label="菜单URL" prop="url">
                     <el-input v-model="form.url" placeholder="请输入菜单URL"/>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="类型" prop="type">
+                    <el-select v-model="form.type" class="filter-item" placeholder="请输入资源请求类型">
+                      <el-option v-for="item in typeOptions" :key="item" :label="item | typeFilter" :value="item"/>
+                    </el-select>
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -51,27 +58,18 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="图标" prop="icon">
+                  <el-form-item label="菜单图标" prop="icon">
                     <el-input v-model="form.icon" placeholder="请选择"/>
                   </el-form-item>
                 </el-col>
               </el-row>
               <el-row>
                 <el-col :span="12">
-                  <el-form-item label="类型" prop="type">
-                    <el-select v-model="form.type" class="filter-item" placeholder="请输入资源请求类型">
-                      <el-option v-for="item in typeOptions" :key="item" :label="item | typeFilter" :value="item"/>
-                    </el-select>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="12">
                   <el-form-item label="组件名称" prop="component">
                     <el-input v-model="form.component" placeholder="请输入组件名称"/>
                   </el-form-item>
                 </el-col>
-              </el-row>
-              <el-row>
-                <el-col :span="24">
+                <el-col :span="12">
                   <el-form-item label="组件地址" prop="component">
                     <el-input v-model="form.path" placeholder="组件地址"/>
                   </el-form-item>
@@ -80,7 +78,7 @@
               <el-row>
                 <el-col :span="24">
                   <el-form-item :label="$t('table.remark')">
-                    <el-input :autosize="{ minRows: 2, maxRows: 4}" v-model="form.remark" type="textarea" placeholder="备注"/>
+                    <el-input :autosize="{ minRows: 4, maxRows: 9}" v-model="form.remark" type="textarea" placeholder="备注"/>
                   </el-form-item>
                 </el-col>
               </el-row>

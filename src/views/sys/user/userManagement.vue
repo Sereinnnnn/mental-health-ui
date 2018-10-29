@@ -59,28 +59,52 @@
       <el-pagination v-show="total>0" :current-page="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 90%; margin-left:50px;">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="60%" top="10vh">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" style="width: 90%;">
         <el-row>
-          <el-col :span="11">
+          <el-col :span="12">
             <el-form-item :label="$t('table.username')" prop="username">
               <el-input v-model="temp.username" :readonly="temp.readonly" placeholder="账号"/>
             </el-form-item>
           </el-col>
-          <el-col :span="11" :offset="1">
+          <el-col :span="12">
             <el-form-item :label="$t('table.name')" prop="name">
               <el-input v-model="temp.name" placeholder="姓名"/>
             </el-form-item>
           </el-col>
         </el-row>
-
         <el-row>
-          <el-col :span="11">
+          <el-col :span="12">
+            <el-form-item :label="$t('table.ownDept')" prop="deptName">
+              <el-input v-model="temp.deptName" placeholder="请选择所属部门" @focus="handleSelectDept"/>
+              <input v-model="temp.deptId" type="hidden">
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.role')" prop="role">
+              <el-select v-model="temp.role" class="filter-item" placeholder="请选择角色" multiple width="100%">
+                <el-option v-for="item in roleData" :key="item.id" :label="item.roleName" :value="item.id">
+                  <span style="float: left">{{ item.roleName }}</span>
+                </el-option>
+              </el-select>
+              <input v-model="temp.roleId" type="hidden">
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
             <el-form-item :label="$t('table.phone')" prop="phone">
               <el-input v-model="temp.phone" placeholder="电话号码"/>
             </el-form-item>
           </el-col>
-          <el-col :span="11" :offset="1">
+          <el-col :span="12">
+            <el-form-item :label="$t('table.born')" prop="born">
+              <el-date-picker v-model="temp.born" type="date" format="yyyy 年 MM 月 dd 日" value-format="yyyy-MM-dd" placeholder="出生日期"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
             <el-form-item :label="$t('table.sex')">
               <el-radio-group v-model="temp.sex">
                 <el-radio :label="0">男</el-radio>
@@ -88,14 +112,7 @@
               </el-radio-group>
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="11">
-            <el-form-item :label="$t('table.born')" prop="born">
-              <el-date-picker v-model="temp.born" type="datetime" format="yyyy-MM-dd" placeholder="出生日期"/>
-            </el-form-item>
-          </el-col>
-          <el-col :span="11" :offset="1">
+          <el-col :span="12">
             <el-form-item :label="$t('table.status')">
               <el-radio-group v-model="temp.status">
                 <el-radio :label="0">启用</el-radio>
@@ -105,35 +122,12 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="23">
-            <el-form-item :label="$t('table.ownDept')" prop="deptName">
-              <el-input v-model="temp.deptName" placeholder="请选择所属部门" @focus="handleSelectDept"/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="23">
-            <el-form-item :label="$t('table.role')" prop="role">
-              <el-select v-model="temp.role" class="filter-item" placeholder="请选择角色" multiple width="100%">
-                <el-option v-for="item in roleData" :key="item.id" :label="item.roleName" :value="item.id">
-                  <span style="float: left">{{ item.roleName }}</span>
-                </el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="23">
+          <el-col :span="24">
             <el-form-item :label="$t('table.remark')">
               <el-input :autosize="{ minRows: 4, maxRows: 6}" v-model="temp.remark" type="textarea" placeholder="备注"/>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item>
-          <el-input v-model="temp.deptId" type="hidden"/>
-          <el-input v-model="temp.roleId" type="hidden"/>
-        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
@@ -234,7 +228,7 @@ export default {
         name: '',
         phone: '',
         email: '',
-        born: new Date(),
+        born: '',
         sex: 0,
         status: 0,
         deptId: -1,
@@ -253,10 +247,7 @@ export default {
       pvData: [],
       rules: {
         name: [{ required: true, message: '请输入账号', trigger: 'change' }],
-        username: [{ required: true, message: '请输入姓名', trigger: 'change' }],
-        born: [{ type: 'date', required: true, message: '请选择出生日期', trigger: 'change' }],
-        phone: [{ required: true, message: '请输入电话号码', trigger: 'blur' }],
-        email: [{ type: 'email', message: '请输入邮箱', trigger: 'blur' }]
+        username: [{ required: true, message: '请输入姓名', trigger: 'change' }]
       },
       downloadLoading: false,
       treeDeptData: [],
@@ -342,7 +333,7 @@ export default {
         username: '',
         sex: 0,
         remark: '',
-        born: new Date(),
+        born: '',
         status: 0,
         readonly: false,
         deptId: -1,
@@ -379,7 +370,6 @@ export default {
     handleUpdate(row) {
       row.role = []
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.born = new Date(parseInt(this.temp.born))
       this.temp.sex = parseInt(this.temp.sex)
       this.temp.status = parseInt(this.temp.status)
       this.temp.readonly = true
@@ -390,21 +380,22 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
       // 根据部门ID获取角色
-      deptRoleList(row.deptId).then(response => {
-        if (row.roleList !== null && row.roleList !== undefined) {
-          for (let i = 0; i < row.roleList.length; i++) {
-            this.role[i] = row.roleList[i].id
+      if (row.deptId !== null && row.deptId !== undefined) {
+        deptRoleList(row.deptId).then(response => {
+          if (row.roleList !== null && row.roleList !== undefined) {
+            for (let i = 0; i < row.roleList.length; i++) {
+              this.role[i] = row.roleList[i].id
+            }
           }
-        }
-        this.temp.role = this.role
-        this.roleData = response.data
-      })
+          this.temp.role = this.role
+          this.roleData = response.data
+        })
+      }
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          tempData.born = +new Date(tempData.born) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           putObj(tempData).then(() => {
             for (const v of this.list) {
               if (v.id === this.temp.id) {
@@ -460,11 +451,7 @@ export default {
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {
-        if (j === 'born') {
-          return parseTime(v[j])
-        } else {
           return v[j]
-        }
       }))
     },
     handleSelectDept() {
@@ -472,9 +459,11 @@ export default {
         this.treeDeptData = response.data
         this.dialogDeptVisible = true
         this.role = ''
-        deptRoleList(this.treeDeptData.id).then(response => {
-          this.roleData = response.data
-        })
+        if (this.treeDeptData.id !== null && this.treeDeptData.id !== undefined) {
+          deptRoleList(this.treeDeptData.id).then(response => {
+            this.roleData = response.data
+          })
+        }
       })
     },
     getDeptNodeData(data) {

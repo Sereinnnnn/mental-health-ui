@@ -207,7 +207,8 @@ export default {
       permissionProps: {
         children: 'children',
         lable: 'name'
-      }
+      },
+      labelPosition: 'right'
     }
   },
   created() {

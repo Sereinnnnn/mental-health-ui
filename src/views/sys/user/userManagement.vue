@@ -343,6 +343,8 @@ export default {
       }
     },
     handleCreate() {
+      this.role = []
+      this.roleData = []
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true

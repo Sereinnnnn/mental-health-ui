@@ -98,7 +98,7 @@
 import { fetchTree, getObj, addObj, delObj, putObj } from '@/api/menu'
 import { mapGetters } from 'vuex'
 export default {
-  name: 'MenuManagement',
+  name: 'PersonalMessage',
   components: {},
   filters: {
     typeFilter(type) {

@@ -282,7 +282,7 @@ export default {
         permission: undefined,
         name: undefined,
         id: undefined,
-        parentId: -1,
+        parentId: this.currentId,
         url: undefined,
         icon: 'example',
         sort: 30,

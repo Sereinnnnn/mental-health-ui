@@ -126,7 +126,7 @@ export default {
       },
       oTreeNodeChildren: {
       },
-      aExpandedKeys: ['1', '7', '14'],
+      aExpandedKeys: ['1', '7', '14', '15'],
       defaultProps: {
         children: 'children',
         label: 'name'
@@ -223,6 +223,7 @@ export default {
     handlerAddSuper() {
       this.resetForm()
       this.form.parentId = -1
+      this.form.component = 'Layout'
       this.formStatus = 'create'
     },
     handlerAdd() {
@@ -286,7 +287,7 @@ export default {
         id: undefined,
         parentId: this.currentId,
         url: undefined,
-        icon: 'example',
+        icon: '',
         sort: 30,
         component: undefined,
         type: '0',

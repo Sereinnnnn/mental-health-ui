@@ -147,7 +147,12 @@ export default {
     roleDesc: '角色描述',
     ownDept: '所属部门',
     role: '角色',
-    permission: '权限'
+    permission: '权限',
+    attachment: '附件',
+    attachName: '附件名称',
+    attachSize: '附件大小',
+    upload: '上传',
+    download: '下载'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',

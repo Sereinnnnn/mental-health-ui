@@ -77,7 +77,21 @@ export const constantRouterMap = [
         noCache: true
       }
     ]
-  }
+  }/*,
+  {
+    path: '/iframe',
+    component: Layout,
+    redirect: '/iframe', // you can set roles in root nav
+    children: [{
+      path: ':routerPath',
+      component: () => import('@/views/iframe/index'),
+      name: 'iframe',
+      meta: {
+        title: 'iframe',
+        icon: 'people'
+      }
+    }]
+  }*/
 ]
 
 export default new Router({

@@ -37,3 +37,11 @@ export function putObj(obj) {
     data: obj
   })
 }
+
+export function updateObjInfo(obj) {
+  return request({
+    url: '/admin/user/updateInfo',
+    method: 'put',
+    data: obj
+  })
+}

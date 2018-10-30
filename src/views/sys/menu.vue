@@ -1,30 +1,51 @@
 <template>
   <div class="tab-container">
     <div class="filter-container">
+      <el-button-group>
+        <el-button type="primary" icon="plus" @click="handlerAddSuper">添加顶级菜单</el-button>
+        <el-button type="primary" icon="plus" @click="handlerAdd">添加子菜单</el-button>
+        <el-button type="primary" icon="delete" @click="handleDelete">删除</el-button>
+      </el-button-group>
+
       <el-row>
-        <el-col :span="20" :offset="2" style="margin-top:10px;">
+        <el-col :span="5" style ="margin-top:10px;">
+          <el-tree
+            :data="treeData"
+            :default-expanded-keys="aExpandedKeys"
+            :filter-node-method="filterNode"
+            :props="defaultProps"
+            class="filter-tree"
+            node-key="id"
+            highlight-current
+            accordion
+            @node-click="getNodeData"
+            @node-expand="nodeExpand"
+            @node-collapse="nodeCollapse"
+          />
+        </el-col>
+        <el-col :span="19" style="margin-top:10px;">
           <el-card class="box-card">
-            <el-form ref="form" :label-position="labelPosition" :model="form" label-width="100px" style="width: 90%;">
+            <el-form ref="form" :rules="rules" :label-position="labelPosition" :model="form" label-width="100px" style="width: 90%;">
               <el-row>
                 <el-col :span="12">
-                  <el-form-item label="账号：" prop="username">
-                    <el-label v-model="username"/>
+                  <el-form-item label="菜单名称" prop="name">
+                    <el-input v-model="form.name" placeholder="请输入菜单名称"/>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="姓名：" prop="name">
-                    <el-input v-model="name" placeholder="请输入姓名"/>
+                  <el-form-item label="菜单标识" prop="permission">
+                    <el-input v-model="form.permission" placeholder="请输入菜单标识"/>
                   </el-form-item>
                 </el-col>
               </el-row>
               <el-row>
                 <el-col :span="12">
-                  <el-form-item label="性别：" prop="sex">
-                    <el-input v-model="sex"/>
+                  <el-form-item label="菜单URL" prop="url">
+                    <el-input v-model="form.url" placeholder="请输入菜单URL"/>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="出生日期：" prop="type">
+                  <el-form-item label="类型" prop="type">
                     <el-select v-model="form.type" class="filter-item" placeholder="请输入资源请求类型">
                       <el-option v-for="item in typeOptions" :key="item" :label="item | typeFilter" :value="item"/>
                     </el-select>
@@ -33,12 +54,12 @@
               </el-row>
               <el-row>
                 <el-col :span="12">
-                  <el-form-item label="联系电话：" prop="sort">
+                  <el-form-item label="排序号" prop="sort">
                     <el-input v-model="form.sort" placeholder="请输入排序号"/>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="邮箱" prop="icon">
+                  <el-form-item label="菜单图标" prop="icon">
                     <el-input v-model="form.icon" placeholder="请选择"/>
                   </el-form-item>
                 </el-col>
@@ -78,7 +99,7 @@
 import { fetchTree, getObj, addObj, delObj, putObj } from '@/api/menu'
 import { mapGetters } from 'vuex'
 export default {
-  name: 'PersonalMessage',
+  name: 'MenuManagement',
   components: {},
   filters: {
     typeFilter(type) {
@@ -102,13 +123,10 @@ export default {
       },
       treeData: [],
       oExpandedKey: {
-        // key (from tree id) : expandedOrNot boolean
       },
       oTreeNodeChildren: {
-        // id1 : [children] (from tree node id1)
-        // id2 : [children] (from tree node id2)
       },
-      aExpandedKeys: [],
+      aExpandedKeys: ['1', '7', '14'],
       defaultProps: {
         children: 'children',
         label: 'name'
@@ -120,7 +138,7 @@ export default {
         id: undefined,
         parentId: -1,
         url: undefined,
-        icon: 'example',
+        icon: '',
         sort: 30,
         component: undefined,
         type: '0',
@@ -128,9 +146,11 @@ export default {
         remark: undefined
       },
       currentId: -1,
-      menuManager_btn_add: false,
-      menuManager_btn_edit: false,
-      menuManager_btn_del: false
+      rules: {
+        name: [{ required: true, message: '请输入菜单名称', trigger: 'change' }],
+        permission: [{ required: true, message: '请输入菜单标识', trigger: 'change' }],
+        url: [{ required: true, message: '请输入菜单URL', trigger: 'blur' }],
+      }
     }
   },
   created() {
@@ -149,7 +169,6 @@ export default {
       })
     },
     filterNode(value, data) {
-      // console.log(value);
       if (!value) return true
       return data.label.indexOf(value) !== -1
     },
@@ -201,6 +220,11 @@ export default {
         this.formStatus = 'update'
       }
     },
+    handlerAddSuper() {
+      this.resetForm()
+      this.form.parentId = -1
+      this.formStatus = 'create'
+    },
     handlerAdd() {
       this.resetForm()
       this.formStatus = 'create'
@@ -248,6 +272,7 @@ export default {
               })
             })
           }
+          this.getList()
         }
       })
     },

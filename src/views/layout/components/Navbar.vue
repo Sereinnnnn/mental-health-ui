@@ -16,8 +16,6 @@
           <size-select class="international right-menu-item"/>
         </el-tooltip>
 
-        <lang-select class="international right-menu-item"/>
-
         <el-tooltip :content="$t('navbar.theme')" effect="dark" placement="bottom">
           <theme-picker class="theme-switch right-menu-item"/>
         </el-tooltip>
@@ -29,9 +27,14 @@
           <i class="el-icon-caret-bottom"/>
         </div>
         <el-dropdown-menu slot="dropdown">
-          <router-link to="/">
+          <router-link to="/personal/message">
             <el-dropdown-item>
-              {{ $t('navbar.dashboard') }}
+              个人资料
+            </el-dropdown-item>
+          </router-link>
+          <router-link to="/personal/password">
+            <el-dropdown-item>
+              修改密码
             </el-dropdown-item>
           </router-link>
           <el-dropdown-item divided>

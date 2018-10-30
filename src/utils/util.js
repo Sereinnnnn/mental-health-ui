@@ -79,13 +79,6 @@ export const formatRoutes = (aMenu) => {
 }
 
 /**
- * 设置浏览器头部标题
- */
-export const setTitle = function(title) {
-  title = title ? `${title}——Pig 微服务快速开发框架` : 'Pig 微服务快速开发框架'
-  window.document.title = title
-}
-/**
  * 浏览器判断是否全屏
  */
 export const fullscreenToggel = () => {

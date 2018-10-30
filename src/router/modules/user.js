@@ -11,8 +11,8 @@ const userManagementRouter = {
   children: [
     {
       path: 'user_management',
-      component: () => import('@/views/sys/user/userManagement'),
-      name: 'UserManagement',
+      component: () => import('@/views/sys/user'),
+      name: 'User',
       meta: { title: 'user_management' }
     }
   ]

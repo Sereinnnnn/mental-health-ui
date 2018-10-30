@@ -44,10 +44,6 @@
       <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button v-if="scope.row.status != '1'" size="mini" @click="handleModifyStatus(scope.row,'1')">{{ $t('table.disable') }}
-          </el-button>
-          <el-button v-if="scope.row.status != '0'" size="mini" @click="handleModifyStatus(scope.row,'0')">{{ $t('table.enable') }}
-          </el-button>
           <el-button v-if="scope.row.delFlag != '1'" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
           </el-button>
           <el-button size="mini" @click="handlePermission(scope.row)">{{ $t('table.permission') }}
@@ -57,7 +53,7 @@
     </el-table>
 
     <div class="pagination-container">
-      <el-pagination v-show="total>0" :current-page="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
+      <el-pagination v-show="total>0" :current-page="listQuery.pageNum" :page-sizes="[10,20,30, 50]" :page-size="listQuery.pageSize" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="60%" top="10vh">
@@ -168,8 +164,8 @@ export default {
       total: null,
       listLoading: true,
       listQuery: {
-        page: 1,
-        limit: 20,
+        pageNum: 1,
+        pageSize: 10,
         roleName: undefined,
         sort: '+id'
       },
@@ -227,7 +223,7 @@ export default {
       })
     },
     handleFilter() {
-      this.listQuery.page = 1
+      this.listQuery.pageNum = 1
       this.getList()
     },
     handleSizeChange(val) {
@@ -235,7 +231,7 @@ export default {
       this.getList()
     },
     handleCurrentChange(val) {
-      this.listQuery.page = val
+      this.listQuery.pageNum = val
       this.getList()
     },
     handleModifyStatus(row, status) {

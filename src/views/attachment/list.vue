@@ -7,6 +7,7 @@
         :show-file-list="showFileList"
         :on-success="handleUploadSuccess"
         :action="uploadUrl"
+        :headers="headers"
         class="upload-demo"
         multiple>
         <el-button class="filter-item" style="margin-left: 10px;" type="primary">点击上传</el-button>
@@ -33,9 +34,14 @@
           <span>{{ scope.row.attachName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.attachSize')" min-width="90" align="center">
+      <el-table-column :label="$t('table.uploader')" min-width="90" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.attachSize }}</span>
+          <span>{{ scope.row.creator }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('table.uploadDate')" min-width="90" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.createDate }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
@@ -57,6 +63,7 @@
 import { fetchList, addObj, putObj, delObj } from '@/api/attachment'
 import waves from '@/directive/waves'
 import { ATTACHMENT_URL } from '@/config/attachment'
+import { getToken } from '@/utils/auth' // getToken from cookie
 
 const calendarTypeOptions = [
   { key: 'CN', display_name: 'China' },
@@ -93,7 +100,7 @@ export default {
   },
   data() {
     return {
-      uploadUrl: ATTACHMENT_URL + '/upload',
+      uploadUrl: 'admin/attachment/upload',
       tableKey: 0,
       list: null,
       total: null,
@@ -111,7 +118,10 @@ export default {
       },
       downloadLoading: false,
       labelPosition: 'right',
-      showFileList: false
+      showFileList: false,
+      headers: {
+        Authorization: 'Bearer ' + getToken()
+      }
     }
   },
   created() {

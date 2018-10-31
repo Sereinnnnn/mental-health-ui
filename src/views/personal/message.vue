@@ -59,8 +59,9 @@
                     :on-success="handleAvatarSuccess"
                     :before-upload="beforeAvatarUpload"
                     :action="uploadUrl"
+                    :headers="headers"
                     class="avatar-uploader">
-                    <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                    <img v-if="userInfo.avatar" :src="userInfo.avatar" class="avatar">
                     <i v-else class="el-icon-plus avatar-uploader-icon"/>
                   </el-upload>
                 </el-col>
@@ -84,19 +85,22 @@
 import { updateObjInfo } from '@/api/user'
 import { mapState } from 'vuex'
 import { ATTACHMENT_URL } from '@/config/attachment'
+import { getToken } from '@/utils/auth'
 
 export default {
   name: 'PersonalMessage',
   components: {},
   data() {
     return {
-      uploadUrl: ATTACHMENT_URL + '/upload',
-      imageUrl: '',
+      uploadUrl: '/admin/attachment/upload',
       labelPosition: 'right',
       disabled: true,
       rules: {
         name: [{ required: true, message: '请输入账号', trigger: 'change' }],
         username: [{ required: true, message: '请输入姓名', trigger: 'change' }]
+      },
+      headers: {
+        Authorization: 'Bearer ' + getToken()
       }
     }
   },
@@ -141,7 +145,6 @@ export default {
     },
     handleAvatarSuccess(res, file) {
       this.userInfo.avatar = ATTACHMENT_URL + '/download?id=' + res.data.id
-      this.imageUrl = this.userInfo.avatar
       this.$refs['form'].validate((valid) => {
         if (valid) {
           updateObjInfo(this.userInfo).then(response => {

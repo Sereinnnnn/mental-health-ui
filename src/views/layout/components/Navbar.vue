@@ -23,7 +23,7 @@
 
       <el-dropdown class="avatar-container right-menu-item" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif'+'?imageView2/1/w/80/h/80'" class="user-avatar">
+          <img :src="userInfo.avatar" class="user-avatar">
           <i class="el-icon-caret-bottom"/>
         </div>
         <el-dropdown-menu slot="dropdown">
@@ -55,6 +55,7 @@ import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import LangSelect from '@/components/LangSelect'
 import ThemePicker from '@/components/ThemePicker'
+import { mapState } from 'vuex'
 
 export default {
   components: {
@@ -66,13 +67,24 @@ export default {
     LangSelect,
     ThemePicker
   },
+  data() {
+    return {
+      avatarUrl: ''
+    }
+  },
+  created() {
+    this.userInfo.sex = parseInt(this.userInfo.sex)
+  },
   computed: {
     ...mapGetters([
       'sidebar',
       'name',
       'avatar',
       'device'
-    ])
+    ]),
+    ...mapState({
+      userInfo: state => state.user.userInfo
+    })
   },
   methods: {
     toggleSideBar() {

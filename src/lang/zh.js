@@ -152,7 +152,9 @@ export default {
     attachName: '附件名称',
     attachSize: '附件大小',
     upload: '上传',
-    download: '下载'
+    download: '下载',
+    uploader: '上传者',
+    uploadDate: '上传时间'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',

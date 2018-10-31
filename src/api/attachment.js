@@ -15,13 +15,6 @@ export function fetchList(query) {
   })
 }
 
-export function deptAttachmentList(deptId) {
-  return request({
-    url: '/admin/attachment/attachmentList/' + deptId,
-    method: 'get'
-  })
-}
-
 export function getObj(id) {
   return request({
     url: '/admin/attachment/' + id,

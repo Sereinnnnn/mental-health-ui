@@ -4,9 +4,10 @@
       <el-input :placeholder="$t('table.attachName')" v-model="listQuery.attachName" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
       <el-upload
-        class="upload-demo"
-        action="/admin/attachment/upload"
         :show-file-list="showFileList"
+        :on-success="handleUploadSuccess"
+        :action="uploadUrl"
+        class="upload-demo"
         multiple>
         <el-button class="filter-item" style="margin-left: 10px;" type="primary">点击上传</el-button>
       </el-upload>
@@ -21,6 +22,11 @@
       highlight-current-row
       style="width: 100%;">
       <el-table-column type="selection" width="55">
+      </el-table-column>
+      <el-table-column label="流水号" min-width="100" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.id }}</span>
+        </template>
       </el-table-column>
       <el-table-column :label="$t('table.attachName')" min-width="90" align="center">
         <template slot-scope="scope">
@@ -50,6 +56,7 @@
 <script>
 import { fetchList, addObj, putObj, delObj } from '@/api/attachment'
 import waves from '@/directive/waves'
+import { ATTACHMENT_URL } from '@/config/attachment'
 
 const calendarTypeOptions = [
   { key: 'CN', display_name: 'China' },
@@ -86,6 +93,7 @@ export default {
   },
   data() {
     return {
+      uploadUrl: ATTACHMENT_URL + '/upload',
       tableKey: 0,
       list: null,
       total: null,
@@ -212,6 +220,15 @@ export default {
       })
       const index = this.list.indexOf(row)
       this.list.splice(index, 1)
+    },
+    handleUploadSuccess() {
+      this.getList()
+      this.$notify({
+        title: '成功',
+        message: '上传成功',
+        type: 'success',
+        duration: 2000
+      })
     }
   }
 }

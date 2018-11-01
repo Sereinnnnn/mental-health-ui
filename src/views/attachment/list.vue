@@ -2,19 +2,21 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input :placeholder="$t('table.attachName')" v-model="listQuery.attachName" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-select v-model="listQuery.type" :placeholder="$t('table.type')" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key"/>
+      <el-select v-model="listQuery.busiType" :placeholder="$t('table.type')" clearable class="filter-item" style="width: 130px">
+        <el-option v-for="item in attachmentTypeOptions" :key="item.key" :label="item.display_name" :value="item.key"/>
       </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
       <el-upload
         :show-file-list="showFileList"
         :on-success="handleUploadSuccess"
+        :on-progress="handleUploadProgress"
         :action="uploadUrl"
         :headers="headers"
         :data="params"
         class="upload-demo"
         multiple>
         <el-button v-waves type="primary" class="filter-item">上传<i class="el-icon-upload el-icon--right" style="margin-left: 10px;"/></el-button>
+        <el-progress v-if="uploading === true" :percentage="percentage" :text-inside="true" :stroke-width="18" status="success"/>
       </el-upload>
     </div>
 
@@ -26,8 +28,7 @@
       fit
       highlight-current-row
       style="width: 100%;">
-      <el-table-column type="selection" width="55">
-      </el-table-column>
+      <el-table-column type="selection" width="55"/>
       <el-table-column label="流水号" min-width="100" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
@@ -126,8 +127,8 @@ export default {
       listQuery: {
         pageNum: 1,
         pageSize: 10,
-        roleName: undefined,
-        sort: '+id'
+        sort: '+id',
+        busiType: '0'
       },
       temp: {
         id: '',
@@ -142,7 +143,19 @@ export default {
       },
       params: {
         busiType: '0'
-      }
+      },
+      attachmentTypeOptions: [
+        {
+          display_name: '普通附件',
+          key: '0'
+        },
+        {
+          display_name: '用户头像',
+          key: '1'
+        }
+      ],
+      uploading: false,
+      percentage: 0
     }
   },
   created() {
@@ -175,7 +188,6 @@ export default {
     handleModifyStatus(row, status) {
       row.status = status
       putObj(row).then(() => {
-        this.dialogFormVisible = false
         this.$message({
           message: '操作成功',
           type: 'success'
@@ -226,7 +238,6 @@ export default {
                 break
               }
             }
-            this.dialogFormVisible = false
             this.getList()
             this.$notify({
               title: '成功',
@@ -253,6 +264,7 @@ export default {
       this.list.splice(index, 1)
     },
     handleUploadSuccess() {
+      this.uploading = false
       this.getList()
       this.$notify({
         title: '成功',
@@ -260,6 +272,10 @@ export default {
         type: 'success',
         duration: 2000
       })
+    },
+    handleUploadProgress(event, file, fileList) {
+      this.uploading = true
+      this.percentage = parseInt(file.percentage.toFixed(0))
     }
   }
 }

@@ -87,6 +87,7 @@ import { updateObjInfo } from '@/api/user'
 import { mapState } from 'vuex'
 import { ATTACHMENT_URL } from '@/config/attachment'
 import { getToken } from '@/utils/auth'
+import { delObj } from '@/api/attachment'
 
 export default {
   name: 'PersonalMessage',
@@ -105,11 +106,15 @@ export default {
       },
       params: {
         busiType: '1'
-      }
+      },
+      avatarId: ''
     }
   },
   created() {
     this.userInfo.sex = parseInt(this.userInfo.sex)
+    if (this.userInfo.avatar !== null) {
+      this.avatarId = this.userInfo.avatar.substring(this.userInfo.avatar.lastIndexOf('=') + 1, this.userInfo.avatar.length)
+    }
   },
   computed: {
     ...mapState({
@@ -151,21 +156,26 @@ export default {
       this.userInfo.avatar = ATTACHMENT_URL + '/download?id=' + res.data.id
       this.$refs['form'].validate((valid) => {
         if (valid) {
-          updateObjInfo(this.userInfo).then(response => {
-            if (response.data.data) {
+          // 删除旧头像
+          delObj(this.avatarId).then(() => {
+            this.avatarId = res.data.id
+            // 更新头像信息
+            updateObjInfo(this.userInfo).then(response => {
+              if (response.data.data) {
+                this.$notify({
+                  title: '成功',
+                  message: '头像上传成功',
+                  type: 'success',
+                  duration: 2000
+                })
+              }
+            }).catch(() => {
               this.$notify({
-                title: '成功',
-                message: '头像上传成功',
-                type: 'success',
+                title: '失败',
+                message: '头像上传失败',
+                type: 'error',
                 duration: 2000
               })
-            }
-          }).catch(() => {
-            this.$notify({
-              title: '失败',
-              message: '头像上传失败',
-              type: 'error',
-              duration: 2000
             })
           })
         }

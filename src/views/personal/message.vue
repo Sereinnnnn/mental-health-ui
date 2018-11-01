@@ -60,6 +60,7 @@
                     :before-upload="beforeAvatarUpload"
                     :action="uploadUrl"
                     :headers="headers"
+                    :data="params"
                     class="avatar-uploader">
                     <img v-if="userInfo.avatar" :src="userInfo.avatar" class="avatar">
                     <i v-else class="el-icon-plus avatar-uploader-icon"/>
@@ -101,6 +102,9 @@ export default {
       },
       headers: {
         Authorization: 'Bearer ' + getToken()
+      },
+      params: {
+        busiType: '1'
       }
     }
   },

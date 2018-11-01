@@ -2,15 +2,19 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input :placeholder="$t('table.attachName')" v-model="listQuery.attachName" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-select v-model="listQuery.type" :placeholder="$t('table.type')" clearable class="filter-item" style="width: 130px">
+        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key"/>
+      </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
       <el-upload
         :show-file-list="showFileList"
         :on-success="handleUploadSuccess"
         :action="uploadUrl"
         :headers="headers"
+        :data="params"
         class="upload-demo"
         multiple>
-        <el-button class="filter-item" style="margin-left: 10px;" type="primary">点击上传</el-button>
+        <el-button v-waves type="primary" class="filter-item">上传<i class="el-icon-upload el-icon--right" style="margin-left: 10px;"/></el-button>
       </el-upload>
     </div>
 
@@ -37,6 +41,11 @@
       <el-table-column :label="$t('table.uploader')" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.creator }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="附件类型" min-width="90" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.busiType | attachmentTypeFilter }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.uploadDate')" min-width="90" align="center">
@@ -96,6 +105,15 @@ export default {
     },
     typeFilter(type) {
       return calendarTypeKeyValue[type]
+    },
+    attachmentTypeFilter(type) {
+      let attachType
+      if (type === '1') {
+        attachType = '用户头像'
+      } else {
+        attachType = '普通附件'
+      }
+      return attachType
     }
   },
   data() {
@@ -121,6 +139,9 @@ export default {
       showFileList: false,
       headers: {
         Authorization: 'Bearer ' + getToken()
+      },
+      params: {
+        busiType: '0'
       }
     }
   },

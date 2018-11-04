@@ -2,9 +2,9 @@
   <div class="tab-container">
     <div class="filter-container">
       <el-button-group>
-        <el-button type="primary" icon="plus" @click="handlerAddSuper">添加顶级菜单</el-button>
-        <el-button type="primary" icon="plus" @click="handlerAdd">添加子菜单</el-button>
-        <el-button type="primary" icon="delete" @click="handleDelete">删除</el-button>
+        <el-button v-if="menu_btn_add" type="primary" icon="plus" @click="handlerAddSuper">添加顶级菜单</el-button>
+        <el-button v-if="menu_btn_add" type="primary" icon="plus" @click="handlerAdd">添加子菜单</el-button>
+        <el-button v-if="menu_btn_del" type="primary" icon="delete" @click="handleDelete">删除</el-button>
       </el-button-group>
 
       <el-row>
@@ -84,7 +84,7 @@
                 </el-col>
               </el-row>
               <el-form-item>
-                <el-button type="primary" @click="create">保存</el-button>
+                <el-button v-if="menu_btn_edit" type="primary" @click="create">保存</el-button>
                 <el-button @click="onCancel">取消</el-button>
               </el-form-item>
             </el-form>
@@ -98,6 +98,7 @@
 <script>
 import { fetchTree, getObj, addObj, delObj, putObj } from '@/api/menu'
 import { mapGetters } from 'vuex'
+
 export default {
   name: 'MenuManagement',
   components: {},
@@ -148,13 +149,18 @@ export default {
       currentId: -1,
       rules: {
         name: [{ required: true, message: '请输入菜单名称', trigger: 'change' }],
-        permission: [{ required: true, message: '请输入菜单标识', trigger: 'change' }],
-        url: [{ required: true, message: '请输入菜单URL', trigger: 'blur' }],
-      }
+        permission: [{ required: true, message: '请输入菜单标识', trigger: 'change' }]
+      },
+      menu_btn_add: false,
+      menu_btn_edit: false,
+      menu_btn_del: false
     }
   },
   created() {
     this.getList()
+    this.menu_btn_add = this.permissions['sys:menu:add']
+    this.menu_btn_edit = this.permissions['sys:menu:edit']
+    this.menu_btn_del = this.permissions['sys:menu:del']
   },
   computed: {
     ...mapGetters([

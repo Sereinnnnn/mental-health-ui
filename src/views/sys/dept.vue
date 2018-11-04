@@ -2,8 +2,8 @@
   <div class="tab-container">
     <div class="filter-container">
       <el-button-group>
-        <el-button type="primary" icon="plus" @click="handlerAdd">添加</el-button>
-        <el-button type="primary" icon="delete" @click="handleDelete">删除</el-button>
+        <el-button v-if="dept_btn_add" type="primary" icon="plus" @click="handlerAdd">添加</el-button>
+        <el-button v-if="dept_btn_del" type="primary" icon="delete" @click="handleDelete">删除</el-button>
       </el-button-group>
 
       <el-row>
@@ -74,6 +74,7 @@
 <script>
 import { fetchTree, getObj, addObj, delObj, putObj } from '@/api/dept'
 import { mapGetters } from 'vuex'
+
 export default {
   name: 'DeptManagement',
   components: {},
@@ -123,11 +124,17 @@ export default {
       currentId: -1,
       rules: {
         deptName: [{ required: true, message: '请输入部门名称', trigger: 'change' }]
-      }
+      },
+      dept_btn_add: false,
+      dept_btn_edit: false,
+      dept_btn_del: false
     }
   },
   created() {
     this.getList()
+    this.dept_btn_add = this.permissions['sys:dept:add']
+    this.dept_btn_edit = this.permissions['sys:dept:edit']
+    this.dept_btn_del = this.permissions['sys:dept:del']
   },
   computed: {
     ...mapGetters([

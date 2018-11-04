@@ -3,8 +3,7 @@
     <div class="filter-container">
       <el-input :placeholder="$t('table.username')" v-model="listQuery.username" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">{{ $t('table.export') }}</el-button>
+      <el-button v-if="user_btn_add" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
     </div>
 
     <el-table
@@ -44,8 +43,8 @@
       </el-table-column>
       <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button v-if="scope.row.delFlag !== '1'" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
+          <el-button v-if="user_btn_edit" type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
+          <el-button v-if="user_btn_del" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
           </el-button>
         </template>
       </el-table-column>
@@ -169,22 +168,9 @@
 <script>
 import { fetchList, fetchPv, addObj, putObj, delObj } from '@/api/user'
 import waves from '@/directive/waves'
-import { parseTime } from '@/utils'
 import { fetchTree } from '@/api/dept'
 import { deptRoleList } from '@/api/role'
-
-const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
-
-// arr to obj ,such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'User',
@@ -253,11 +239,23 @@ export default {
         children: 'children',
         label: 'deptName'
       },
-      aExpandedKeys: []
+      aExpandedKeys: [],
+      user_btn_add: false,
+      user_btn_edit: false,
+      user_btn_del: false
     }
   },
   created() {
     this.getList()
+    this.user_btn_add = this.permissions['sys:user:add']
+    this.user_btn_edit = this.permissions['sys:user:edit']
+    this.user_btn_del = this.permissions['sys:user:del']
+  },
+  computed: {
+    ...mapGetters([
+      'elements',
+      'permissions'
+    ])
   },
   methods: {
     nodeCollapse(data) {

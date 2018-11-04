@@ -3,7 +3,7 @@
     <div class="filter-container">
       <el-input :placeholder="$t('table.roleName')" v-model="listQuery.roleName" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
+      <el-button v-if="role_btn_add" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
     </div>
 
     <el-table
@@ -43,10 +43,10 @@
       </el-table-column>
       <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button v-if="scope.row.delFlag != '1'" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
+          <el-button v-if="role_btn_edit" type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
+          <el-button v-if="role_btn_del" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
           </el-button>
-          <el-button size="mini" @click="handlePermission(scope.row)">{{ $t('table.permission') }}
+          <el-button v-if="role_btn_auth" size="mini" @click="handlePermission(scope.row)">{{ $t('table.permission') }}
           </el-button>
         </template>
       </el-table-column>
@@ -112,7 +112,7 @@
         @node-click="getNodeData"
       />
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="savePermission(id, roleCode)">保存</el-button>
+        <el-button v-if="role_btn_edit" type="primary" @click="savePermission(id, roleCode)">保存</el-button>
       </div>
     </el-dialog>
 
@@ -123,19 +123,7 @@
 import { fetchList, addObj, putObj, delObj, fetchDeptTree, fetchRoleTree, permissionUpdate } from '@/api/role'
 import { fetchTree } from '@/api/menu'
 import waves from '@/directive/waves'
-
-const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
-
-// arr to obj ,such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'RoleManagement',
@@ -152,9 +140,6 @@ export default {
     },
     statusFilter(status) {
       return status === '0' ? '启用' : '禁用'
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type]
     }
   },
   data() {
@@ -204,11 +189,25 @@ export default {
         children: 'children',
         lable: 'name'
       },
-      labelPosition: 'right'
+      labelPosition: 'right',
+      role_btn_add: false,
+      role_btn_edit: false,
+      role_btn_del: false,
+      role_btn_auth: false
     }
   },
   created() {
     this.getList()
+    this.role_btn_add = this.permissions['sys:role:add']
+    this.role_btn_edit = this.permissions['sys:role:edit']
+    this.role_btn_del = this.permissions['sys:role:del']
+    this.role_btn_auth = this.permissions['sys:role:auth']
+  },
+  computed: {
+    ...mapGetters([
+      'elements',
+      'permissions'
+    ])
   },
   methods: {
     getList() {

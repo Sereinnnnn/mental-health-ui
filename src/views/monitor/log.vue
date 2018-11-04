@@ -15,9 +15,9 @@
       style="width: 100%;">
       <el-table-column type="selection" width="55">
       </el-table-column>
-      <el-table-column label="类型" min-width="90" align="center">
+      <el-table-column label="标题" min-width="90" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.type }}</span>
+          <span>{{ scope.row.title }}</span>
         </template>
       </el-table-column>
       <el-table-column label="请求接口" min-width="90" align="center">
@@ -25,14 +25,14 @@
           <span>{{ scope.row.requestUri }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="IP地址" min-width="90" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.ip }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="请求方式" min-width="90" align="center">
+      <el-table-column label="请求方式" width="120px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.method }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="类型" width="120px" align="center">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.type | statusTypeFilter">{{ scope.row.type | statusFilter }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="请求时间" align="center" width="120px">
@@ -40,7 +40,17 @@
           <span>{{ scope.row.createDate }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
+      <el-table-column label="IP地址" min-width="90" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.ip }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="请求结果" align="center" min-width="90">
+        <template slot-scope="scope">
+          <span>{{ scope.row.exception }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('table.actions')" class-name="status-col" width="200px">
         <template slot-scope="scope">
           <el-button v-if="scope.row.delFlag != '1'" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
           </el-button>
@@ -63,6 +73,18 @@ export default {
   name: 'LogManagement',
   directives: {
     waves
+  },
+  filters: {
+    statusTypeFilter(status) {
+      const statusMap = {
+        1: 'success',
+        2: 'danger'
+      }
+      return statusMap[status]
+    },
+    statusFilter(status) {
+      return status === '1' ? '正常访问' : '访问异常'
+    }
   },
   data() {
     return {

@@ -4,6 +4,11 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
+        <!--<el-row>
+          <el-col :span="12" :offset="6">
+            <img class="logo" src="/src/assets/logo.png" style="width:200px;height: 200px; cursor:pointer;">
+          </el-col>
+        </el-row>-->
         <h3 class="title">{{ $t('login.title') }}</h3>
       </div>
 
@@ -36,21 +41,22 @@
         </span>
       </el-form-item>
 
-      <el-form-item prop="code">
-        <el-row :span="24">
-          <el-col :span="14">
-            <el-input :maxlength="code.len" v-model="loginForm.code" size="small" auto-complete="off" placeholder="请输入验证码" @keyup.enter.native="handleLogin">
-              <i slot="prefix" class="icon-yanzhengma"></i>
-            </el-input>
-          </el-col>
-          <el-col :span="10">
-            <div class="login-code">
-              <span v-if="code.type === 'text'" class="login-code-img" @click="refreshCode">{{ code.value }}</span>
-              <img v-else :src="code.src" alt="验证码" class="login-code-img" @click="refreshCode">
-            </div>
-          </el-col>
-        </el-row>
-      </el-form-item>
+      <el-row :span="24">
+        <el-col :span="14">
+          <el-form-item prop="code">
+            <span class="svg-container svg-container_login">
+              <svg-icon icon-class="size" />
+            </span>
+            <el-input :maxlength="code.len" v-model="loginForm.code" size="small" auto-complete="off" placeholder="请输入验证码" @keyup.enter.native="handleLogin" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="10">
+          <div class="login-code">
+            <span v-if="code.type === 'text'" class="login-code-img" @click="refreshCode">{{ code.value }}</span>
+            <img v-else :src="code.src" alt="验证码" class="login-code-img" @click="refreshCode">
+          </div>
+        </el-col>
+      </el-row>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">{{ $t('login.logIn') }}</el-button>
     </el-form>
@@ -165,24 +171,6 @@ export default {
           return false
         }
       })
-    },
-    afterQRScan() {
-      // const hash = window.location.hash.slice(1)
-      // const hashObj = getQueryObject(hash)
-      // const originUrl = window.location.origin
-      // history.replaceState({}, '', originUrl)
-      // const codeMap = {
-      //   wechat: 'code',
-      //   tencent: 'code'
-      // }
-      // const codeName = hashObj[codeMap[this.auth_type]]
-      // if (!codeName) {
-      //   alert('第三方登录失败')
-      // } else {
-      //   this.$store.dispatch('LoginByThirdparty', codeName).then(() => {
-      //     this.$router.push({ path: '/' })
-      //   })
-      // }
     }
   }
 }
@@ -203,6 +191,14 @@ export default {
         color: $light_gray;
       }
     }
+  }
+
+  .login-page h1 {
+    font-weight: 300;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 36px;
+    color: #fff;
   }
 
   /* reset element-ui css */
@@ -283,11 +279,8 @@ $light_gray:#eee;
       text-align: center;
       font-weight: bold;
     }
-    .set-language {
-      color: #fff;
-      position: absolute;
+    .logo {
       top: 5px;
-      right: 0px;
     }
   }
   .show-pwd {
@@ -304,5 +297,10 @@ $light_gray:#eee;
     right: 35px;
     bottom: 28px;
   }
+  .login-code-img {
+     margin-top: 2px;
+     height: 45px;
+    padding-left: 20px;
+   }
 }
 </style>

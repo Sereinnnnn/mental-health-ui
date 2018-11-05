@@ -8,10 +8,9 @@ import Layout from '@/views/layout/Layout'
 
 /* Router Modules */
 import componentsRouter from './modules/components'
-import chartsRouter from './modules/charts'
-import tableRouter from './modules/table'
-import nestedRouter from './modules/nested'
-import userManagementRouter from './modules/user'
+import { formatRoutes } from '@/utils/util'
+import store from '@/store'
+import { getStore } from '@/utils/store'
 
 /** note: Submenu only appear when children.length>=1
  *  detail see  https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
@@ -97,7 +96,7 @@ export const constantRouterMap = [
 export default new Router({
   // mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
-  routes: constantRouterMap
+  routes: constantRouterMap.concat(...formatRoutes(store.state.routers))
 })
 
 export const asyncRouterMap = [

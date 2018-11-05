@@ -5,7 +5,6 @@
 
       <div class="title-container">
         <h3 class="title">{{ $t('login.title') }}</h3>
-        <lang-select class="set-language"/>
       </div>
 
       <el-form-item prop="username">
@@ -37,6 +36,22 @@
         </span>
       </el-form-item>
 
+      <el-form-item prop="code">
+        <el-row :span="24">
+          <el-col :span="14">
+            <el-input :maxlength="code.len" v-model="loginForm.code" size="small" auto-complete="off" placeholder="请输入验证码" @keyup.enter.native="handleLogin">
+              <i slot="prefix" class="icon-yanzhengma"></i>
+            </el-input>
+          </el-col>
+          <el-col :span="10">
+            <div class="login-code">
+              <span v-if="code.type === 'text'" class="login-code-img" @click="refreshCode">{{ code.value }}</span>
+              <img v-else :src="code.src" alt="验证码" class="login-code-img" @click="refreshCode">
+            </div>
+          </el-col>
+        </el-row>
+      </el-form-item>
+
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">{{ $t('login.logIn') }}</el-button>
     </el-form>
 
@@ -55,21 +70,18 @@
 import { isvalidUsername } from '@/utils/validate'
 import LangSelect from '@/components/LangSelect'
 import SocialSign from './socialsignin'
+import { randomLenNum } from '@/utils/util'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'Login',
   components: { LangSelect, SocialSign },
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!isvalidUsername(value)) {
-        callback(new Error('请输入正确的用户名'))
-      } else {
-        callback()
-      }
-    }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('密码长度至少6位'))
+    const validateCode = (rule, value, callback) => {
+      if (this.code.value !== value) {
+        this.loginForm.code = ''
+        this.refreshCode()
+        callback(new Error('请输入正确的验证码'))
       } else {
         callback()
       }
@@ -77,11 +89,25 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: '123456'
+        password: '123456',
+        code: '',
+        randomStr: ''
+      },
+      code: {
+        src: '/admin/code',
+        value: '',
+        len: 4,
+        type: 'image'
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        username: [{ required: true, trigger: 'blur', message: '请输入用户名' }],
+        password: [
+          { required: true, trigger: 'blur', message: '请输入密码' },
+          { min: 6, trigger: 'blur', message: '密码长度最少为6位' }],
+        code: [
+          { required: true, message: '请输入验证码', trigger: 'blur' },
+          { min: 4, max: 4, message: '验证码长度为4位', trigger: 'blur' }
+        ]
       },
       passwordType: 'password',
       loading: false,
@@ -99,12 +125,22 @@ export default {
 
   },
   created() {
-    // window.addEventListener('hashchange', this.afterQRScan)
+    this.refreshCode()
+  },
+  computed: {
+    ...mapGetters(["tagWel"])
   },
   destroyed() {
-    // window.removeEventListener('hashchange', this.afterQRScan)
+
   },
   methods: {
+    refreshCode() {
+      this.loginForm.code = ''
+      this.loginForm.randomStr = randomLenNum(this.code.len, true)
+      this.code.type === 'text'
+        ? (this.code.value = randomLenNum(this.code.len))
+        : (this.code.src = `/admin/code/${this.loginForm.randomStr}`)
+    },
     showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
@@ -118,9 +154,11 @@ export default {
           this.loading = true
           this.$store.dispatch('LoginByUsername', this.loginForm).then(() => {
             this.loading = false
+            this.$store.commit('ADD_TAG', this.tagWel)
             this.$router.push({ path: this.redirect || '/' })
           }).catch(() => {
             this.loading = false
+            this.refreshCode()
           })
         } else {
           console.log('error submit!!')

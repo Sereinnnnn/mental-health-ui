@@ -9,7 +9,7 @@
       text-color="#bfcbd9"
       active-text-color="#409EFF"
     >
-      <sidebar-item v-for="route in permission_routers" :key="route.name" :item="route" :base-path="route.path"/>
+      <sidebar-item :menu="menu" :is-collapse="isCollapse"/>
     </el-menu>
   </el-scrollbar>
 </template>
@@ -17,21 +17,23 @@
 <script>
 import { mapGetters } from 'vuex'
 import SidebarItem from './SidebarItem'
+import { validatenull } from '@/utils/validate'
+import { initMenu } from '@/utils/util'
+import { setUrlPath } from '@/utils/util'
 
 export default {
   components: { SidebarItem },
   created() {
-    this.$store.dispatch('GenerateRoutes').then(() => { // 根据roles权限生成可访问的路由表
-      this.$router.addRoutes(this.$store.getters.addRouters) // 动态添加可访问路由表
-    })
+    if (validatenull(this.menu)) {
+      this.$store.dispatch('GetMenu').then(data => {
+        initMenu(this.$router, data)
+      })
+    }
   },
   computed: {
-    ...mapGetters([
-      'permission_routers',
-      'sidebar'
-    ]),
-    isCollapse() {
-      return !this.sidebar.opened
+    ...mapGetters(['menu', 'tag', 'isCollapse']),
+    nowTagValue: function() {
+      return setUrlPath(this.$route)
     }
   }
 }

@@ -14,7 +14,6 @@
       </router-link>
     </scroll-pane>
     <ul v-show="visible" :style="{left:left+'px',top:top+'px'}" class="contextmenu">
-      <li @click="refreshSelectedTag(selectedTag)">{{ $t('tagsView.refresh') }}</li>
       <li @click="closeSelectedTag(selectedTag)">{{ $t('tagsView.close') }}</li>
       <li @click="closeOthersTags">{{ $t('tagsView.closeOthers') }}</li>
       <li @click="closeAllTags">{{ $t('tagsView.closeAll') }}</li>

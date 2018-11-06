@@ -1,93 +1,55 @@
 <template>
-  <div v-if="!item.hidden&&item.children" class="menu-wrapper">
+  <div class="menu-wrapper">
+    <template v-for="(item, index) in menu">
+      <el-menu-item v-if="item.children.length===0 " :index="filterPath(item.path,index)" :class="{'submenu-title-noDropdown':!isNest}" :key="item.label" @click="open(item)">
+        <svg-icon :icon-class="item.icon" />
+        <span slot="title">{{ item.label }}</span>
+      </el-menu-item>
 
-    <template v-if="hasOneShowingChild(item.children) && !onlyOneChild.children&&!item.alwaysShow">
-      <a :href="onlyOneChild.path" target="_blank" @click="clickLink(onlyOneChild.path,$event)">
-        <el-menu-item :index="resolvePath(onlyOneChild.path)" :class="{'submenu-title-noDropdown':!isNest}">
-          <item v-if="onlyOneChild.name" :icon="onlyOneChild.icon||item.icon" :title="onlyOneChild.name" />
-        </el-menu-item>
-      </a>
-    </template>
-
-    <el-submenu v-else :index="item.name||item.path">
-      <template slot="title">
-        <item v-if="item.name" :icon="item.icon" :title="item.name" />
-      </template>
-
-      <template v-for="child in item.children" v-if="!child.hidden">
-        <sidebar-item v-if="child.children&&child.children.length>0" :is-nest="true" :item="child" :key="child.path" :base-path="resolvePath(child.path)" class="nest-menu"/>
-
-        <a v-else :href="child.path" :key="child.name" target="_blank" @click="clickLink(child.path,$event)">
-          <el-menu-item :index="resolvePath(child.path)">
-            <item v-if="child.name" :icon="child.icon" :title="child.name" />
+      <el-submenu v-else :index="filterPath(item.label,index)" :key="item.label">
+        <template slot="title">
+          <svg-icon :icon-class="item.icon" />
+          <span slot="title" :class="{'el-menu--display':isCollapse}">{{ item.label }}</span>
+        </template>
+        <template v-for="(child,cindex) in item.children">
+          <el-menu-item v-if="child.children.length==0" :index="filterPath(child.path,cindex)" :key="cindex" @click="open(child)">
+            <span slot="title">{{ child.label }}</span>
           </el-menu-item>
-        </a>
-      </template>
-    </el-submenu>
-
+          <sidebar-item v-else :menu="[child]" :key="cindex" :is-collapse="isCollapse"/>
+        </template>
+      </el-submenu>
+    </template>
   </div>
 </template>
 
 <script>
-import path from 'path'
-import { generateTitle } from '@/utils/i18n'
-import { validateURL } from '@/utils/validate'
 import Item from './Item'
+import { resolveUrlPath } from '@/utils/util'
 
 export default {
   name: 'SidebarItem',
   components: { Item },
   props: {
-    // route object
-    item: {
-      type: Object,
-      required: true
+    menu: {
+      type: Array
     },
-    isNest: {
-      type: Boolean,
-      default: false
-    },
-    basePath: {
-      type: String,
-      default: ''
+    isCollapse: {
+      type: Boolean
     }
   },
   data() {
-    return {
-      onlyOneChild: null
-    }
+    return {}
   },
   methods: {
-    hasOneShowingChild(children) {
-      const showingChildren = children.filter(item => {
-        if (item.hidden) {
-          return false
-        } else {
-          // temp set(will be used if only has one showing child )
-          this.onlyOneChild = item
-          return true
-        }
+    filterPath(path, index) {
+      return path == null ? index + '' : path
+    },
+    open(item) {
+      this.$router.push({
+        path: resolveUrlPath(item.path, item.label),
+        query: item.query
       })
-      if (showingChildren.length === 1) {
-        return true
-      }
-      return false
-    },
-    resolvePath(routePath) {
-      debugger
-      return path.resolve(this.basePath, routePath)
-    },
-    isExternalLink(routePath) {
-      return validateURL(routePath)
-    },
-    clickLink(routePath, e) {
-      if (!this.isExternalLink(routePath)) {
-        e.preventDefault()
-        const path = this.resolvePath(routePath)
-        this.$router.push(path)
-      }
-    },
-    generateTitle
+    }
   }
 }
 </script>

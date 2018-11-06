@@ -76,7 +76,7 @@ export const constantRouterMap = [
         noCache: true
       }
     ]
-  }/*,
+  },
   {
     path: '/iframe',
     component: Layout,
@@ -90,13 +90,13 @@ export const constantRouterMap = [
         icon: 'people'
       }
     }]
-  }*/
+  }
 ]
 
 export default new Router({
   // mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
-  routes: constantRouterMap.concat(...formatRoutes(store.state.routers))
+  routes: [].concat(constantRouterMap)
 })
 
 export const asyncRouterMap = [

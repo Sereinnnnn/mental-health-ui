@@ -20,6 +20,11 @@ import SidebarItem from './SidebarItem'
 
 export default {
   components: { SidebarItem },
+  created() {
+    this.$store.dispatch('GenerateRoutes').then(() => { // 根据roles权限生成可访问的路由表
+      this.$router.addRoutes(this.$store.getters.addRouters) // 动态添加可访问路由表
+    })
+  },
   computed: {
     ...mapGetters([
       'permission_routers',

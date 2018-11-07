@@ -1,7 +1,7 @@
 <template>
   <div class="menu-wrapper">
     <template v-for="(item, index) in menu">
-      <el-menu-item v-if="item.children.length===0 " :index="filterPath(item.path,index)" :class="{'submenu-title-noDropdown':!isNest}" :key="item.label" @click="open(item)">
+      <el-menu-item v-if="item.children.length===0 " :index="filterPath(item.path,index)" :key="item.label" @click="open(item)">
         <svg-icon :icon-class="item.icon" />
         <span slot="title">{{ item.label }}</span>
       </el-menu-item>

@@ -172,9 +172,9 @@ export const resolveUrlPath = (url, name) => {
   let reqUrl = url
   if (url.indexOf('#') !== -1 && url.indexOf('http') === -1) {
     const port = reqUrl.substr(reqUrl.indexOf(':'))
-    reqUrl = `/myiframe/urlPath?src=${baseUrl}${port}${reqUrl.replace('#', '').replace(port, '')}}&name=${name}`
+    reqUrl = `/iframe/urlPath?src=${baseUrl}${port}${reqUrl.replace('#', '').replace(port, '')}}&name=${name}`
   } else if (url.indexOf('http') !== -1) {
-    reqUrl = `/myiframe/urlPath?src=${reqUrl}&name=${name}`
+    reqUrl = `/iframe/urlPath?src=${reqUrl}&name=${name}`
   } else {
     reqUrl = `${reqUrl}`
   }

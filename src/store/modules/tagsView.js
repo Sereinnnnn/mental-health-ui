@@ -21,7 +21,11 @@ const tagsView = {
 
     DEL_VISITED_VIEW: (state, view) => {
       for (const [i, v] of state.visitedViews.entries()) {
-        if (v.path === view.fullPath) {
+        // 关闭iframe
+        if (view.fullPath.indexOf('iframe') !== -1 && v.path.indexOf('iframe') !== -1) {
+          state.visitedViews.splice(i, 1)
+          break
+        } else if (v.path === view.fullPath) {
           state.visitedViews.splice(i, 1)
           break
         }

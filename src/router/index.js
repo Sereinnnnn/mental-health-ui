@@ -96,7 +96,7 @@ export const constantRouterMap = [
 export default new Router({
   // mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
-  routes: [].concat(constantRouterMap)
+  routes: [].concat(...formatRoutes(store.state.user.menu), constantRouterMap)
 })
 
 export const asyncRouterMap = [

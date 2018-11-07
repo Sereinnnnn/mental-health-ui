@@ -8,7 +8,7 @@ import NProgress from 'nprogress' // progress bar
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'Myiframe',
+  name: 'Iframe',
   components: {
     ...mapGetters(['tagList']),
     tagListNum: function() {

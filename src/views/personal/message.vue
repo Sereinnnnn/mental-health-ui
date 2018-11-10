@@ -83,11 +83,11 @@
 </template>
 
 <script>
-import { updateObjInfo } from '@/api/user'
+import { updateObjInfo } from '@/api/admin/user'
 import { mapState } from 'vuex'
 import { ATTACHMENT_URL } from '@/config/attachment'
 import { getToken } from '@/utils/auth'
-import { delObj } from '@/api/attachment'
+import { delObj } from '@/api/admin/attachment'
 
 export default {
   name: 'PersonalMessage',

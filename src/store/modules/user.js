@@ -1,8 +1,8 @@
-import { loginByUsername, logout, getUserInfo } from '@/api/login'
+import { loginByUsername, logout, getUserInfo } from '@/api/admin/login'
 import { setToken, removeToken } from '@/utils/auth'
 import { setStore, getStore } from '@/utils/store'
 import { encryption } from '@/utils/util'
-import { GetMenu } from '@/api/menu'
+import { GetMenu } from '@/api/admin/menu'
 import { validatenull } from '@/utils/validate'
 
 const user = {

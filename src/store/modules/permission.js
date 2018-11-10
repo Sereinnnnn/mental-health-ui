@@ -1,7 +1,7 @@
 import { asyncRouterMap, constantRouterMap } from '@/router'
 import { setStore, getStore } from '@/utils/store'
 import { initMenu } from '@/utils/util'
-import { GetMenu } from '@/api/menu'
+import { GetMenu } from '@/api/admin/menu'
 import router from '../../router'
 import store from '../index'
 

@@ -154,7 +154,11 @@ export default {
     upload: '上传',
     download: '下载',
     uploader: '上传者',
-    uploadDate: '上传时间'
+    uploadDate: '上传时间',
+    courseName: '课程名称',
+    college: '学院',
+    major: '专业',
+    teacher: '老师'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',

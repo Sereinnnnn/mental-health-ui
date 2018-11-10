@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import { fetchList, addObj, putObj, delObj } from '@/api/attachment'
+import { fetchList, addObj, putObj, delObj } from '@/api/admin/attachment'
 import waves from '@/directive/waves'
 import { ATTACHMENT_URL } from '@/config/attachment'
 import { getToken } from '@/utils/auth' // getToken from cookie

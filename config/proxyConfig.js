@@ -18,6 +18,13 @@ module.exports = {
             pathRewrite: {
                 '^/admin': '/admin'
             }
+        },
+      '/exam': {
+        target: baseUrl,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/exam': '/exam'
         }
+      }
     }
 }

@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { updateObjInfo } from '@/api/user'
+import { updateObjInfo } from '@/api/admin/user'
 import { mapState } from 'vuex'
 
 export default {

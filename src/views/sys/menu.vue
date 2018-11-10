@@ -96,7 +96,7 @@
 </template>
 
 <script>
-import { fetchTree, getObj, addObj, delObj, putObj } from '@/api/menu'
+import { fetchTree, getObj, addObj, delObj, putObj } from '@/api/admin/menu'
 import { mapGetters } from 'vuex'
 
 export default {

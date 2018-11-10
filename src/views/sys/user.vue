@@ -166,10 +166,10 @@
 </template>
 
 <script>
-import { fetchList, fetchPv, addObj, putObj, delObj } from '@/api/user'
+import { fetchList, fetchPv, addObj, putObj, delObj } from '@/api/admin/user'
 import waves from '@/directive/waves'
-import { fetchTree } from '@/api/dept'
-import { deptRoleList } from '@/api/role'
+import { fetchTree } from '@/api/admin/dept'
+import { deptRoleList } from '@/api/admin/role'
 import { mapGetters } from 'vuex'
 
 export default {

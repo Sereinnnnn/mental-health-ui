@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import { fetchList, delObj } from '@/api/log'
+import { fetchList, delObj } from '@/api/admin/log'
 import waves from '@/directive/waves'
 
 export default {

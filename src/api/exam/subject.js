@@ -1,15 +1,15 @@
 import request from '@/router/axios'
 
-export function courseList() {
+export function subjectList() {
   return request({
-    url: '/exam/course/courseList',
+    url: '/exam/subject/subjectList',
     method: 'get'
   })
 }
 
-export function fetchCourseList(query) {
+export function fetchSubjectList(query) {
   return request({
-    url: '/exam/course/courseList',
+    url: '/exam/subject/subjectList',
     method: 'get',
     params: query
   })
@@ -17,30 +17,30 @@ export function fetchCourseList(query) {
 
 export function getObj(id) {
   return request({
-    url: '/exam/course/' + id,
+    url: '/exam/subject/' + id,
     method: 'get'
   })
 }
 
-export function addObj(obj) {
+export function addSubject(obj) {
   return request({
-    url: '/exam/course/',
+    url: '/exam/subject/',
     method: 'post',
     data: obj
   })
 }
 
-export function putObj(obj) {
+export function putSubject(obj) {
   return request({
-    url: '/exam/course/',
+    url: '/exam/subject/',
     method: 'put',
     data: obj
   })
 }
 
-export function delObj(id) {
+export function delSubject(id) {
   return request({
-    url: '/exam/course/' + id,
+    url: '/exam/subject/' + id,
     method: 'delete'
   })
 }

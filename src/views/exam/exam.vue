@@ -1,11 +1,12 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input :placeholder="$t('table.roleName')" v-model="listQuery.roleName" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input :placeholder="$t('table.examinationName')" v-model="listQuery.examinationName" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
-      <el-button v-if="role_btn_add" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
+      <el-button v-if="exam_btn_add" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
     </div>
 
+    <!--考试列表-->
     <el-table
       v-loading="listLoading"
       :key="tableKey"
@@ -14,26 +15,30 @@
       fit
       highlight-current-row
       style="width: 100%;">
-      <el-table-column type="selection" width="55">
-      </el-table-column>
-      <el-table-column :label="$t('table.roleCode')" min-width="90" align="center">
+      <el-table-column type="selection" width="55"/>
+      <el-table-column :label="$t('table.examinationName')" min-width="90" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.roleCode }}</span>
+          <span>{{ scope.row.examinationName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.roleName')" min-width="90" align="center">
+      <el-table-column :label="$t('table.type')" min-width="90" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.roleName }}</span>
+          <span>{{ scope.row.type | typeFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.roleDesc')" min-width="90" align="center">
+      <el-table-column :label="$t('table.startTime')" min-width="90" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.roleDesc }}</span>
+          <span>{{ scope.row.startTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.ownDept')" min-width="90" align="center">
+      <el-table-column :label="$t('table.endTime')" min-width="90" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.deptName }}</span>
+          <span>{{ scope.row.endTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('table.totalScore')" align="center" width="120px">
+        <template slot-scope="scope">
+          <span>{{ scope.row.totalScore }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.status')" align="center" width="120px">
@@ -43,11 +48,9 @@
       </el-table-column>
       <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
         <template slot-scope="scope">
-          <el-button v-if="role_btn_edit" type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button v-if="role_btn_del" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
-          </el-button>
-          <el-button v-if="role_btn_auth" size="mini" @click="handlePermission(scope.row)">{{ $t('table.permission') }}
-          </el-button>
+          <el-button v-if="exam_btn_edit" type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
+          <el-button v-if="exam_btn_del" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button>
+          <el-button v-if="exam_btn_subject" size="mini" @click="handleSubjectManagement(scope.row)">{{ $t('table.subjectManagement') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -56,77 +59,223 @@
       <el-pagination v-show="total>0" :current-page="listQuery.pageNum" :page-sizes="[10,20,30, 50]" :page-size="listQuery.pageSize" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
 
+    <!--考试信息表单-->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="60%" top="10vh">
       <el-form ref="dataForm" :rules="rules" :model="temp" :label-position="labelPosition" label-width="100px">
-        <el-form-item :label="$t('table.roleCode')" prop="roleCode">
-          <el-input v-model="temp.roleCode" :readonly="temp.readonly"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.roleName')" prop="roleName">
-          <el-input v-model="temp.roleName"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.roleDesc')" prop="roleDesc">
-          <el-input v-model="temp.roleDesc"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.status')">
-          <el-radio-group v-model="temp.status">
-            <el-radio :label="0">启用</el-radio>
-            <el-radio :label="1">禁用</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item :label="$t('table.ownDept')" prop="deptName">
-          <el-input v-model="temp.deptName" @focus="handleSelectDept"/>
-          <el-input v-model="temp.deptId" type="hidden"/>
-        </el-form-item>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.examinationName')" prop="examinationName">
+              <el-input v-model="temp.examinationName" :readonly="temp.readonly"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.totalScore')" prop="totalScore">
+              <el-input v-model="temp.totalScore"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.college')" prop="college">
+              <el-input v-model="temp.college"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.major')" prop="major">
+              <el-input v-model="temp.major"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.course')" prop="course">
+              <el-input v-model="temp.course" @focus="selectCourse"/>
+              <input v-model="temp.courseId" type="hidden">
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.startTime')" prop="startTime">
+              <el-date-picker v-model="temp.startTime" :placeholder="$t('table.startTime')" type="datetime" format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.endTime')" prop="endTime">
+              <el-date-picker v-model="temp.endTime" :placeholder="$t('table.endTime')" type="datetime" format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.type')" prop="type">
+              <el-radio-group v-model="temp.type">
+                <el-radio :label="0">正式考试</el-radio>
+                <el-radio :label="1">模拟考试</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.status')">
+              <el-radio-group v-model="temp.status">
+                <el-radio :label="0">已发布</el-radio>
+                <el-radio :label="1">未发布</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item :label="$t('table.attention')">
+              <el-input :autosize="{ minRows: 3, maxRows: 5}" :placeholder="$t('table.attention')" v-model="temp.attention" type="textarea"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item :label="$t('table.remark')">
+              <el-input :autosize="{ minRows: 3, maxRows: 5}" v-model="temp.remark" type="textarea" placeholder="备注"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
+        <el-button v-if="dialogStatus === 'create'" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
         <el-button v-else type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
       </div>
     </el-dialog>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogDeptVisible">
-      <el-tree
-        :data="treeDeptData"
-        :props="defaultProps"
-        class="filter-tree"
-        node-key="id"
-        default-expand-all
-        highlight-current
-        @node-click="getNodeData"
-      />
+    <!--课程选择弹窗-->
+    <el-dialog :visible.sync="dialogCourseVisible" :title="$t('table.course')">
+      <el-table v-loading="course.listLoading" :data="course.list" @row-dblclick="selectedCourse">
+        <el-table-column :label="$t('table.courseName')" property="courseName" width="150">
+          <template slot-scope="scope">
+            <span>{{ scope.row.courseName }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('table.college')" property="college" width="200">
+          <template slot-scope="scope">
+            <span>{{ scope.row.college }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('table.major')" property="major">
+          <template slot-scope="scope">
+            <span>{{ scope.row.major }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('table.teacher')" property="teacher">'
+          <template slot-scope="scope">
+            <span>{{ scope.row.teacher }}</span>
+          </template>
+        </el-table-column>
+      </el-table>
     </el-dialog>
 
-    <el-dialog :visible.sync="dialogPermissionVisible" title="角色权限" top="10vh">
-      <el-tree
-        ref="menuTree"
-        :data="treePermissionData"
-        :props="permissionProps"
-        :default-checked-keys="checkedKeys"
-        show-checkbox
-        class="filter-tree"
-        node-key="id"
-        default-expand-all
-        highlight-current
-        check-strictly
-        @node-click="getNodeData"
-      />
+    <!--题目管理列表-->
+    <el-dialog :visible.sync="dialogSubjectVisible" :title="$t('table.subjectManagement')" width="70%" top="10vh">
+      <div class="filter-container">
+        <el-input :placeholder="$t('table.subjectName')" v-model="subject.listQuery.subjectName" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilterSubject"/>
+        <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilterSubject">{{ $t('table.search') }}</el-button>
+        <el-button v-if="exam_btn_subject" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreateSubject">{{ $t('table.add') }}</el-button>
+      </div>
+      <el-table v-loading="subject.listLoading" :data="subject.list">
+        <el-table-column :label="$t('table.subjectName')" property="subjectName" width="150">
+          <template slot-scope="scope">
+            <span>{{ scope.row.subjectName }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('table.type')" property="type" width="200">
+          <template slot-scope="scope">
+            <span>{{ scope.row.type }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('table.score')" property="score">
+          <template slot-scope="scope">
+            <span>{{ scope.row.score }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('table.level')" property="level">'
+          <template slot-scope="scope">
+            <span>{{ scope.row.level }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
+          <template slot-scope="scope">
+            <el-button v-if="exam_btn_subject" type="primary" size="mini" @click="handleUpdateSubject(scope.row)">{{ $t('table.edit') }}</el-button>
+            <el-button v-if="exam_btn_subject" size="mini" type="danger" @click="handleDeleteSubject(scope.row)">{{ $t('table.delete') }}</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
+
+    <!--题目信息表单-->
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogSubjectFormVisible" width="60%" top="10vh">
+      <el-form ref="dataSubjectForm" :rules="subjectRules" :model="tempSubject" :label-position="labelPosition" label-width="100px">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.subjectName')" prop="subjectName">
+              <el-input v-model="tempSubject.subjectName"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.type')" prop="type">
+              <el-input v-model="tempSubject.type"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item :label="$t('table.content')" prop="content">
+              <el-input v-model="tempSubject.content"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item :label="$t('table.answer')" prop="answer">
+              <el-input v-model="tempSubject.answer"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.score')" prop="score">
+              <el-input v-model="tempSubject.score"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.analysis')" prop="analysis">
+              <el-input v-model="tempSubject.analysis"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.level')" prop="level">
+              <el-input v-model="tempSubject.level"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button v-if="role_btn_edit" type="primary" @click="savePermission(id, roleCode)">保存</el-button>
+        <el-button @click="dialogSubjectFormVisible = false">{{ $t('table.cancel') }}</el-button>
+        <el-button v-if="dialogStatus === 'create'" type="primary" @click="createSubjectData">{{ $t('table.confirm') }}</el-button>
+        <el-button v-else type="primary" @click="updateSubjectData">{{ $t('table.confirm') }}</el-button>
       </div>
     </el-dialog>
-
   </div>
 </template>
 
 <script>
-import { fetchList, addObj, putObj, delObj, fetchDeptTree, fetchRoleTree, permissionUpdate } from '@/api/admin/role'
-import { fetchTree } from '@/api/admin/menu'
+import { fetchList, addObj, putObj, delObj } from '@/api/exam/exam'
+import { fetchCourseList } from '@/api/exam/course'
+import { fetchSubjectList, addSubject, putSubject, delSubject } from '@/api/exam/subject'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'RoleManagement',
+  name: 'ExamManagement',
   directives: {
     waves
   },
@@ -134,12 +283,15 @@ export default {
     statusTypeFilter(status) {
       const statusMap = {
         0: 'success',
-        1: 'danger'
+        1: 'warning'
       }
       return statusMap[status]
     },
     statusFilter(status) {
-      return status === '0' ? '启用' : '禁用'
+      return status === '0' ? '已发布' : '未发布'
+    },
+    typeFilter(type) {
+      return type === '0' ? '正式考试' : '模拟考试'
     }
   },
   data() {
@@ -151,57 +303,90 @@ export default {
       listQuery: {
         pageNum: 1,
         pageSize: 10,
-        roleName: undefined,
         sort: '+id'
+      },
+      course: {
+        listQuery: {
+          pageNum: 1,
+          pageSize: 10,
+          sort: '+id'
+        },
+        list: null,
+        total: null,
+        listLoading: true
+      },
+      subject: {
+        listQuery: {
+          pageNum: 1,
+          pageSize: 10,
+          sort: '+id'
+        },
+        list: null,
+        total: null,
+        listLoading: true
       },
       temp: {
         id: '',
-        roleName: '',
-        roleCode: '',
-        roleDesc: '',
+        examinationName: '',
+        type: 0,
+        attention: '',
+        startTime: '',
+        endTime: '',
+        duration: '',
+        totalScore: '',
         status: 0,
-        deptId: '',
-        deptName: ''
+        avatar: '',
+        college: '',
+        major: '',
+        course: '',
+        remark: '',
+        courseId: ''
       },
-      treeData: [],
-      treeDeptData: [],
-      treePermissionData: [],
-      checkedKeys: [],
+      tempSubject: {
+        id: '',
+        subjectName: '',
+        type: '',
+        content: '',
+        answer: '',
+        score: '',
+        analysis: '',
+        level: ''
+      },
       dialogFormVisible: false,
-      dialogDeptVisible: false,
-      dialogPermissionVisible: false,
       dialogStatus: '',
       textMap: {
         update: '编辑',
         create: '新建'
       },
-      pvData: [],
       rules: {
-        roleName: [{ required: true, message: '请输入角色名称', trigger: 'change' }],
-        roleCode: [{ required: true, message: '请输入角色代码', trigger: 'change' }]
+        examinationName: [{ required: true, message: '请输入考试名称', trigger: 'change' }],
+        college: [{ required: true, message: '请输入考试所属学院', trigger: 'change' }],
+        major: [{ required: true, message: '请输入考试所属专业', trigger: 'change' }],
+        course: [{ required: true, message: '请输入考试所属课程', trigger: 'change' }],
+        startTime: [{ required: true, message: '请选择开始时间', trigger: 'change' }],
+        endTime: [{ required: true, message: '请选择结束时间', trigger: 'change' }],
+        totalScore: [{ required: true, message: '请输入总分', trigger: 'change' }]
       },
+      subjectRules: {},
       downloadLoading: false,
-      defaultProps: {
-        children: 'children',
-        label: 'deptName'
-      },
-      permissionProps: {
-        children: 'children',
-        lable: 'name'
-      },
       labelPosition: 'right',
-      role_btn_add: false,
-      role_btn_edit: false,
-      role_btn_del: false,
-      role_btn_auth: false
+      exam_btn_add: false,
+      exam_btn_edit: false,
+      exam_btn_del: false,
+      exam_btn_subject: false,
+      dialogCourseVisible: false,
+      courseData: [],
+      dialogSubjectVisible: false,
+      subjectData: [],
+      dialogSubjectFormVisible: false
     }
   },
   created() {
     this.getList()
-    this.role_btn_add = this.permissions['sys:role:add']
-    this.role_btn_edit = this.permissions['sys:role:edit']
-    this.role_btn_del = this.permissions['sys:role:del']
-    this.role_btn_auth = this.permissions['sys:role:auth']
+    this.exam_btn_add = this.permissions['exam:exam:add']
+    this.exam_btn_edit = this.permissions['exam:exam:edit']
+    this.exam_btn_del = this.permissions['exam:exam:del']
+    this.exam_btn_subject = this.permissions['exam:exam:subject']
   },
   computed: {
     ...mapGetters([
@@ -246,12 +431,20 @@ export default {
     resetTemp() {
       this.temp = {
         id: '',
-        roleName: '',
-        roleCode: '',
-        roleDesc: '',
+        examinationName: '',
+        type: 0,
+        attention: '',
+        startTime: '',
+        endTime: '',
+        duration: '',
+        totalScore: '',
         status: 0,
-        deptId: '',
-        deptName: ''
+        avatar: '',
+        college: '',
+        major: '',
+        course: '',
+        remark: '',
+        courseId: ''
       }
     },
     handleCreate() {
@@ -281,10 +474,8 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.born = new Date(parseInt(this.temp.born))
-      this.temp.sex = parseInt(this.temp.sex)
       this.temp.status = parseInt(this.temp.status)
-      this.temp.readonly = true
+      this.temp.type = parseInt(this.temp.type)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -330,59 +521,124 @@ export default {
       const index = this.list.indexOf(row)
       this.list.splice(index, 1)
     },
-    // 所属部门
-    handleSelectDept() {
-      fetchDeptTree().then(response => {
-        this.treeDeptData = response.data
-        this.dialogDeptVisible = true
+    // 选择课程
+    selectCourse() {
+      this.course.listLoading = true
+      fetchCourseList(this.course.listQuery).then(response => {
+        this.course.list = response.data.list
+        this.course.total = response.data.total
+        this.course.listLoading = false
+      })
+      this.dialogCourseVisible = true
+    },
+    // 双击选择课程
+    selectedCourse(row) {
+      this.temp.courseId = row.id
+      this.temp.course = row.courseName
+      this.dialogCourseVisible = false
+    },
+    // 加载题目
+    handleSubjectManagement(row) {
+      this.subject.listLoading = true
+      fetchSubjectList(this.subject.listQuery).then(response => {
+        this.subject.list = response.data.list
+        this.subject.total = response.data.total
+        this.subject.listLoading = false
+      })
+      this.dialogSubjectVisible = true
+    },
+    handleFilterSubject() {
+      this.subject.listQuery.pageNum = 1
+      this.handleSubjectManagement()
+    },
+    // 新建题目
+    handleCreateSubject() {
+      this.resetTempSubject()
+      this.dialogStatus = 'create'
+      this.dialogSubjectFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataSubjectForm'].clearValidate()
       })
     },
-    getNodeData(data) {
-      this.dialogDeptVisible = false
-      this.temp.deptId = data.id
-      this.temp.deptName = data.deptName
-    },
-    // 分配权限
-    handlePermission(row) {
-      fetchRoleTree(row.roleCode)
-        .then(response => {
-          this.checkedKeys = response.data
-          return fetchTree()
-        })
-        .then(response => {
-          this.treePermissionData = response.data
-          this.dialogPermissionVisible = true
-          this.id = row.id
-          this.roleCode = row.roleCode
-        })
-    },
-    // 保存权限
-    savePermission(id, roleCode) {
-      const keys = this.$refs.menuTree.getCheckedKeys()
-      let menus = ''
-      if (keys.length > 0) {
-        for (let i = 0; i < keys.length; i++) {
-          menus = menus + keys[i] + ','
-        }
+    resetTempSubject() {
+      this.tempSubject = {
+        id: '',
+        subjectName: '',
+        type: '',
+        content: '',
+        answer: '',
+        score: '',
+        analysis: '',
+        level: ''
       }
-      // 更新
-      permissionUpdate(id, menus).then(() => {
-        this.dialogPermissionVisible = false
-        // 重新加载
-        fetchTree()
-          .then(response => {
-            this.treePermissionData = response.data
-            return fetchRoleTree(roleCode)
-          })
-          .then(response => {
-            this.checkedKeys = response.data
+    },
+    // 修改题目
+    handleUpdateSubject(row) {
+      this.tempSubject = Object.assign({}, row) // copy obj
+      this.tempSubject.status = parseInt(this.tempSubject.status)
+      this.tempSubject.type = parseInt(this.tempSubject.type)
+      this.dialogStatus = 'update'
+      this.dialogSubjectFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataSubjectForm'].clearValidate()
+      })
+    },
+    // 删除题目
+    handleDeleteSubject(row) {
+      delSubject(row.id).then(() => {
+        this.dialogSubjectFormVisible = false
+        this.handleSubjectManagement()
+        this.$notify({
+          title: '成功',
+          message: '删除成功',
+          type: 'success',
+          duration: 2000
+        })
+      })
+      const index = this.subject.list.indexOf(row)
+      this.subject.list.splice(index, 1)
+    },
+    // 保存题目
+    createSubjectData() {
+      this.$refs['dataSubjectForm'].validate((valid) => {
+        if (valid) {
+          addSubject(this.tempSubject).then(() => {
+            this.subject.list.unshift(this.tempSubject)
+            this.dialogSubjectFormVisible = false
+            this.handleSubjectManagement()
             this.$notify({
               title: '成功',
-              message: '修改成功',
+              message: '创建成功',
               type: 'success',
               duration: 2000
             })
           })
+        }
+      })
+    },
+    // 更新题目
+    updateSubjectData() {
+      this.$refs['dataSubjectForm'].validate((valid) => {
+        if (valid) {
+          const tempData = Object.assign({}, this.tempSubject)
+          putSubject(tempData).then(() => {
+            for (const v of this.subject.list) {
+              if (v.id === this.tempSubject.id) {
+                const index = this.subject.list.indexOf(v)
+                this.subject.list.splice(index, 1, this.tempSubject)
+                break
+              }
+            }
+            this.dialogSubjectFormVisible = false
+            this.handleSubjectManagement()
+            this.$notify({
+              title: '成功',
+              message: '更新成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
       })
     }
   }

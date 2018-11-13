@@ -156,9 +156,20 @@ export default {
     uploader: '上传者',
     uploadDate: '上传时间',
     courseName: '课程名称',
+    course: '课程',
+    courseDescription: '课程描述',
     college: '学院',
     major: '专业',
-    teacher: '老师'
+    teacher: '老师',
+    examinationName: '考试名称',
+    attention: '注意事项',
+    startTime: '开始时间',
+    endTime: '结束时间',
+    totalScore: '总分',
+    subjectManagement: '题目管理',
+    subjectName: '题目名称',
+    level: '难度',
+    score: '分值'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',

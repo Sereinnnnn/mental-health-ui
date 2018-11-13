@@ -51,18 +51,37 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="60%" top="10vh">
       <el-form ref="dataForm" :rules="rules" :model="temp" :label-position="labelPosition" label-width="100px">
-        <el-form-item :label="$t('table.courseName')" prop="courseName">
-          <el-input v-model="temp.courseName"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.college')" prop="college">
-          <el-input v-model="temp.college"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.major')" prop="major">
-          <el-input v-model="temp.major"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.teacher')" prop="teacher">
-          <el-input v-model="temp.teacher"/>
-        </el-form-item>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.courseName')" prop="courseName">
+              <el-input v-model="temp.courseName"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.college')" prop="college">
+              <el-input v-model="temp.college"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.major')" prop="major">
+              <el-input v-model="temp.major"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.teacher')" prop="teacher">
+              <el-input v-model="temp.teacher"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item :label="$t('table.courseDescription')">
+              <el-input :autosize="{ minRows: 3, maxRows: 5}" :placeholder="$t('table.courseDescription')" v-model="temp.courseDescription" type="textarea"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
@@ -74,7 +93,7 @@
 </template>
 
 <script>
-import { fetchList, addObj, putObj, delObj } from '@/api/exam/course'
+import { fetchCourseList, addObj, putObj, delObj } from '@/api/exam/course'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 
@@ -100,7 +119,8 @@ export default {
         courseName: '',
         college: '',
         major: '',
-        teacher: ''
+        teacher: '',
+        courseDescription: ''
       },
       checkedKeys: [],
       dialogFormVisible: false,
@@ -134,7 +154,7 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchList(this.listQuery).then(response => {
+      fetchCourseList(this.listQuery).then(response => {
         this.list = response.data.list
         this.total = response.data.total
         // Just to simulate the time of the request
@@ -171,7 +191,8 @@ export default {
         courseName: '',
         college: '',
         major: '',
-        teacher: ''
+        teacher: '',
+        courseDescription: ''
       }
     },
     handleCreate() {
@@ -201,8 +222,6 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.born = new Date(parseInt(this.temp.born))
-      this.temp.sex = parseInt(this.temp.sex)
       this.temp.status = parseInt(this.temp.status)
       this.temp.readonly = true
       this.dialogStatus = 'update'

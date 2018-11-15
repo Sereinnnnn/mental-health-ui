@@ -168,8 +168,14 @@ export default {
     totalScore: '总分',
     subjectManagement: '题目管理',
     subjectName: '题目名称',
-    level: '难度',
-    score: '分值'
+    subject: {
+      type: '题目类型',
+      level: '难度',
+      score: '题目分值',
+      content: '题目内容',
+      answer: '参考答案',
+      analysis: '解析'
+    }
   },
   errorLog: {
     tips: '请点击右上角bug小图标',

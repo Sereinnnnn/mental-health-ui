@@ -185,19 +185,19 @@
             <span>{{ scope.row.subjectName }}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('table.type')" property="type" width="200">
+        <el-table-column :label="$t('table.subject.type')" property="type" width="200">
           <template slot-scope="scope">
-            <span>{{ scope.row.type }}</span>
+            <el-tag type="success">{{ scope.row.type | subjectTypeFilter }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('table.score')" property="score">
+        <el-table-column :label="$t('table.subject.score')" property="score">
           <template slot-scope="scope">
             <span>{{ scope.row.score }}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('table.level')" property="level">'
+        <el-table-column :label="$t('table.subject.level')" property="level">'
           <template slot-scope="scope">
-            <span>{{ scope.row.level }}</span>
+            <el-rate v-model="scope.row.level" />
           </template>
         </el-table-column>
         <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
@@ -219,41 +219,45 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item :label="$t('table.type')" prop="type">
-              <el-input v-model="tempSubject.type"/>
+            <el-form-item :label="$t('table.subject.type')" prop="type">
+              <el-select v-model="tempSubject.type" class="filter-item" placeholder="请选择题目类型" width="100%">
+                <el-option v-for="item in subjectTypeData" :key="item.id" :label="item.subjectTypeName" :value="item.id">
+                  <span style="float: left">{{ item.subjectTypeName }}</span>
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.subject.score')" prop="score">
+              <el-input v-model="tempSubject.score"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.subject.level')" prop="level">
+              <el-rate v-model="tempSubject.level" :max="4" :texts="['简单', '一般', '略难', '非常难']" show-text/>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="24">
-            <el-form-item :label="$t('table.content')" prop="content">
+            <el-form-item :label="$t('table.subject.content')" prop="content">
               <el-input v-model="tempSubject.content"/>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="24">
-            <el-form-item :label="$t('table.answer')" prop="answer">
+            <el-form-item :label="$t('table.subject.answer')" prop="answer">
               <el-input v-model="tempSubject.answer"/>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.score')" prop="score">
-              <el-input v-model="tempSubject.score"/>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.analysis')" prop="analysis">
+          <el-col :span="24">
+            <el-form-item :label="$t('table.subject.analysis')" prop="analysis">
               <el-input v-model="tempSubject.analysis"/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.level')" prop="level">
-              <el-input v-model="tempSubject.level"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -292,6 +296,15 @@ export default {
     },
     typeFilter(type) {
       return type === '0' ? '正式考试' : '模拟考试'
+    },
+    subjectTypeFilter(type) {
+      const typeMap = {
+        0: '选择题',
+        1: '填空题',
+        2: '判断题',
+        3: '简答题'
+      }
+      return typeMap[type]
     }
   },
   data() {
@@ -345,12 +358,12 @@ export default {
       tempSubject: {
         id: '',
         subjectName: '',
-        type: '',
+        type: 0,
         content: '',
         answer: '',
         score: '',
         analysis: '',
-        level: ''
+        level: 2
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -378,7 +391,13 @@ export default {
       courseData: [],
       dialogSubjectVisible: false,
       subjectData: [],
-      dialogSubjectFormVisible: false
+      dialogSubjectFormVisible: false,
+      subjectTypeData: [
+        { id: 0, subjectTypeName: '选择题' },
+        { id: 1, subjectTypeName: '填空题' },
+        { id: 2, subjectTypeName: '判断题' },
+        { id: 3, subjectTypeName: '简答题' }
+      ]
     }
   },
   created() {
@@ -564,19 +583,19 @@ export default {
       this.tempSubject = {
         id: '',
         subjectName: '',
-        type: '',
+        type: 0,
         content: '',
         answer: '',
         score: '',
         analysis: '',
-        level: ''
+        level: 2
       }
     },
     // 修改题目
     handleUpdateSubject(row) {
       this.tempSubject = Object.assign({}, row) // copy obj
-      this.tempSubject.status = parseInt(this.tempSubject.status)
-      this.tempSubject.type = parseInt(this.tempSubject.type)
+      this.tempSubject.status = parseInt(status)
+      this.tempSubject.type = parseInt(row.type)
       this.dialogStatus = 'update'
       this.dialogSubjectFormVisible = true
       this.$nextTick(() => {

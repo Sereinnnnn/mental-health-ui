@@ -26,6 +26,11 @@
           <span>{{ scope.row.type | typeFilter }}</span>
         </template>
       </el-table-column>
+      <el-table-column :label="$t('table.course')" min-width="90" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.course.courseName }}</span>
+        </template>
+      </el-table-column>
       <el-table-column :label="$t('table.startTime')" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.startTime }}</span>
@@ -76,21 +81,21 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item :label="$t('table.college')" prop="college">
-              <el-input v-model="temp.college"/>
+            <el-form-item :label="$t('table.college')" prop="collegeId">
+              <el-input v-model="temp.collegeId"/>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item :label="$t('table.major')" prop="major">
-              <el-input v-model="temp.major"/>
+            <el-form-item :label="$t('table.major')" prop="majorId">
+              <el-input v-model="temp.majorId"/>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item :label="$t('table.course')" prop="course">
-              <el-input v-model="temp.course" @focus="selectCourse"/>
-              <input v-model="temp.courseId" type="hidden">
+            <el-form-item :label="$t('table.course')" prop="course.id">
+              <el-input v-model="temp.course.courseName" @focus="selectCourse"/>
+              <input v-model="temp.course.id" type="hidden">
             </el-form-item>
           </el-col>
         </el-row>
@@ -197,7 +202,7 @@
         </el-table-column>
         <el-table-column :label="$t('table.subject.level')" property="level">'
           <template slot-scope="scope">
-            <el-rate v-model="scope.row.level" />
+            <el-rate v-model="scope.row.level" :max="4"/>
           </template>
         </el-table-column>
         <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
@@ -332,11 +337,13 @@ export default {
         listQuery: {
           pageNum: 1,
           pageSize: 10,
-          sort: '+id'
+          sort: '+id',
+          examinationId: ''
         },
         list: null,
         total: null,
-        listLoading: true
+        listLoading: true,
+        examinationId: ''
       },
       temp: {
         id: '',
@@ -349,14 +356,17 @@ export default {
         totalScore: '',
         status: 0,
         avatar: '',
-        college: '',
-        major: '',
-        course: '',
-        remark: '',
-        courseId: ''
+        collegeId: '',
+        majorId: '',
+        course: {
+          id: '',
+          courseName: ''
+        },
+        remark: ''
       },
       tempSubject: {
         id: '',
+        examinationId: '',
         subjectName: '',
         type: 0,
         content: '',
@@ -373,9 +383,9 @@ export default {
       },
       rules: {
         examinationName: [{ required: true, message: '请输入考试名称', trigger: 'change' }],
-        college: [{ required: true, message: '请输入考试所属学院', trigger: 'change' }],
-        major: [{ required: true, message: '请输入考试所属专业', trigger: 'change' }],
-        course: [{ required: true, message: '请输入考试所属课程', trigger: 'change' }],
+        collegeId: [{ required: true, message: '请输入考试所属学院', trigger: 'change' }],
+        majorId: [{ required: true, message: '请输入考试所属专业', trigger: 'change' }],
+        courseId: [{ required: true, message: '请输入考试所属课程', trigger: 'change' }],
         startTime: [{ required: true, message: '请选择开始时间', trigger: 'change' }],
         endTime: [{ required: true, message: '请选择结束时间', trigger: 'change' }],
         totalScore: [{ required: true, message: '请输入总分', trigger: 'change' }]
@@ -459,11 +469,13 @@ export default {
         totalScore: '',
         status: 0,
         avatar: '',
-        college: '',
-        major: '',
-        course: '',
-        remark: '',
-        courseId: ''
+        collegeId: '',
+        majorId: '',
+        course: {
+          id: '',
+          courseName: ''
+        },
+        remark: ''
       }
     },
     handleCreate() {
@@ -495,6 +507,12 @@ export default {
       this.temp = Object.assign({}, row) // copy obj
       this.temp.status = parseInt(this.temp.status)
       this.temp.type = parseInt(this.temp.type)
+      if (this.temp.course === null) {
+        this.temp.course = {
+          id: '',
+          courseName: ''
+        }
+      }
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -552,14 +570,26 @@ export default {
     },
     // 双击选择课程
     selectedCourse(row) {
-      this.temp.courseId = row.id
-      this.temp.course = row.courseName
+      this.temp.course.id = row.id
+      this.temp.course.courseName = row.courseName
       this.dialogCourseVisible = false
     },
     // 加载题目
     handleSubjectManagement(row) {
       this.subject.listLoading = true
+      // 保存当前题目列表的考试ID
+      if (row !== undefined) {
+        this.subject.examinationId = row.id
+        this.subject.listQuery.examinationId = row.id
+      }
       fetchSubjectList(this.subject.listQuery).then(response => {
+        if (response.data.list.length > 0) {
+          for (var i = 0; i < response.data.list.length; i++) {
+            var subject = response.data.list[i]
+            subject.type = parseInt(subject.type)
+            subject.level = parseInt(subject.level)
+          }
+        }
         this.subject.list = response.data.list
         this.subject.total = response.data.total
         this.subject.listLoading = false
@@ -582,6 +612,7 @@ export default {
     resetTempSubject() {
       this.tempSubject = {
         id: '',
+        examinationId: '',
         subjectName: '',
         type: 0,
         content: '',
@@ -596,6 +627,8 @@ export default {
       this.tempSubject = Object.assign({}, row) // copy obj
       this.tempSubject.status = parseInt(status)
       this.tempSubject.type = parseInt(row.type)
+      // 绑定考试ID
+      this.tempSubject.examinationId = this.subject.examinationId
       this.dialogStatus = 'update'
       this.dialogSubjectFormVisible = true
       this.$nextTick(() => {
@@ -621,6 +654,8 @@ export default {
     createSubjectData() {
       this.$refs['dataSubjectForm'].validate((valid) => {
         if (valid) {
+          // 绑定考试ID
+          this.tempSubject.examinationId = this.subject.examinationId
           addSubject(this.tempSubject).then(() => {
             this.subject.list.unshift(this.tempSubject)
             this.dialogSubjectFormVisible = false

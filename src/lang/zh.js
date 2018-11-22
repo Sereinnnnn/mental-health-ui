@@ -173,6 +173,12 @@ export default {
       level: '难度',
       score: '题目分值',
       content: '题目内容',
+      optionA: '选项A',
+      optionB: '选项B',
+      optionC: '选项C',
+      optionD: '选项D',
+      optionE: '选项E',
+      optionF: '选项F',
       answer: '参考答案',
       analysis: '解析'
     }

@@ -225,7 +225,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item :label="$t('table.subject.type')" prop="type">
-              <el-select v-model="tempSubject.type" class="filter-item" placeholder="请选择题目类型" width="100%">
+              <el-select @change="changeSubjectType" v-model="tempSubject.type" class="filter-item" placeholder="请选择题目类型" width="100%">
                 <el-option v-for="item in subjectTypeData" :key="item.id" :label="item.subjectTypeName" :value="item.id">
                   <span style="float: left">{{ item.subjectTypeName }}</span>
                 </el-option>
@@ -249,6 +249,34 @@
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.content')" prop="content">
               <el-input v-model="tempSubject.content"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row v-if="tempSubject.type === 0">
+          <el-col :span="24">
+            <el-form-item :label="$t('table.subject.optionA')" prop="optionA">
+              <el-input v-model="tempSubject.optionA"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row v-if="tempSubject.type === 0">
+          <el-col :span="24">
+            <el-form-item :label="$t('table.subject.optionB')" prop="optionB">
+              <el-input v-model="tempSubject.optionB"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row v-if="tempSubject.type === 0">
+          <el-col :span="24">
+            <el-form-item :label="$t('table.subject.optionC')" prop="optionC">
+              <el-input v-model="tempSubject.optionC"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row v-if="tempSubject.type === 0">
+          <el-col :span="24">
+            <el-form-item :label="$t('table.subject.optionD')" prop="optionD">
+              <el-input v-model="tempSubject.optionD"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -370,6 +398,12 @@ export default {
         subjectName: '',
         type: 0,
         content: '',
+        optionA: '',
+        optionB: '',
+        optionC: '',
+        optionD: '',
+        optionE: '',
+        optionF: '',
         answer: '',
         score: '',
         analysis: '',
@@ -616,6 +650,12 @@ export default {
         subjectName: '',
         type: 0,
         content: '',
+        optionA: '',
+        optionB: '',
+        optionC: '',
+        optionD: '',
+        optionE: '',
+        optionF: '',
         answer: '',
         score: '',
         analysis: '',
@@ -694,6 +734,10 @@ export default {
           })
         }
       })
+    },
+    // 切换题目类型
+    changeSubjectType(value) {
+      console.log(value)
     }
   }
 }

@@ -51,11 +51,13 @@
           <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
+      <el-table-column :label="$t('table.actions')" class-name="status-col" width="400px">
         <template slot-scope="scope">
           <el-button v-if="exam_btn_edit" type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button v-if="exam_btn_del" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button>
+          <el-button v-if="exam_btn_edit && scope.row.status == 1" type="warning" size="mini" @click="handlePublic(scope.row, 0)">{{ $t('table.public') }}</el-button>
+          <el-button v-if="exam_btn_edit&& scope.row.status == 0" type="success" size="mini" @click="handlePublic(scope.row, 1)">{{ $t('table.retrieve') }}</el-button>
           <el-button v-if="exam_btn_subject" size="mini" @click="handleSubjectManagement(scope.row)">{{ $t('table.subjectManagement') }}</el-button>
+          <el-button v-if="exam_btn_del" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -65,7 +67,7 @@
     </div>
 
     <!--考试信息表单-->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="60%" top="10vh">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="80%" top="10vh">
       <el-form ref="dataForm" :rules="rules" :model="temp" :label-position="labelPosition" label-width="100px">
         <el-row>
           <el-col :span="12">
@@ -178,14 +180,14 @@
     </el-dialog>
 
     <!--题目管理列表-->
-    <el-dialog :visible.sync="dialogSubjectVisible" :title="$t('table.subjectManagement')" width="70%" top="10vh">
+    <el-dialog :visible.sync="dialogSubjectVisible" :title="$t('table.subjectManagement')" width="80%" top="10vh">
       <div class="filter-container">
         <el-input :placeholder="$t('table.subjectName')" v-model="subject.listQuery.subjectName" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilterSubject"/>
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilterSubject">{{ $t('table.search') }}</el-button>
         <el-button v-if="exam_btn_subject" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreateSubject">{{ $t('table.add') }}</el-button>
       </div>
-      <el-table v-loading="subject.listLoading" :data="subject.list">
-        <el-table-column :label="$t('table.subjectName')" property="subjectName" width="150">
+      <el-table v-loading="subject.listLoading" :data="subject.list" border fit highlight-current-row style="width: 100%;">
+        <el-table-column :label="$t('table.subjectName')" property="subjectName" min-width="120">
           <template slot-scope="scope">
             <span>{{ scope.row.subjectName }}</span>
           </template>
@@ -212,10 +214,13 @@
           </template>
         </el-table-column>
       </el-table>
+      <div class="pagination-container">
+        <el-pagination v-show="subject.total>0" :current-page="subject.listQuery.pageNum" :page-sizes="[10,20,30, 50]" :page-size="subject.listQuery.pageSize" :total="subject.total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSubjectSizeChange" @current-change="handleSubjectCurrentChange"/>
+      </div>
     </el-dialog>
 
     <!--题目信息表单-->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogSubjectFormVisible" width="60%" top="10vh">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogSubjectFormVisible" width="80%" top="10vh">
       <el-form ref="dataSubjectForm" :rules="subjectRules" :model="tempSubject" :label-position="labelPosition" label-width="100px">
         <el-row>
           <el-col :span="12">
@@ -245,52 +250,60 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row>
+        <el-row v-if="tempSubject.type !== 0">
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.content')" prop="content">
-              <el-input v-model="tempSubject.content"/>
+              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.content" type="textarea"/>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row v-if="tempSubject.type === 0">
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.optionA')" prop="optionA">
-              <el-input v-model="tempSubject.optionA"/>
+              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.optionA" type="textarea"/>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row v-if="tempSubject.type === 0">
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.optionB')" prop="optionB">
-              <el-input v-model="tempSubject.optionB"/>
+              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.optionB" type="textarea"/>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row v-if="tempSubject.type === 0">
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.optionC')" prop="optionC">
-              <el-input v-model="tempSubject.optionC"/>
+              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.optionC" type="textarea"/>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row v-if="tempSubject.type === 0">
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.optionD')" prop="optionD">
-              <el-input v-model="tempSubject.optionD"/>
+              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.optionD" type="textarea"/>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.answer')" prop="answer">
-              <el-input v-model="tempSubject.answer"/>
+              <!-- 非选择 -->
+              <el-input v-if="tempSubject.type !== 0" :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.answer" type="textarea"/>
+              <!-- 选择题 -->
+              <el-radio-group v-if="tempSubject.type === 0" v-model="tempSubject.answer">
+                <el-radio :label="0">A</el-radio>
+                <el-radio :label="1">B</el-radio>
+                <el-radio :label="2">C</el-radio>
+                <el-radio :label="3">D</el-radio>
+              </el-radio-group>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.analysis')" prop="analysis">
-              <el-input v-model="tempSubject.analysis"/>
+              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.analysis" type="textarea"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -481,6 +494,14 @@ export default {
       this.listQuery.pageNum = val
       this.getList()
     },
+    handleSubjectSizeChange(val) {
+      this.subject.listQuery.limit = val
+      this.handleSubjectManagement()
+    },
+    handleSubjectCurrentChange(val) {
+      this.subject.listQuery.pageNum = val
+      this.handleSubjectManagement()
+    },
     handleModifyStatus(row, status) {
       row.status = status
       putObj(row).then(() => {
@@ -622,6 +643,9 @@ export default {
             var subject = response.data.list[i]
             subject.type = parseInt(subject.type)
             subject.level = parseInt(subject.level)
+            if (subject.type === 0) {
+              subject.answer = parseInt(subject.answer)
+            }
           }
         }
         this.subject.list = response.data.list
@@ -738,6 +762,20 @@ export default {
     // 切换题目类型
     changeSubjectType(value) {
       console.log(value)
+    },
+    // 发布考试
+    handlePublic(row, status) {
+      const tempData = Object.assign({}, row)
+      tempData.status = status
+      putObj(tempData).then(() => {
+        this.getList()
+        this.$notify({
+          title: '成功',
+          message: '更新成功',
+          type: 'success',
+          duration: 2000
+        })
+      })
     }
   }
 }

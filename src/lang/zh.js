@@ -181,7 +181,9 @@ export default {
       optionF: '选项F',
       answer: '参考答案',
       analysis: '解析'
-    }
+    },
+    public: '发布',
+    retrieve: '回收'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',

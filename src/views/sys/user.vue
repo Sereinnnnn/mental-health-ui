@@ -3,19 +3,23 @@
     <div class="filter-container">
       <el-input :placeholder="$t('table.username')" v-model="listQuery.username" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
-      <el-button v-if="user_btn_add" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
+      <el-button v-if="user_btn_add" class="filter-item" icon="el-icon-check" plain @click="handleCreate">{{ $t('table.add') }}</el-button>
+      <el-button v-if="user_btn_add" class="filter-item" icon="el-icon-delete" plain @click="handleDeletes">{{ $t('table.del') }}</el-button>
+      <el-button v-if="user_btn_add" class="filter-item" icon="el-icon-upload2" plain @click="handleImport">{{ $t('table.import') }}</el-button>
+      <el-button v-if="user_btn_add" class="filter-item" icon="el-icon-download" plain @click="handleExport">{{ $t('table.export') }}</el-button>
     </div>
-
     <el-table
       v-loading="listLoading"
+      ref="multipleTable"
       :key="tableKey"
       :data="list"
       border
       fit
       highlight-current-row
-      style="width: 100%;">
-      <el-table-column type="selection" width="55">
-      </el-table-column>
+      style="width: 100%;"
+      @cell-dblclick="handleUpdate"
+      @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55"/>
       <el-table-column :label="$t('table.username')" min-width="110">
         <template slot-scope="scope">
           <span>{{ scope.row.username }}</span>
@@ -198,6 +202,7 @@ export default {
       list: null,
       total: null,
       listLoading: true,
+      multipleSelection: [],
       listQuery: {
         pageNum: 1,
         pageSize: 10,
@@ -425,29 +430,38 @@ export default {
       const index = this.list.indexOf(row)
       this.list.splice(index, 1)
     },
-    handleFetchPv(pv) {
-      fetchPv(pv).then(response => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
-    },
-    handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['username', 'name', 'email', 'phone', 'status']
-        const filterVal = ['username', 'name', 'email', 'phone', 'status']
-        const data = this.formatJson(filterVal, this.list)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: 'table-list'
+    // 检查是否选中
+    checkMultipleSelect() {
+      if (this.multipleSelection.length === 0) {
+        this.$message({
+          message: '请选择记录！',
+          type: 'warning'
         })
-        this.downloadLoading = false
-      })
+        return false
+      }
+      return true
+    },
+    handleDeletes() {
+      if (this.checkMultipleSelect()) {
+        console.log(this.multipleSelection)
+      }
+    },
+    handleExport() {
+      if (this.checkMultipleSelect()) {
+        console.log(this.multipleSelection)
+      }
+    },
+    handleImport() {
+      if (this.checkMultipleSelect()) {
+        console.log(this.multipleSelection)
+      }
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {
-          return v[j]
+        return v[j]
       }))
     },
     handleSelectDept() {

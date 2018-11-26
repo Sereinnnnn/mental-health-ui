@@ -170,7 +170,7 @@
 </template>
 
 <script>
-import { fetchList, fetchPv, addObj, putObj, delObj } from '@/api/admin/user'
+import { fetchList, addObj, putObj, delObj, exportObj } from '@/api/admin/user'
 import waves from '@/directive/waves'
 import { fetchTree } from '@/api/admin/dept'
 import { deptRoleList } from '@/api/admin/role'
@@ -449,6 +449,7 @@ export default {
     handleExport() {
       if (this.checkMultipleSelect()) {
         console.log(this.multipleSelection)
+        exportObj(this.multipleSelection)
       }
     },
     handleImport() {

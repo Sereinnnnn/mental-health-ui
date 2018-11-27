@@ -184,7 +184,10 @@
       <div class="filter-container">
         <el-input :placeholder="$t('table.subjectName')" v-model="subject.listQuery.subjectName" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilterSubject"/>
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilterSubject">{{ $t('table.search') }}</el-button>
-        <el-button v-if="exam_btn_subject" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreateSubject">{{ $t('table.add') }}</el-button>
+        <el-button v-if="exam_btn_subject_add" class="filter-item" icon="el-icon-check" plain @click="handleCreateSubject">{{ $t('table.add') }}</el-button>
+        <el-button v-if="exam_btn_subject_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletesSubject">{{ $t('table.del') }}</el-button>
+        <el-button v-if="exam_btn_subject_import" class="filter-item" icon="el-icon-upload2" plain @click="handleImportSubject">{{ $t('table.import') }}</el-button>
+        <el-button v-if="exam_btn_subject_export" class="filter-item" icon="el-icon-download" plain @click="handleExportSubject">{{ $t('table.export') }}</el-button>
       </div>
       <el-table v-loading="subject.listLoading" :data="subject.list" border fit highlight-current-row style="width: 100%;">
         <el-table-column :label="$t('table.subjectName')" property="subjectName" min-width="120">
@@ -454,7 +457,8 @@ export default {
         { id: 1, subjectTypeName: '填空题' },
         { id: 2, subjectTypeName: '判断题' },
         { id: 3, subjectTypeName: '简答题' }
-      ]
+      ],
+      multipleSelection: []
     }
   },
   created() {
@@ -462,7 +466,10 @@ export default {
     this.exam_btn_add = this.permissions['exam:exam:add']
     this.exam_btn_edit = this.permissions['exam:exam:edit']
     this.exam_btn_del = this.permissions['exam:exam:del']
-    this.exam_btn_subject = this.permissions['exam:exam:subject']
+    this.exam_btn_subject_add = this.permissions['exam:exam:subject:add']
+    this.exam_btn_subject_del = this.permissions['exam:exam:subject:del']
+    this.exam_btn_subject_import = this.permissions['exam:exam:subject:import']
+    this.exam_btn_subject_export = this.permissions['exam:exam:subject:export']
   },
   computed: {
     ...mapGetters([
@@ -776,6 +783,39 @@ export default {
           duration: 2000
         })
       })
+    },
+    // 检查是否选中
+    checkMultipleSelect() {
+      if (this.multipleSelection.length === 0) {
+        this.$message({
+          message: '请选择记录！',
+          type: 'warning'
+        })
+        return false
+      }
+      return true
+    },
+    // 批量删除
+    handleDeletesSubject() {
+      if (this.checkMultipleSelect()) {
+        console.log(this.multipleSelection)
+      }
+    },
+    // 导出
+    handleExportSubject() {
+      if (this.checkMultipleSelect()) {
+        let ids = ''
+        for (let i = 0; i < this.multipleSelection.length; i++) {
+          ids += this.multipleSelection[i].id + ','
+        }
+        window.open('/exam/subject/export?ids=' + ids)
+      }
+    },
+    // 导入
+    handleImportSubject() {
+      if (this.checkMultipleSelect()) {
+        console.log(this.multipleSelection)
+      }
     }
   }
 }

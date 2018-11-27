@@ -4,9 +4,9 @@
       <el-input :placeholder="$t('table.username')" v-model="listQuery.username" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
       <el-button v-if="user_btn_add" class="filter-item" icon="el-icon-check" plain @click="handleCreate">{{ $t('table.add') }}</el-button>
-      <el-button v-if="user_btn_add" class="filter-item" icon="el-icon-delete" plain @click="handleDeletes">{{ $t('table.del') }}</el-button>
-      <el-button v-if="user_btn_add" class="filter-item" icon="el-icon-upload2" plain @click="handleImport">{{ $t('table.import') }}</el-button>
-      <el-button v-if="user_btn_add" class="filter-item" icon="el-icon-download" plain @click="handleExport">{{ $t('table.export') }}</el-button>
+      <el-button v-if="user_btn_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletes">{{ $t('table.del') }}</el-button>
+      <el-button v-if="user_btn_import" class="filter-item" icon="el-icon-upload2" plain @click="handleImport">{{ $t('table.import') }}</el-button>
+      <el-button v-if="user_btn_export" class="filter-item" icon="el-icon-download" plain @click="handleExport">{{ $t('table.export') }}</el-button>
     </div>
     <el-table
       v-loading="listLoading"
@@ -170,7 +170,7 @@
 </template>
 
 <script>
-import { fetchList, addObj, putObj, delObj, exportObj } from '@/api/admin/user'
+import { fetchList, addObj, putObj, delObj } from '@/api/admin/user'
 import waves from '@/directive/waves'
 import { fetchTree } from '@/api/admin/dept'
 import { deptRoleList } from '@/api/admin/role'
@@ -255,6 +255,8 @@ export default {
     this.user_btn_add = this.permissions['sys:user:add']
     this.user_btn_edit = this.permissions['sys:user:edit']
     this.user_btn_del = this.permissions['sys:user:del']
+    this.user_btn_import = this.permissions['sys:user:import']
+    this.user_btn_export = this.permissions['sys:user:export']
   },
   computed: {
     ...mapGetters([
@@ -441,17 +443,23 @@ export default {
       }
       return true
     },
+    // 批量删除
     handleDeletes() {
       if (this.checkMultipleSelect()) {
         console.log(this.multipleSelection)
       }
     },
+    // 导出
     handleExport() {
       if (this.checkMultipleSelect()) {
-        console.log(this.multipleSelection)
-        exportObj(this.multipleSelection)
+        let ids = ''
+        for (let i = 0; i < this.multipleSelection.length; i++) {
+          ids += this.multipleSelection[i].id + ','
+        }
+        window.open('/admin/user/export?ids=' + ids)
       }
     },
+    // 导入
     handleImport() {
       if (this.checkMultipleSelect()) {
         console.log(this.multipleSelection)

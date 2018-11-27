@@ -46,10 +46,3 @@ export function updateObjInfo(obj) {
   })
 }
 
-export function exportObj(obj) {
-  return request({
-    url: '/admin/user/export',
-    method: 'post',
-    data: obj
-  })
-}

@@ -156,14 +156,17 @@
       </el-row>
     </el-dialog>
 
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
-      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="Channel"/>
-        <el-table-column prop="pv" label="Pv"/>
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">{{ $t('table.confirm') }}</el-button>
-      </span>
+    <!-- 导入用户 -->
+    <el-dialog :visible.sync="dialogImportVisible" :title="$t('table.import')">
+      <el-upload
+        :show-file-list="false"
+        :on-success="handleUploadUserSuccess"
+        :before-upload="beforeUploadUserUpload"
+        :action="importUrl"
+        :headers="headers">
+        <el-button size="small">点击上传</el-button>
+        <div slot="tip" class="el-upload__tip">只能上传xlns文件，且不超过500kb</div>
+      </el-upload>
     </el-dialog>
 
   </div>
@@ -175,6 +178,7 @@ import waves from '@/directive/waves'
 import { fetchTree } from '@/api/admin/dept'
 import { deptRoleList } from '@/api/admin/role'
 import { mapGetters } from 'vuex'
+import { getToken } from '@/utils/auth'
 
 export default {
   name: 'User',
@@ -225,12 +229,12 @@ export default {
       dialogFormVisible: false,
       dialogDeptVisible: false,
       dialogRoleVisible: false,
+      dialogImportVisible: false,
       dialogStatus: '',
       textMap: {
         update: '编辑',
         create: '新建'
       },
-      dialogPvVisible: false,
       pvData: [],
       rules: {
         name: [{ required: true, message: '请输入账号', trigger: 'change' }],
@@ -247,7 +251,13 @@ export default {
       aExpandedKeys: [],
       user_btn_add: false,
       user_btn_edit: false,
-      user_btn_del: false
+      user_btn_del: false,
+      user_btn_import: false,
+      user_btn_export: false,
+      importUrl: '/admin/user/import',
+      headers: {
+        Authorization: 'Bearer ' + getToken()
+      }
     }
   },
   created() {
@@ -461,9 +471,7 @@ export default {
     },
     // 导入
     handleImport() {
-      if (this.checkMultipleSelect()) {
-        console.log(this.multipleSelection)
-      }
+      this.dialogImportVisible = true
     },
     handleSelectionChange(val) {
       this.multipleSelection = val
@@ -491,6 +499,22 @@ export default {
       this.temp.deptName = data.deptName
       deptRoleList(data.id).then(response => {
         this.roleData = response.data
+      })
+    },
+    // 上传前
+    beforeUploadUserUpload() {
+      console.log('before upload.')
+    },
+    // 上传成功
+    handleUploadUserSuccess() {
+      console.log('upload success.')
+      this.dialogImportVisible = false
+      this.getList()
+      this.$notify({
+        title: '成功',
+        message: '导入成功',
+        type: 'success',
+        duration: 2000
       })
     }
   }

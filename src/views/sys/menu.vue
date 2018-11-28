@@ -2,9 +2,11 @@
   <div class="tab-container">
     <div class="filter-container">
       <el-button-group>
-        <el-button v-if="menu_btn_add" type="primary" icon="plus" @click="handlerAddSuper">添加顶级菜单</el-button>
-        <el-button v-if="menu_btn_add" type="primary" icon="plus" @click="handlerAdd">添加子菜单</el-button>
-        <el-button v-if="menu_btn_del" type="primary" icon="delete" @click="handleDelete">删除</el-button>
+        <el-button v-if="menu_btn_add" plain icon="plus" @click="handlerAddSuper">添加顶级菜单</el-button>
+        <el-button v-if="menu_btn_add" plain icon="plus" @click="handlerAdd">添加子菜单</el-button>
+        <el-button v-if="menu_btn_del" plain icon="delete" @click="handleDelete">{{ $t('table.del') }}</el-button>
+        <el-button v-if="menu_btn_import" plain icon="el-icon-upload2" @click="handleImport">{{ $t('table.import') }}</el-button>
+        <el-button v-if="menu_btn_export" plain icon="el-icon-download" @click="handleExport">{{ $t('table.export') }}</el-button>
       </el-button-group>
 
       <el-row>
@@ -92,12 +94,46 @@
         </el-col>
       </el-row>
     </div>
+
+    <!-- 导出菜单 -->
+    <el-dialog :visible.sync="dialogExportVisible" :title="$t('table.export')">
+      <el-tree
+        ref="menuTree"
+        :data="treeData"
+        :props="defaultProps"
+        :default-checked-keys="checkedKeys"
+        show-checkbox
+        class="filter-tree"
+        node-key="id"
+        default-expand-all
+        highlight-current
+        check-strictly
+        @node-click="getNodeData"
+      />
+      <div slot="footer" class="dialog-footer">
+        <el-button v-if="menu_btn_export" type="primary" @click="handleExportMenu()">导出</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 导入菜单 -->
+    <el-dialog :visible.sync="dialogImportVisible" :title="$t('table.import')">
+      <el-upload
+        :show-file-list="false"
+        :on-success="handleUploadMenuSuccess"
+        :before-upload="beforeMenuUpload"
+        :action="importUrl"
+        :headers="headers">
+        <el-button size="small">点击上传</el-button>
+        <div slot="tip" class="el-upload__tip">只能上传xlns文件，且不超过500kb</div>
+      </el-upload>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { fetchTree, getObj, addObj, delObj, putObj } from '@/api/admin/menu'
 import { mapGetters } from 'vuex'
+import { getToken } from '@/utils/auth'
 
 export default {
   name: 'MenuManagement',
@@ -147,13 +183,27 @@ export default {
         remark: undefined
       },
       currentId: -1,
+      // 表单校验规则
       rules: {
         name: [{ required: true, message: '请输入菜单名称', trigger: 'change' }],
         permission: [{ required: true, message: '请输入菜单标识', trigger: 'change' }]
       },
+      // 按钮权限
       menu_btn_add: false,
       menu_btn_edit: false,
-      menu_btn_del: false
+      menu_btn_del: false,
+      menu_btn_import: false,
+      menu_btn_export: false,
+      // 导入窗口状态
+      dialogImportVisible: false,
+      // 导出窗口状态
+      dialogExportVisible: false,
+      // 选择的菜单
+      multipleSelection: [],
+      importUrl: '/admin/menu/import',
+      headers: {
+        Authorization: 'Bearer ' + getToken()
+      }
     }
   },
   created() {
@@ -161,6 +211,8 @@ export default {
     this.menu_btn_add = this.permissions['sys:menu:add']
     this.menu_btn_edit = this.permissions['sys:menu:edit']
     this.menu_btn_del = this.permissions['sys:menu:del']
+    this.menu_btn_import = this.permissions['sys:menu:import']
+    this.menu_btn_export = this.permissions['sys:menu:export']
   },
   computed: {
     ...mapGetters([
@@ -300,6 +352,39 @@ export default {
         path: undefined,
         remark: undefined
       }
+    },
+    // 导入
+    handleImport() {
+      this.dialogImportVisible = true
+    },
+    // 显示导出弹窗
+    handleExport() {
+      this.dialogExportVisible = true
+    },
+    // 导出
+    handleExportMenu() {
+      const keys = this.$refs.menuTree.getCheckedKeys()
+      let menus = ''
+      if (keys.length > 0) {
+        for (let i = 0; i < keys.length; i++) {
+          menus = menus + keys[i] + ','
+        }
+      }
+      window.open('/admin/menu/export?ids=' + menus)
+    },
+    // 上传前
+    beforeMenuUpload() {
+      console.log('before upload.')
+    },
+    // 上传成功
+    handleUploadMenuSuccess() {
+      console.log('upload success.')
+      this.$notify({
+        title: '成功',
+        message: '导入成功',
+        type: 'success',
+        duration: 2000
+      })
     }
   }
 }

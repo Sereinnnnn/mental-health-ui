@@ -317,6 +317,19 @@
         <el-button v-else type="primary" @click="updateSubjectData">{{ $t('table.confirm') }}</el-button>
       </div>
     </el-dialog>
+
+    <!-- 导入题目 -->
+    <el-dialog :visible.sync="dialogImportVisible" title="$t('table.import')">
+      <el-upload
+        :show-file-list="false"
+        :on-success="handleUploadUserSuccess"
+        :before-upload="beforeUploadUserUpload"
+        :action="importUrl"
+        :headers="headers">
+        <el-button size="small">点击上传</el-button>
+        <div slot="tip" class="el-upload__tip">只能上传xlns文件，且不超过500kb</div>
+      </el-upload>
+    </el-dialog>
   </div>
 </template>
 
@@ -326,6 +339,7 @@ import { fetchCourseList } from '@/api/exam/course'
 import { fetchSubjectList, addSubject, putSubject, delSubject } from '@/api/exam/subject'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
+import { getToken } from '@/utils/auth'
 
 export default {
   name: 'ExamManagement',
@@ -358,6 +372,7 @@ export default {
   },
   data() {
     return {
+      baseUrl: '/exam',
       tableKey: 0,
       list: null,
       total: null,
@@ -367,6 +382,7 @@ export default {
         pageSize: 10,
         sort: '+id'
       },
+      // 课程
       course: {
         listQuery: {
           pageNum: 1,
@@ -377,6 +393,7 @@ export default {
         total: null,
         listLoading: true
       },
+      // 题目
       subject: {
         listQuery: {
           pageNum: 1,
@@ -389,6 +406,7 @@ export default {
         listLoading: true,
         examinationId: ''
       },
+      // 考试临时信息
       temp: {
         id: '',
         examinationName: '',
@@ -408,6 +426,7 @@ export default {
         },
         remark: ''
       },
+      // 题目临时信息
       tempSubject: {
         id: '',
         examinationId: '',
@@ -431,6 +450,7 @@ export default {
         update: '编辑',
         create: '新建'
       },
+      // 校验规则
       rules: {
         examinationName: [{ required: true, message: '请输入考试名称', trigger: 'change' }],
         collegeId: [{ required: true, message: '请输入考试所属学院', trigger: 'change' }],
@@ -443,22 +463,34 @@ export default {
       subjectRules: {},
       downloadLoading: false,
       labelPosition: 'right',
+      // 按钮权限
       exam_btn_add: false,
       exam_btn_edit: false,
       exam_btn_del: false,
       exam_btn_subject: false,
+      exam_btn_subject_import: false,
+      exam_btn_subject_export: false,
       dialogCourseVisible: false,
       courseData: [],
       dialogSubjectVisible: false,
       subjectData: [],
       dialogSubjectFormVisible: false,
+      // 题目类型
       subjectTypeData: [
         { id: 0, subjectTypeName: '选择题' },
         { id: 1, subjectTypeName: '填空题' },
         { id: 2, subjectTypeName: '判断题' },
         { id: 3, subjectTypeName: '简答题' }
       ],
-      multipleSelection: []
+      // 多选
+      multipleSelection: [],
+      // 导入弹窗状态
+      dialogImportVisible: false,
+      // 导入题目的url
+      importUrl: this.baseUrl + '/subject/import',
+      headers: {
+        Authorization: 'Bearer ' + getToken()
+      }
     }
   },
   created() {
@@ -808,14 +840,12 @@ export default {
         for (let i = 0; i < this.multipleSelection.length; i++) {
           ids += this.multipleSelection[i].id + ','
         }
-        window.open('/exam/subject/export?ids=' + ids)
+        window.open(this.baseUrl + '/subject/export?ids=' + ids)
       }
     },
     // 导入
     handleImportSubject() {
-      if (this.checkMultipleSelect()) {
-        console.log(this.multipleSelection)
-      }
+      this.dialogImportVisible = true
     }
   }
 }

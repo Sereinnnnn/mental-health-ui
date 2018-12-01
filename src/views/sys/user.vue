@@ -430,17 +430,23 @@ export default {
       })
     },
     handleDelete(row) {
-      delObj(row.id).then(() => {
-        this.dialogFormVisible = false
-        this.$notify({
-          title: '成功',
-          message: '删除成功',
-          type: 'success',
-          duration: 2000
+      this.$confirm('确定要删除吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        delObj(row.id).then(() => {
+          this.dialogFormVisible = false
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
         })
+        const index = this.list.indexOf(row)
+        this.list.splice(index, 1)
       })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
     },
     // 检查是否选中
     checkMultipleSelect() {
@@ -466,7 +472,7 @@ export default {
         for (let i = 0; i < this.multipleSelection.length; i++) {
           ids += this.multipleSelection[i].id + ','
         }
-        window.open('/admin/user/export?ids=' + ids)
+        window.location.href = '/admin/user/export?ids=' + ids
       }
     },
     // 导入

@@ -2,8 +2,12 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input :placeholder="$t('table.examinationName')" v-model="listQuery.examinationName" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-select v-model="listQuery.courseId" :placeholder="$t('table.course')" style="width: 140px" class="filter-item" @change="handleFilter">
+        <el-option v-for="item in course.list" :key="item.id" :label="item.courseName" :value="item.id"/>
+      </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
-      <el-button v-if="exam_btn_add" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
+      <el-button v-if="exam_btn_add" class="filter-item" style="margin-left: 10px;" icon="el-icon-check" plain @click="handleCreate">{{ $t('table.add') }}</el-button>
+      <el-button v-if="exam_btn_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletes">{{ $t('table.del') }}</el-button>
     </div>
 
     <!--考试列表-->
@@ -14,7 +18,8 @@
       border
       fit
       highlight-current-row
-      style="width: 100%;">
+      style="width: 100%;"
+      @cell-dblclick="handleUpdate">
       <el-table-column type="selection" width="55"/>
       <el-table-column :label="$t('table.examinationName')" min-width="90" align="center">
         <template slot-scope="scope">
@@ -189,7 +194,16 @@
         <el-button v-if="exam_btn_subject_import" class="filter-item" icon="el-icon-upload2" plain @click="handleImportSubject">{{ $t('table.import') }}</el-button>
         <el-button v-if="exam_btn_subject_export" class="filter-item" icon="el-icon-download" plain @click="handleExportSubject">{{ $t('table.export') }}</el-button>
       </div>
-      <el-table v-loading="subject.listLoading" :data="subject.list" border fit highlight-current-row style="width: 100%;">
+      <el-table
+        v-loading="subject.listLoading"
+        :data="subject.list"
+        border
+        fit
+        highlight-current-row
+        style="width: 100%;"
+        @selection-change="handleSelectionChange"
+        @cell-dblclick="handleUpdateSubject">
+        <el-table-column type="selection" width="55"/>
         <el-table-column :label="$t('table.subjectName')" property="subjectName" min-width="120">
           <template slot-scope="scope">
             <span>{{ scope.row.subjectName }}</span>
@@ -233,7 +247,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item :label="$t('table.subject.type')" prop="type">
-              <el-select @change="changeSubjectType" v-model="tempSubject.type" class="filter-item" placeholder="请选择题目类型" width="100%">
+              <el-select v-model="tempSubject.type" class="filter-item" placeholder="请选择题目类型" width="100%" @change="changeSubjectType">
                 <el-option v-for="item in subjectTypeData" :key="item.id" :label="item.subjectTypeName" :value="item.id">
                   <span style="float: left">{{ item.subjectTypeName }}</span>
                 </el-option>
@@ -319,15 +333,17 @@
     </el-dialog>
 
     <!-- 导入题目 -->
-    <el-dialog :visible.sync="dialogImportVisible" title="$t('table.import')">
+    <el-dialog :visible.sync="dialogImportVisible" :title="$t('table.import')">
       <el-upload
-        :show-file-list="false"
-        :on-success="handleUploadUserSuccess"
-        :before-upload="beforeUploadUserUpload"
+        :multiple="false"
+        :auto-upload="true"
+        :show-file-list="true"
+        :on-success="handleUploadSubjectSuccess"
+        :before-upload="beforeUploadSubjectUpload"
         :action="importUrl"
         :headers="headers">
-        <el-button size="small">点击上传</el-button>
-        <div slot="tip" class="el-upload__tip">只能上传xlns文件，且不超过500kb</div>
+        <el-button size="small">选择文件</el-button>
+        <div slot="tip" class="el-upload__tip">只能上传xlsx文件，且不超过1M</div>
       </el-upload>
     </el-dialog>
   </div>
@@ -380,7 +396,8 @@ export default {
       listQuery: {
         pageNum: 1,
         pageSize: 10,
-        sort: '+id'
+        sort: '+id',
+        courseId: ''
       },
       // 课程
       course: {
@@ -487,17 +504,25 @@ export default {
       // 导入弹窗状态
       dialogImportVisible: false,
       // 导入题目的url
-      importUrl: this.baseUrl + '/subject/import',
+      importUrl: '/exam/subject/import',
       headers: {
         Authorization: 'Bearer ' + getToken()
       }
     }
   },
   created() {
+    // 加载考试列表
     this.getList()
+    // 获取课程列表
+    fetchCourseList(this.course.listQuery).then(response => {
+      this.course.list = response.data.list
+      this.course.total = response.data.total
+      this.course.listLoading = false
+    })
     this.exam_btn_add = this.permissions['exam:exam:add']
     this.exam_btn_edit = this.permissions['exam:exam:edit']
     this.exam_btn_del = this.permissions['exam:exam:del']
+    this.exam_btn_subject = this.permissions['exam:exam:subject']
     this.exam_btn_subject_add = this.permissions['exam:exam:subject:add']
     this.exam_btn_subject_del = this.permissions['exam:exam:subject:del']
     this.exam_btn_subject_import = this.permissions['exam:exam:subject:import']
@@ -639,18 +664,24 @@ export default {
     },
     // 删除
     handleDelete(row) {
-      delObj(row.id).then(() => {
-        this.dialogFormVisible = false
-        this.getList()
-        this.$notify({
-          title: '成功',
-          message: '删除成功',
-          type: 'success',
-          duration: 2000
+      this.$confirm('确定要删除吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        delObj(row.id).then(() => {
+          this.dialogFormVisible = false
+          this.getList()
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
         })
+        const index = this.list.indexOf(row)
+        this.list.splice(index, 1)
       })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
     },
     // 选择课程
     selectCourse() {
@@ -740,18 +771,24 @@ export default {
     },
     // 删除题目
     handleDeleteSubject(row) {
-      delSubject(row.id).then(() => {
-        this.dialogSubjectFormVisible = false
-        this.handleSubjectManagement()
-        this.$notify({
-          title: '成功',
-          message: '删除成功',
-          type: 'success',
-          duration: 2000
+      this.$confirm('确定要删除吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        delSubject(row.id).then(() => {
+          this.dialogSubjectFormVisible = false
+          this.handleSubjectManagement()
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
         })
+        const index = this.subject.list.indexOf(row)
+        this.subject.list.splice(index, 1)
       })
-      const index = this.subject.list.indexOf(row)
-      this.subject.list.splice(index, 1)
     },
     // 保存题目
     createSubjectData() {
@@ -816,17 +853,6 @@ export default {
         })
       })
     },
-    // 检查是否选中
-    checkMultipleSelect() {
-      if (this.multipleSelection.length === 0) {
-        this.$message({
-          message: '请选择记录！',
-          type: 'warning'
-        })
-        return false
-      }
-      return true
-    },
     // 批量删除
     handleDeletesSubject() {
       if (this.checkMultipleSelect()) {
@@ -835,17 +861,57 @@ export default {
     },
     // 导出
     handleExportSubject() {
-      if (this.checkMultipleSelect()) {
-        let ids = ''
-        for (let i = 0; i < this.multipleSelection.length; i++) {
-          ids += this.multipleSelection[i].id + ','
-        }
-        window.open(this.baseUrl + '/subject/export?ids=' + ids)
+      // 没选择题目，导出所有
+      if (this.multipleSelection.length === 0) {
+        this.$confirm('是否导出所有题目?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'success'
+        }).then(() => {
+          window.location.href = this.baseUrl + '/subject/export?ids=&examinationId=' + this.subject.examinationId
+        }).catch(() => {
+
+        })
+      } else {
+        // 导出选中
+        this.$confirm('是否导出选中的题目?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'success'
+        }).then(() => {
+          let ids = ''
+          for (let i = 0; i < this.multipleSelection.length; i++) {
+            ids += this.multipleSelection[i].id + ','
+          }
+          window.location.href = this.baseUrl + '/subject/export?ids=' + ids
+        }).catch(() => {
+
+        })
       }
     },
     // 导入
     handleImportSubject() {
       this.dialogImportVisible = true
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val
+    },
+    // 上传前
+    beforeUploadSubjectUpload(file) {
+      const isText = file.type === 'application/vnd.ms-excel'
+      const isTextComputer = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      return (isText | isTextComputer)
+    },
+    // 上传成功
+    handleUploadSubjectSuccess() {
+      this.dialogImportVisible = false
+      this.handleSubjectManagement()
+      this.$notify({
+        title: '成功',
+        message: '导入成功',
+        type: 'success',
+        duration: 2000
+      })
     }
   }
 }

@@ -1,13 +1,11 @@
 <template>
   <div class="tab-container">
     <div class="filter-container">
-      <el-button-group>
-        <el-button v-if="menu_btn_add" plain icon="plus" @click="handlerAddSuper">添加顶级菜单</el-button>
-        <el-button v-if="menu_btn_add" plain icon="plus" @click="handlerAdd">添加子菜单</el-button>
-        <el-button v-if="menu_btn_del" plain icon="delete" @click="handleDelete">{{ $t('table.del') }}</el-button>
-        <el-button v-if="menu_btn_import" plain icon="el-icon-upload2" @click="handleImport">{{ $t('table.import') }}</el-button>
-        <el-button v-if="menu_btn_export" plain icon="el-icon-download" @click="handleExport">{{ $t('table.export') }}</el-button>
-      </el-button-group>
+      <el-button v-if="menu_btn_add" icon="el-icon-check" plain @click="handlerAddSuper">添加顶级菜单</el-button>
+      <el-button v-if="menu_btn_add" icon="el-icon-check" plain @click="handlerAdd">添加子菜单</el-button>
+      <el-button v-if="menu_btn_del" icon="el-icon-delete" plain @click="handleDelete">{{ $t('table.del') }}</el-button>
+      <el-button v-if="menu_btn_import" icon="el-icon-upload2" plain @click="handleImport">{{ $t('table.import') }}</el-button>
+      <el-button v-if="menu_btn_export" icon="el-icon-download" plain @click="handleExport">{{ $t('table.export') }}</el-button>
 
       <el-row>
         <el-col :span="5" style ="margin-top:10px;">
@@ -101,13 +99,10 @@
         ref="menuTree"
         :data="treeData"
         :props="defaultProps"
-        :default-checked-keys="checkedKeys"
         show-checkbox
         class="filter-tree"
         node-key="id"
-        default-expand-all
         highlight-current
-        check-strictly
         @node-click="getNodeData"
       />
       <div slot="footer" class="dialog-footer">
@@ -118,13 +113,15 @@
     <!-- 导入菜单 -->
     <el-dialog :visible.sync="dialogImportVisible" :title="$t('table.import')">
       <el-upload
-        :show-file-list="false"
+        :multiple="false"
+        :auto-upload="true"
+        :show-file-list="true"
         :on-success="handleUploadMenuSuccess"
         :before-upload="beforeMenuUpload"
         :action="importUrl"
         :headers="headers">
-        <el-button size="small">点击上传</el-button>
-        <div slot="tip" class="el-upload__tip">只能上传xlns文件，且不超过500kb</div>
+        <el-button size="small">选择文件</el-button>
+        <div slot="tip" class="el-upload__tip">只能上传xlsx文件，且不超过1M</div>
       </el-upload>
     </el-dialog>
   </div>
@@ -182,7 +179,7 @@ export default {
         path: undefined,
         remark: undefined
       },
-      currentId: -1,
+      currentId: '',
       // 表单校验规则
       rules: {
         name: [{ required: true, message: '请输入菜单名称', trigger: 'change' }],
@@ -289,7 +286,14 @@ export default {
       this.formStatus = 'create'
     },
     handleDelete() {
-      this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+      if (this.currentId === '') {
+        this.$message({
+          message: '请选择要删除的记录',
+          type: 'warning'
+        })
+        return
+      }
+      this.$confirm('确定要删除吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -363,28 +367,49 @@ export default {
     },
     // 导出
     handleExportMenu() {
-      const keys = this.$refs.menuTree.getCheckedKeys()
+      // 获取选中节点
+      const keys = this.$refs.menuTree.getCheckedKeys(true).concat(this.$refs.menuTree.getHalfCheckedKeys())
       let menus = ''
-      if (keys.length > 0) {
-        for (let i = 0; i < keys.length; i++) {
-          menus = menus + keys[i] + ','
-        }
+      if (keys.length === 0) {
+        this.$confirm('是否导出所有菜单?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'success'
+        }).then(() => {
+          window.location.href = '/admin/menu/export?ids=' + menus
+        }).catch(() => {
+
+        })
+      } else {
+        this.$confirm('是否导出选中的菜单?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'success'
+        }).then(() => {
+          for (let i = 0; i < keys.length; i++) {
+            menus = menus + keys[i] + ','
+          }
+          window.location.href = '/admin/menu/export?ids=' + menus
+        }).catch(() => {
+
+        })
       }
-      window.open('/admin/menu/export?ids=' + menus)
     },
     // 上传前
     beforeMenuUpload() {
-      console.log('before upload.')
+
     },
     // 上传成功
     handleUploadMenuSuccess() {
-      console.log('upload success.')
+      debugger
       this.$notify({
         title: '成功',
         message: '导入成功',
         type: 'success',
         duration: 2000
       })
+      this.dialogImportVisible = false
+      this.getList()
     }
   }
 }

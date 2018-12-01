@@ -224,7 +224,7 @@ export default {
       })
     },
     handleDownload(row) {
-      window.open('/admin/attachment/download?id=' + row.id)
+      window.location.href = '/admin/attachment/download?id=' + row.id
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
@@ -251,17 +251,23 @@ export default {
     },
     // 删除
     handleDelete(row) {
-      delObj(row.id).then(() => {
-        this.getList()
-        this.$notify({
-          title: '成功',
-          message: '删除成功',
-          type: 'success',
-          duration: 2000
+      this.$confirm('确定要删除吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        delObj(row.id).then(() => {
+          this.getList()
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
         })
+        const index = this.list.indexOf(row)
+        this.list.splice(index, 1)
       })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
     },
     handleUploadSuccess() {
       this.uploading = false

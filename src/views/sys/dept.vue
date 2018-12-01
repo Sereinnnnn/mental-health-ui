@@ -1,10 +1,8 @@
 <template>
   <div class="tab-container">
     <div class="filter-container">
-      <el-button-group>
-        <el-button v-if="dept_btn_add" type="primary" icon="plus" @click="handlerAdd">添加</el-button>
-        <el-button v-if="dept_btn_del" type="primary" icon="delete" @click="handleDelete">删除</el-button>
-      </el-button-group>
+      <el-button v-if="dept_btn_add" icon="el-icon-check" plain @click="handlerAdd">添加</el-button>
+      <el-button v-if="dept_btn_del" icon="el-icon-delete" plain @click="handleDelete">删除</el-button>
 
       <el-row>
         <el-col :span="5" style ="margin-top:10px;">
@@ -121,7 +119,7 @@ export default {
         sort: 30,
         status: 0
       },
-      currentId: -1,
+      currentId: '',
       rules: {
         deptName: [{ required: true, message: '请输入部门名称', trigger: 'change' }]
       },
@@ -206,7 +204,14 @@ export default {
       this.formStatus = 'create'
     },
     handleDelete() {
-      this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+      if (this.currentId === '') {
+        this.$message({
+          message: '请选择要删除的记录',
+          type: 'warning'
+        })
+        return
+      }
+      this.$confirm('确定要删除吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'

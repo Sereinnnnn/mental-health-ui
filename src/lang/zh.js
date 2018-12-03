@@ -136,6 +136,8 @@ export default {
     delete: '删除',
     cancel: '取 消',
     confirm: '确 定',
+    save: '保存',
+    saveAndAdd: '保存并添加',
     username: '账号',
     name: '姓名',
     email: '邮箱',

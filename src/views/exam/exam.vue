@@ -19,7 +19,8 @@
       fit
       highlight-current-row
       style="width: 100%;"
-      @cell-dblclick="handleUpdate">
+      @cell-dblclick="handleUpdate"
+      @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55"/>
       <el-table-column :label="$t('table.examinationName')" min-width="90" align="center">
         <template slot-scope="scope">
@@ -327,8 +328,9 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogSubjectFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button v-if="dialogStatus === 'create'" type="primary" @click="createSubjectData">{{ $t('table.confirm') }}</el-button>
-        <el-button v-else type="primary" @click="updateSubjectData">{{ $t('table.confirm') }}</el-button>
+        <el-button v-if="dialogStatus === 'create'" type="primary" @click="createSubjectData">{{ $t('table.save') }}</el-button>
+        <el-button v-else type="primary" @click="updateSubjectData">{{ $t('table.save') }}</el-button>
+        <el-button type="primary" @click="updateAndAddSubjectData">{{ $t('table.saveAndAdd') }}</el-button>
       </div>
     </el-dialog>
 
@@ -341,7 +343,8 @@
         :on-success="handleUploadSubjectSuccess"
         :before-upload="beforeUploadSubjectUpload"
         :action="importUrl"
-        :headers="headers">
+        :headers="headers"
+        :data="params">
         <el-button size="small">选择文件</el-button>
         <div slot="tip" class="el-upload__tip">只能上传xlsx文件，且不超过1M</div>
       </el-upload>
@@ -350,7 +353,7 @@
 </template>
 
 <script>
-import { fetchList, addObj, putObj, delObj } from '@/api/exam/exam'
+import { fetchList, addObj, putObj, delObj, delAllObj } from '@/api/exam/exam'
 import { fetchCourseList } from '@/api/exam/course'
 import { fetchSubjectList, addSubject, putSubject, delSubject } from '@/api/exam/subject'
 import waves from '@/directive/waves'
@@ -507,6 +510,9 @@ export default {
       importUrl: '/exam/subject/import',
       headers: {
         Authorization: 'Bearer ' + getToken()
+      },
+      params: {
+        examinationId: ''
       }
     }
   },
@@ -575,6 +581,20 @@ export default {
           type: 'success'
         })
       })
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val
+    },
+    // 检查是否选中
+    checkMultipleSelect() {
+      if (this.multipleSelection.length === 0) {
+        this.$message({
+          message: '请选择记录！',
+          type: 'warning'
+        })
+        return false
+      }
+      return true
     },
     resetTemp() {
       this.temp = {
@@ -683,6 +703,33 @@ export default {
         this.list.splice(index, 1)
       })
     },
+    // 批量删除
+    handleDeletes() {
+      debugger
+      if (this.checkMultipleSelect()) {
+        console.log(this.multipleSelection)
+        let ids = ''
+        for (let i = 0; i < this.multipleSelection.length; i++) {
+          ids += this.multipleSelection[i].id + ','
+        }
+        this.$confirm('确定要删除吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          delAllObj(ids).then(() => {
+            this.dialogSubjectFormVisible = false
+            this.handleSubjectManagement()
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        })
+      }
+    },
     // 选择课程
     selectCourse() {
       this.course.listLoading = true
@@ -706,11 +753,12 @@ export default {
       if (row !== undefined) {
         this.subject.examinationId = row.id
         this.subject.listQuery.examinationId = row.id
+        this.params.examinationId = row.id
       }
       fetchSubjectList(this.subject.listQuery).then(response => {
         if (response.data.list.length > 0) {
-          for (var i = 0; i < response.data.list.length; i++) {
-            var subject = response.data.list[i]
+          for (let i = 0; i < response.data.list.length; i++) {
+            const subject = response.data.list[i]
             subject.type = parseInt(subject.type)
             subject.level = parseInt(subject.level)
             if (subject.type === 0) {
@@ -835,6 +883,35 @@ export default {
         }
       })
     },
+    // 更新并添加题目
+    updateAndAddSubjectData() {
+      this.$refs['dataSubjectForm'].validate((valid) => {
+        if (valid) {
+          const tempData = Object.assign({}, this.tempSubject)
+          putSubject(tempData).then(() => {
+            for (const v of this.subject.list) {
+              if (v.id === this.tempSubject.id) {
+                const index = this.subject.list.indexOf(v)
+                this.subject.list.splice(index, 1, this.tempSubject)
+                break
+              }
+            }
+            this.resetTempSubject()
+            this.dialogStatus = 'create'
+            this.$nextTick(() => {
+              this.$refs['dataSubjectForm'].clearValidate()
+            })
+            this.handleSubjectManagement()
+            this.$notify({
+              title: '成功',
+              message: '更新成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
     // 切换题目类型
     changeSubjectType(value) {
       console.log(value)
@@ -892,9 +969,6 @@ export default {
     // 导入
     handleImportSubject() {
       this.dialogImportVisible = true
-    },
-    handleSelectionChange(val) {
-      this.multipleSelection = val
     },
     // 上传前
     beforeUploadSubjectUpload(file) {

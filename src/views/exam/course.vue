@@ -11,29 +11,30 @@
       v-loading="listLoading"
       :key="tableKey"
       :data="list"
+      :default-sort="{ prop: 'id', order: 'descending' }"
       border
-      fit
       highlight-current-row
       style="width: 100%;"
-      @cell-dblclick="handleUpdate">
-      <el-table-column type="selection" width="55">
-      </el-table-column>
-      <el-table-column :label="$t('table.courseName')" min-width="90" align="center">
+      @cell-dblclick="handleUpdate"
+      @selection-change="handleSelectionChange"
+      @sort-change="sortChange">
+      <el-table-column type="selection" width="55"/>
+      <el-table-column :label="$t('table.courseName')" sortable prop="courseName" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.courseName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.college')" min-width="90" align="center">
+      <el-table-column :label="$t('table.college')" sortable prop="college" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.college }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.major')" min-width="90" align="center">
+      <el-table-column :label="$t('table.major')" sortable prop="major" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.major }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.teacher')" min-width="90" align="center">
+      <el-table-column :label="$t('table.teacher')" sortable prop="teacher" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.teacher }}</span>
         </template>
@@ -95,9 +96,10 @@
 </template>
 
 <script>
-import { fetchCourseList, addObj, putObj, delObj } from '@/api/exam/course'
+import { fetchCourseList, addObj, putObj, delObj, delAllObj } from '@/api/exam/course'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
+import { checkMultipleSelect } from '@/utils/util'
 
 export default {
   name: 'CourseManagement',
@@ -114,7 +116,8 @@ export default {
         pageNum: 1,
         pageSize: 10,
         roleName: undefined,
-        sort: '+id'
+        sort: 'id',
+        order: 'descending'
       },
       temp: {
         id: '',
@@ -138,7 +141,9 @@ export default {
       labelPosition: 'right',
       course_btn_add: false,
       course_btn_edit: false,
-      course_btn_del: false
+      course_btn_del: false,
+      // 多选
+      multipleSelection: []
     }
   },
   created() {
@@ -159,7 +164,6 @@ export default {
       fetchCourseList(this.listQuery).then(response => {
         this.list = response.data.list
         this.total = response.data.total
-        // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
         }, 500)
@@ -186,6 +190,14 @@ export default {
           type: 'success'
         })
       })
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val
+    },
+    sortChange(column, prop, order) {
+      this.listQuery.sort = column.prop
+      this.listQuery.order = column.order
+      this.getList()
     },
     resetTemp() {
       this.temp = {
@@ -276,6 +288,31 @@ export default {
         const index = this.list.indexOf(row)
         this.list.splice(index, 1)
       })
+    },
+    // 批量删除
+    handleDeletes() {
+      if (checkMultipleSelect(this.multipleSelection, this)) {
+        let ids = ''
+        for (let i = 0; i < this.multipleSelection.length; i++) {
+          ids += this.multipleSelection[i].id + ','
+        }
+        this.$confirm('确定要删除吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          delAllObj({ ids: ids }).then(() => {
+            this.dialogFormVisible = false
+            this.getList()
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        })
+      }
     }
   }
 }

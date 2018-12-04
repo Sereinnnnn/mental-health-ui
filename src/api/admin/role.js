@@ -77,3 +77,11 @@ export function fetchDeptTree(query) {
     params: query
   })
 }
+
+export function delAllObj(obj) {
+  return request({
+    url: '/admin/dept/deleteAll',
+    method: 'post',
+    data: obj
+  })
+}

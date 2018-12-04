@@ -46,3 +46,11 @@ export function updateObjInfo(obj) {
   })
 }
 
+export function delAllObj(obj) {
+  return request({
+    url: '/admin/user/deleteAll',
+    method: 'post',
+    data: obj
+  })
+}
+

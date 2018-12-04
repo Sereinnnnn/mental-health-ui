@@ -45,3 +45,11 @@ export function delObj(id) {
   })
 }
 
+export function delAllObj(obj) {
+  return request({
+    url: '/admin/attachment/deleteAll',
+    method: 'post',
+    data: obj
+  })
+}
+

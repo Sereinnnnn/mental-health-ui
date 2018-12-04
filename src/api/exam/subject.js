@@ -44,3 +44,11 @@ export function delSubject(id) {
     method: 'delete'
   })
 }
+
+export function delAllSubject(obj) {
+  return request({
+    url: '/exam/subject/deleteAll',
+    method: 'post',
+    data: obj
+  })
+}

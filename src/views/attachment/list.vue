@@ -24,17 +24,18 @@
       v-loading="listLoading"
       :key="tableKey"
       :data="list"
+      :default-sort="{ prop: 'id', order: 'descending' }"
       border
-      fit
       highlight-current-row
-      style="width: 100%;">
+      style="width: 100%;"
+      @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column label="流水号" min-width="100" align="center">
+      <el-table-column sortable prop="id" label="流水号" min-width="100" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.attachName')" min-width="90" align="center">
+      <el-table-column :label="$t('table.attachName')" sortable prop="attachName" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.attachName }}</span>
         </template>
@@ -127,7 +128,8 @@ export default {
       listQuery: {
         pageNum: 1,
         pageSize: 10,
-        sort: '+id',
+        sort: 'id',
+        order: 'descending',
         busiType: '0'
       },
       temp: {
@@ -193,6 +195,11 @@ export default {
           type: 'success'
         })
       })
+    },
+    sortChange(column, prop, order) {
+      this.listQuery.sort = column.prop
+      this.listQuery.order = column.order
+      this.getList()
     },
     resetTemp() {
       this.temp = {

@@ -14,3 +14,11 @@ export function delObj(id) {
     method: 'delete'
   })
 }
+
+export function delAllObj(obj) {
+  return request({
+    url: '/admin/log/deleteAll',
+    method: 'post',
+    data: obj
+  })
+}

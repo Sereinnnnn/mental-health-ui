@@ -257,3 +257,20 @@ export const randomLenNum = (len, date) => {
   if (date) random = random + Date.now()
   return random
 }
+
+/**
+ * 检查选中
+ * @param multipleSelection
+ * @param obj
+ * @returns {boolean}
+ */
+export const checkMultipleSelect = (multipleSelection, obj) => {
+  if (multipleSelection.length === 0) {
+    obj.$message({
+      message: '请选择记录！',
+      type: 'warning'
+    })
+    return false
+  }
+  return true
+}

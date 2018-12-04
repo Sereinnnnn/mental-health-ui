@@ -15,19 +15,20 @@
       v-loading="listLoading"
       :key="tableKey"
       :data="list"
+      :default-sort="{ prop: 'id', order: 'descending' }"
       border
-      fit
       highlight-current-row
       style="width: 100%;"
       @cell-dblclick="handleUpdate"
-      @selection-change="handleSelectionChange">
+      @selection-change="handleSelectionChange"
+      @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column :label="$t('table.examinationName')" min-width="90" align="center">
+      <el-table-column :label="$t('table.examinationName')" sortable prop="examinationName" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.examinationName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.type')" min-width="90" align="center">
+      <el-table-column :label="$t('table.type')" sortable prop="type" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.type | typeFilter }}</span>
         </template>
@@ -37,22 +38,22 @@
           <span>{{ scope.row.course.courseName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.startTime')" min-width="90" align="center">
+      <el-table-column :label="$t('table.startTime')" sortable prop="startTime" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.startTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.endTime')" min-width="90" align="center">
+      <el-table-column :label="$t('table.endTime')" sortable prop="endTime" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.endTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.totalScore')" align="center" width="120px">
+      <el-table-column :label="$t('table.totalScore')" sortable prop="totalScore" align="center" width="120px">
         <template slot-scope="scope">
           <span>{{ scope.row.totalScore }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.status')" align="center" width="120px">
+      <el-table-column :label="$t('table.status')" sortable prop="status" align="center" width="120px">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
         </template>
@@ -198,29 +199,30 @@
       <el-table
         v-loading="subject.listLoading"
         :data="subject.list"
+        :default-sort="{ prop: 'id', order: 'descending' }"
         border
-        fit
         highlight-current-row
         style="width: 100%;"
-        @selection-change="handleSelectionChange"
-        @cell-dblclick="handleUpdateSubject">
+        @selection-change="handleSubjectSelectionChange"
+        @cell-dblclick="handleUpdateSubject"
+        @sort-change="sortSubjectChange">
         <el-table-column type="selection" width="55"/>
-        <el-table-column :label="$t('table.subjectName')" property="subjectName" min-width="120">
+        <el-table-column :label="$t('table.subjectName')" sortable prop="subjectName" property="subjectName" min-width="120">
           <template slot-scope="scope">
             <span>{{ scope.row.subjectName }}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('table.subject.type')" property="type" width="200">
+        <el-table-column :label="$t('table.subject.type')" sortable prop="type" property="type" width="200">
           <template slot-scope="scope">
             <el-tag type="success">{{ scope.row.type | subjectTypeFilter }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('table.subject.score')" property="score">
+        <el-table-column :label="$t('table.subject.score')" sortable prop="score" property="score">
           <template slot-scope="scope">
             <span>{{ scope.row.score }}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('table.subject.level')" property="level">'
+        <el-table-column :label="$t('table.subject.level')" sortable prop="level" property="level">'
           <template slot-scope="scope">
             <el-rate v-model="scope.row.level" :max="4"/>
           </template>
@@ -355,10 +357,11 @@
 <script>
 import { fetchList, addObj, putObj, delObj, delAllObj } from '@/api/exam/exam'
 import { fetchCourseList } from '@/api/exam/course'
-import { fetchSubjectList, addSubject, putSubject, delSubject } from '@/api/exam/subject'
+import { fetchSubjectList, addSubject, putSubject, delSubject, delAllSubject } from '@/api/exam/subject'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
+import { checkMultipleSelect } from '@/utils/util'
 
 export default {
   name: 'ExamManagement',
@@ -399,8 +402,9 @@ export default {
       listQuery: {
         pageNum: 1,
         pageSize: 10,
-        sort: '+id',
-        courseId: ''
+        courseId: '',
+        sort: 'id',
+        order: 'descending'
       },
       // 课程
       course: {
@@ -418,8 +422,9 @@ export default {
         listQuery: {
           pageNum: 1,
           pageSize: 10,
-          sort: '+id',
-          examinationId: ''
+          examinationId: '',
+          sort: 'id',
+          order: 'descending'
         },
         list: null,
         total: null,
@@ -502,8 +507,10 @@ export default {
         { id: 2, subjectTypeName: '判断题' },
         { id: 3, subjectTypeName: '简答题' }
       ],
-      // 多选
+      // 多选考试
       multipleSelection: [],
+      // 多选题目
+      multipleSubjectSelection: [],
       // 导入弹窗状态
       dialogImportVisible: false,
       // 导入题目的url
@@ -521,7 +528,7 @@ export default {
     this.getList()
     // 获取课程列表
     fetchCourseList(this.course.listQuery).then(response => {
-      this.course.list = response.data.list
+      this.course.list = [{ id: '', courseName: '请选择' }].concat(response.data.list)
       this.course.total = response.data.total
       this.course.listLoading = false
     })
@@ -585,16 +592,18 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val
     },
-    // 检查是否选中
-    checkMultipleSelect() {
-      if (this.multipleSelection.length === 0) {
-        this.$message({
-          message: '请选择记录！',
-          type: 'warning'
-        })
-        return false
-      }
-      return true
+    handleSubjectSelectionChange(val) {
+      this.multipleSubjectSelection = val
+    },
+    sortChange(column, prop, order) {
+      this.listQuery.sort = column.prop
+      this.listQuery.order = column.order
+      this.getList()
+    },
+    sortSubjectChange(column, prop, order) {
+      this.subject.listQuery.sort = column.prop
+      this.subject.listQuery.order = column.order
+      this.handleSubjectManagement()
     },
     resetTemp() {
       this.temp = {
@@ -705,9 +714,7 @@ export default {
     },
     // 批量删除
     handleDeletes() {
-      debugger
-      if (this.checkMultipleSelect()) {
-        console.log(this.multipleSelection)
+      if (checkMultipleSelect(this.multipleSelection, this)) {
         let ids = ''
         for (let i = 0; i < this.multipleSelection.length; i++) {
           ids += this.multipleSelection[i].id + ','
@@ -717,9 +724,8 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          delAllObj(ids).then(() => {
-            this.dialogSubjectFormVisible = false
-            this.handleSubjectManagement()
+          delAllObj({ ids: ids }).then(() => {
+            this.getList()
             this.$notify({
               title: '成功',
               message: '删除成功',
@@ -932,8 +938,26 @@ export default {
     },
     // 批量删除
     handleDeletesSubject() {
-      if (this.checkMultipleSelect()) {
-        console.log(this.multipleSelection)
+      if (checkMultipleSelect(this.multipleSubjectSelection, this)) {
+        let ids = ''
+        for (let i = 0; i < this.multipleSubjectSelection.length; i++) {
+          ids += this.multipleSubjectSelection[i].id + ','
+        }
+        this.$confirm('确定要删除吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          delAllSubject({ ids: ids }).then(() => {
+            this.handleSubjectManagement()
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        })
       }
     },
     // 导出

@@ -13,34 +13,35 @@
       ref="multipleTable"
       :key="tableKey"
       :data="list"
+      :default-sort="{ prop: 'id', order: 'descending' }"
       border
-      fit
       highlight-current-row
       style="width: 100%;"
       @cell-dblclick="handleUpdate"
-      @selection-change="handleSelectionChange">
+      @selection-change="handleSelectionChange"
+      @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column :label="$t('table.username')" min-width="110">
+      <el-table-column :label="$t('table.username')" sortable prop="username" min-width="110">
         <template slot-scope="scope">
           <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.name')" min-width="110">
+      <el-table-column :label="$t('table.name')" sortable prop="name" min-width="110">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.ownDept')" width="210px" align="center">
+      <el-table-column :label="$t('table.ownDept')" sortable prop="ownDept" width="210px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.deptName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.role')" width="210px" align="center">
+      <el-table-column :label="$t('table.role')" sortable prop="role" width="210px" align="center">
         <template slot-scope="scope">
           <span v-for="role in scope.row.roleList" :key="role.id">{{ role.roleName }} </span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.status')" align="center" width="95px">
+      <el-table-column :label="$t('table.status')" sortable prop="status" align="center" width="95px">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
         </template>
@@ -173,12 +174,13 @@
 </template>
 
 <script>
-import { fetchList, addObj, putObj, delObj } from '@/api/admin/user'
+import { fetchList, addObj, putObj, delObj, delAllObj } from '@/api/admin/user'
 import waves from '@/directive/waves'
 import { fetchTree } from '@/api/admin/dept'
 import { deptRoleList } from '@/api/admin/role'
 import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
+import { checkMultipleSelect } from '@/utils/util'
 
 export default {
   name: 'User',
@@ -448,26 +450,34 @@ export default {
         this.list.splice(index, 1)
       })
     },
-    // 检查是否选中
-    checkMultipleSelect() {
-      if (this.multipleSelection.length === 0) {
-        this.$message({
-          message: '请选择记录！',
-          type: 'warning'
-        })
-        return false
-      }
-      return true
-    },
     // 批量删除
     handleDeletes() {
-      if (this.checkMultipleSelect()) {
-        console.log(this.multipleSelection)
+      if (checkMultipleSelect(this.multipleSelection, this)) {
+        let ids = ''
+        for (let i = 0; i < this.multipleSelection.length; i++) {
+          ids += this.multipleSelection[i].id + ','
+        }
+        this.$confirm('确定要删除吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          delAllObj({ ids: ids }).then(() => {
+            this.dialogFormVisible = false
+            this.getList()
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        })
       }
     },
     // 导出
     handleExport() {
-      if (this.checkMultipleSelect()) {
+      if (checkMultipleSelect(this.multipleSelection, this)) {
         let ids = ''
         for (let i = 0; i < this.multipleSelection.length; i++) {
           ids += this.multipleSelection[i].id + ','
@@ -481,6 +491,11 @@ export default {
     },
     handleSelectionChange(val) {
       this.multipleSelection = val
+    },
+    sortChange(column, prop, order) {
+      this.listQuery.sort = column.prop
+      this.listQuery.order = column.order
+      this.getList()
     },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {

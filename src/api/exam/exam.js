@@ -38,12 +38,10 @@ export function delObj(id) {
   })
 }
 
-export function delAllObj(ids) {
+export function delAllObj(obj) {
   return request({
     url: '/exam/examination/deleteAll',
     method: 'post',
-    data: {
-      ids: ids
-    }
+    data: obj
   })
 }

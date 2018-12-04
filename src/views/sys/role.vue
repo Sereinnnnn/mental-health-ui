@@ -11,19 +11,19 @@
       v-loading="listLoading"
       :key="tableKey"
       :data="list"
+      :default-sort="{ prop: 'id', order: 'descending' }"
       border
-      fit
       highlight-current-row
       style="width: 100%;"
-      @cell-dblclick="handleUpdate">
-      <el-table-column type="selection" width="55">
-      </el-table-column>
-      <el-table-column :label="$t('table.roleCode')" min-width="90" align="center">
+      @cell-dblclick="handleUpdate"
+      @sort-change="sortChange">
+      <el-table-column type="selection" width="55"/>
+      <el-table-column :label="$t('table.roleCode')" sortable prop="roleCode" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.roleCode }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.roleName')" min-width="90" align="center">
+      <el-table-column :label="$t('table.roleName')" sortable prop="roleName" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.roleName }}</span>
         </template>
@@ -122,7 +122,7 @@
 </template>
 
 <script>
-import { fetchList, addObj, putObj, delObj, fetchDeptTree, fetchRoleTree, permissionUpdate } from '@/api/admin/role'
+import { fetchList, addObj, putObj, delObj, fetchDeptTree, fetchRoleTree, permissionUpdate, delAllObj } from '@/api/admin/role'
 import { fetchTree } from '@/api/admin/menu'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
@@ -154,7 +154,8 @@ export default {
         pageNum: 1,
         pageSize: 10,
         roleName: undefined,
-        sort: '+id'
+        sort: 'id',
+        order: 'descending'
       },
       temp: {
         id: '',
@@ -244,6 +245,11 @@ export default {
           type: 'success'
         })
       })
+    },
+    sortChange(column, prop, order) {
+      this.listQuery.sort = column.prop
+      this.listQuery.order = column.order
+      this.getList()
     },
     resetTemp() {
       this.temp = {
@@ -337,6 +343,32 @@ export default {
         const index = this.list.indexOf(row)
         this.list.splice(index, 1)
       })
+    },
+    // 批量删除
+    handleDeletes() {
+      if (this.checkMultipleSelect()) {
+        console.log(this.multipleSelection)
+        let ids = ''
+        for (let i = 0; i < this.multipleSelection.length; i++) {
+          ids += this.multipleSelection[i].id + ','
+        }
+        this.$confirm('确定要删除吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          delAllObj({ ids: ids }).then(() => {
+            this.dialogFormVisible = false
+            this.getList()
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        })
+      }
     },
     // 所属部门
     handleSelectDept() {

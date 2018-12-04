@@ -9,13 +9,13 @@
       v-loading="listLoading"
       :key="tableKey"
       :data="list"
+      :default-sort="{ prop: 'id', order: 'descending' }"
       border
-      fit
       highlight-current-row
-      style="width: 100%;">
-      <el-table-column type="selection" width="55">
-      </el-table-column>
-      <el-table-column label="标题" min-width="90" align="center">
+      style="width: 100%;"
+      @sort-change="sortChange">
+      <el-table-column type="selection" width="55"/>
+      <el-table-column label="标题" sortable prop="title" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.title }}</span>
         </template>
@@ -35,7 +35,7 @@
           <el-tag :type="scope.row.type | statusTypeFilter">{{ scope.row.type | statusFilter }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="请求时间" align="center" width="120px">
+      <el-table-column label="请求时间" sortable prop="createDate" align="center" width="120px">
         <template slot-scope="scope">
           <span>{{ scope.row.createDate }}</span>
         </template>
@@ -96,7 +96,8 @@ export default {
         pageNum: 1,
         pageSize: 10,
         roleName: undefined,
-        sort: '+id'
+        sort: 'id',
+        order: 'descending'
       },
       temp: {},
       checkedKeys: [],
@@ -136,6 +137,11 @@ export default {
     },
     handleCurrentChange(val) {
       this.listQuery.pageNum = val
+      this.getList()
+    },
+    sortChange(column, prop, order) {
+      this.listQuery.sort = column.prop
+      this.listQuery.order = column.order
       this.getList()
     },
     resetTemp() {

@@ -18,12 +18,12 @@
       @cell-dblclick="handleUpdate"
       @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column :label="$t('table.roleCode')" sortable prop="roleCode" min-width="90" align="center">
+      <el-table-column :label="$t('table.roleCode')" sortable prop="role_code" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.roleCode }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.roleName')" sortable prop="roleName" min-width="90" align="center">
+      <el-table-column :label="$t('table.roleName')" sortable prop="role_name" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.roleName }}</span>
         </template>

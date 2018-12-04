@@ -23,7 +23,7 @@
       @selection-change="handleSelectionChange"
       @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column :label="$t('table.examinationName')" sortable prop="examinationName" min-width="90" align="center">
+      <el-table-column :label="$t('table.examinationName')" sortable prop="examination_name" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.examinationName }}</span>
         </template>
@@ -38,17 +38,17 @@
           <span>{{ scope.row.course.courseName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.startTime')" sortable prop="startTime" min-width="90" align="center">
+      <el-table-column :label="$t('table.startTime')" sortable prop="start_time" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.startTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.endTime')" sortable prop="endTime" min-width="90" align="center">
+      <el-table-column :label="$t('table.endTime')" sortable prop="end_time" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.endTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.totalScore')" sortable prop="totalScore" align="center" width="120px">
+      <el-table-column :label="$t('table.totalScore')" sortable prop="total_score" align="center" width="120px">
         <template slot-scope="scope">
           <span>{{ scope.row.totalScore }}</span>
         </template>
@@ -207,7 +207,7 @@
         @cell-dblclick="handleUpdateSubject"
         @sort-change="sortSubjectChange">
         <el-table-column type="selection" width="55"/>
-        <el-table-column :label="$t('table.subjectName')" sortable prop="subjectName" property="subjectName" min-width="120">
+        <el-table-column :label="$t('table.subjectName')" sortable prop="subject_name" property="subjectName" min-width="120">
           <template slot-scope="scope">
             <span>{{ scope.row.subjectName }}</span>
           </template>
@@ -411,7 +411,8 @@ export default {
         listQuery: {
           pageNum: 1,
           pageSize: 10,
-          sort: '+id'
+          sort: 'id',
+          order: 'descending'
         },
         list: null,
         total: null,

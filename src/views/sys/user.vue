@@ -31,12 +31,12 @@
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.ownDept')" sortable prop="ownDept" width="210px" align="center">
+      <el-table-column :label="$t('table.ownDept')" width="210px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.deptName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.role')" sortable prop="role" width="210px" align="center">
+      <el-table-column :label="$t('table.role')" width="210px" align="center">
         <template slot-scope="scope">
           <span v-for="role in scope.row.roleList" :key="role.id">{{ role.roleName }} </span>
         </template>
@@ -213,7 +213,8 @@ export default {
         pageNum: 1,
         pageSize: 10,
         username: undefined,
-        sort: '+id'
+        sort: 'id',
+        order: 'descending'
       },
       temp: {
         id: '',
@@ -477,7 +478,15 @@ export default {
     },
     // 导出
     handleExport() {
-      if (checkMultipleSelect(this.multipleSelection, this)) {
+      if (this.multipleSelection.length === 0) {
+        this.$confirm('确定要导出全部用户数据吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          window.location.href = '/admin/user/export?ids='
+        })
+      } else {
         let ids = ''
         for (let i = 0; i < this.multipleSelection.length; i++) {
           ids += this.multipleSelection[i].id + ','

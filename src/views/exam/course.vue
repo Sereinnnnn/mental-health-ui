@@ -9,17 +9,18 @@
 
     <el-table
       v-loading="listLoading"
+      ref="multipleTable"
       :key="tableKey"
       :data="list"
       :default-sort="{ prop: 'id', order: 'descending' }"
       border
       highlight-current-row
       style="width: 100%;"
-      @cell-dblclick="handleUpdate"
+      @row-dblclick="handleUpdate"
       @selection-change="handleSelectionChange"
       @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column :label="$t('table.courseName')" sortable prop="courseName" min-width="90" align="center">
+      <el-table-column :label="$t('table.courseName')" sortable prop="course_name" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.courseName }}</span>
         </template>
@@ -198,6 +199,10 @@ export default {
       this.listQuery.sort = column.prop
       this.listQuery.order = column.order
       this.getList()
+    },
+    // 点击选中
+    handleRowClick(row) {
+      this.$refs.multipleTable.toggleRowSelection(row, true)
     },
     resetTemp() {
       this.temp = {

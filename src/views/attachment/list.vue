@@ -35,7 +35,7 @@
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.attachName')" sortable prop="attachName" min-width="90" align="center">
+      <el-table-column :label="$t('table.attachName')" sortable prop="attach_name" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.attachName }}</span>
         </template>

@@ -1,19 +1,19 @@
 <template>
   <div class="app-container">
     <el-row>
-      <el-col :span="6">
-        <el-card class="box-card" style="margin-right: 5px;">
-          <div slot="header" class="clearfix">
+      <el-col :span="5">
+        <el-card class="tree-box-card" style="margin-right: 5px;">
+          <div slot="header">
             <span>题目分类</span>
           </div>
-          <div style="height:100px;">
-            <el-row>
-              <el-button v-if="category_btn_add" icon="el-icon-plus" size="mini" plain @click="handlerAddSuper">顶级分类</el-button>
-              <el-button v-if="category_btn_add" icon="el-icon-plus" size="mini" plain @click="handlerAdd">子分类</el-button>
-              <el-button v-if="category_btn_edit" icon="el-icon-edit" size="mini" plain @click="handleUpdate">{{ $t('table.edit') }}</el-button>
-              <el-button v-if="category_btn_del" icon="el-icon-delete" size="mini" plain @click="handleDelete">{{ $t('table.del') }}</el-button>
-            </el-row>
-            <el-row>
+          <el-row>
+            <el-button v-if="subject_category_btn_add" icon="el-icon-plus" size="mini" plain @click="handleAddSuperCategory">主分类</el-button>
+            <el-button v-if="subject_category_btn_add" icon="el-icon-plus" size="mini" plain @click="handleAddCategory">子分类</el-button>
+            <el-button v-if="subject_category_btn_edit" icon="el-icon-edit" size="mini" plain @click="handleUpdateCategory">{{ $t('table.edit') }}</el-button>
+            <el-button v-if="subject_category_btn_del" icon="el-icon-delete" size="mini" plain @click="handleDeleteCategory">{{ $t('table.del') }}</el-button>
+          </el-row>
+          <el-row>
+            <div class="tree-container">
               <el-tree
                 :data="treeData"
                 :filter-node-method="filterNode"
@@ -27,11 +27,11 @@
                 @node-expand="nodeExpand"
                 @node-collapse="nodeCollapse"
               />
-            </el-row>
-          </div>
+            </div>
+          </el-row>
         </el-card>
       </el-col>
-      <el-col :span="18">
+      <el-col :span="19">
         <el-card class="box-card">
           <div slot="header" class="clearfix">
             <span>题目管理</span>
@@ -39,8 +39,8 @@
           <div class="filter-container">
             <el-input v-model="listQuery.sbujectName" placeholder="题目名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
             <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
-            <el-button v-if="course_btn_add" class="filter-item" style="margin-left: 10px;" icon="el-icon-check" plain @click="handleCreate">{{ $t('table.add') }}</el-button>
-            <el-button v-if="course_btn_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletes">{{ $t('table.del') }}</el-button>
+            <el-button v-if="subject_category_btn_add" class="filter-item" style="margin-left: 10px;" icon="el-icon-check" plain @click="handleCreateSubject">{{ $t('table.add') }}</el-button>
+            <el-button v-if="subject_category_btn_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletesSubject">{{ $t('table.del') }}</el-button>
           </div>
           <el-table
             v-loading="listLoading"
@@ -83,6 +83,31 @@
         </el-card>
       </el-col>
     </el-row>
+
+    <!--题目分类信息表单-->
+    <el-dialog :title="textMap[categormFormStatus]" :visible.sync="dialogCategoryFormVisible" width="30%" top="20vh">
+      <el-form ref="dataCategoryForm" :rules="categoryRules" :model="tempCategory" :label-position="labelPosition" label-width="100px">
+        <el-row>
+          <el-col :span="24">
+            <el-form-item :label="$t('table.categoryName')" prop="categoryName">
+              <el-input :placeholder="$t('table.categoryName')" v-model="tempCategory.categoryName"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item :label="$t('table.categoryDesc')" prop="categoryDesc">
+              <el-input :placeholder="$t('table.categoryDesc')" :autosize="{ minRows: 4, maxRows: 6}" v-model="tempCategory.categoryDesc" type="textarea"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogCategoryFormVisible = false">{{ $t('table.cancel') }}</el-button>
+        <el-button v-if="categormFormStatus === 'create'" type="primary" @click="createCategory">{{ $t('table.save') }}</el-button>
+        <el-button v-else type="primary" @click="updateCategory">{{ $t('table.save') }}</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -91,6 +116,7 @@ import { fetchTree, getObj, addObj, delObj, putObj } from '@/api/exam/subjectCat
 import { fetchSubjectList, addSubject, putSubject, delSubject, delAllSubject } from '@/api/exam/subject'
 import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
+import { checkMultipleSelect } from '@/utils/util'
 
 export default {
   name: 'SubjectManagement',
@@ -117,24 +143,54 @@ export default {
         label: 'categoryName'
       },
       labelPosition: 'right',
-      form: {
+      categoryFormStatus: '',
+      textMap: {
+        update: '编辑',
+        create: '新建'
+      },
+      category: undefined,
+      tempCategory: {
         categoryName: undefined,
         categoryDesc: undefined,
         id: undefined,
         parentId: -1,
         sort: 30
       },
-      currentId: '',
+      // 题目临时信息
+      tempSubject: {
+        id: '',
+        examinationId: '',
+        subjectName: '',
+        type: 0,
+        content: '',
+        optionA: '',
+        optionB: '',
+        optionC: '',
+        optionD: '',
+        optionE: '',
+        optionF: '',
+        answer: '',
+        score: '',
+        analysis: '',
+        level: 2
+      },
+      currentCategoryId: '',
+      // 表单校验规则
+      categoryRules: {
+        categoryName: [{ required: true, message: '请输入分类名称', trigger: 'change' }]
+      },
       // 表单校验规则
       rules: {
         categoryName: [{ required: true, message: '请输入分类名称', trigger: 'change' }]
       },
       // 按钮权限
-      category_btn_add: false,
-      category_btn_edit: false,
-      category_btn_del: false,
-      category_btn_import: false,
-      category_btn_export: false,
+      subject_category_btn_add: false,
+      subject_category_btn_edit: false,
+      subject_category_btn_del: false,
+      subject_category_btn_import: false,
+      subject_category_btn_export: false,
+      // 分类窗口状态
+      dialogCategoryFormVisible: false,
       // 导入窗口状态
       dialogImportVisible: false,
       // 导出窗口状态
@@ -150,11 +206,9 @@ export default {
   created() {
     this.getList()
     this.handleSubjectManagement()
-    this.category_btn_add = this.permissions['exam:subject:category:add']
-    this.category_btn_edit = this.permissions['exam:subject:category:edit']
-    this.category_btn_del = this.permissions['exam:subject:category:del']
-    this.category_btn_import = this.permissions['exam:exam:subject:import']
-    this.category_btn_export = this.permissions['exam:exam:subject:export']
+    this.subject_category_btn_add = this.permissions['exam:subject:category:add']
+    this.subject_category_btn_edit = this.permissions['exam:subject:category:edit']
+    this.subject_category_btn_del = this.permissions['exam:subject:category:del']
   },
   computed: {
     ...mapGetters([
@@ -206,13 +260,12 @@ export default {
         }
       }
     },
+    // 点击分类
     getNodeData(data) {
-      this.formStatus = 'update'
       getObj(data.id).then(response => {
-        this.form = response.data
+        this.category = response.data.data
       })
-      this.currentId = data.id
-      this.showElement = true
+      this.currentCategoryId = data.id
     },
     handleFilter() {
       this.listQuery.pageNum = 1
@@ -226,23 +279,43 @@ export default {
       this.listQuery.pageNum = val
       this.getList()
     },
-    handlerEdit() {
-      if (this.form.id) {
-        this.formStatus = 'update'
+    // 修改分类
+    handleUpdateCategory() {
+      this.tempCategory = Object.assign({}, this.category) // copy obj
+      this.categormFormStatus = 'update'
+      this.dialogCategoryFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataCategoryForm'].clearValidate()
+      })
+    },
+    // 点击主分类按钮
+    handleAddSuperCategory() {
+      this.resetCategoryForm()
+      this.tempCategory.parentId = -1
+      this.categormFormStatus = 'create'
+      this.dialogCategoryFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataCategoryForm'].clearValidate()
+      })
+    },
+    // 点击子分类按钮
+    handleAddCategory() {
+      if (this.currentCategoryId === '') {
+        this.$message({
+          message: '请选择分类',
+          type: 'warning'
+        })
+        return
       }
+      this.resetCategoryForm()
+      this.categormFormStatus = 'create'
+      this.dialogCategoryFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataCategoryForm'].clearValidate()
+      })
     },
-    handlerAddSuper() {
-      this.resetForm()
-      this.form.parentId = -1
-      this.form.component = 'Layout'
-      this.formStatus = 'create'
-    },
-    handlerAdd() {
-      this.resetForm()
-      this.formStatus = 'create'
-    },
-    handleDelete() {
-      if (this.currentId === '') {
+    handleDeleteCategory() {
+      if (this.currentCategoryId === '') {
         this.$message({
           message: '请选择要删除的记录',
           type: 'warning'
@@ -267,44 +340,69 @@ export default {
         })
       })
     },
-    create() {
-      this.$refs['form'].validate((valid) => {
+    createCategory() {
+      this.$refs['dataCategoryForm'].validate((valid) => {
         if (valid) {
-          if (this.form.id) {
-            putObj(this.form).then(() => {
-              this.getList()
-              this.$notify({
-                title: '成功',
-                message: '更新成功',
-                type: 'success',
-                duration: 2000
-              })
+          addObj(this.tempCategory).then(() => {
+            this.dialogCategoryFormVisible = false
+            this.getList()
+            this.$notify({
+              title: '成功',
+              message: '创建成功',
+              type: 'success',
+              duration: 2000
             })
-          } else {
-            addObj(this.form).then(() => {
-              this.getList()
-              this.$notify({
-                title: '成功',
-                message: '创建成功',
-                type: 'success',
-                duration: 2000
-              })
+          })
+        }
+      })
+    },
+    // 更新分类
+    updateCategory() {
+      this.$refs['dataCategoryForm'].validate((valid) => {
+        if (valid) {
+          const tempData = Object.assign({}, this.tempCategory)
+          putObj(tempData).then(() => {
+            this.dialogCategoryFormVisible = false
+            this.getList()
+            this.$notify({
+              title: '成功',
+              message: '更新成功',
+              type: 'success',
+              duration: 2000
             })
-          }
-          this.getList()
+          })
         }
       })
     },
     onCancel() {
       this.formStatus = ''
     },
-    resetForm() {
-      this.form = {
+    resetCategoryForm() {
+      this.tempCategory = {
         categoryName: undefined,
         categoryDesc: undefined,
         id: undefined,
-        parentId: this.currentId,
+        parentId: this.currentCategoryId,
         sort: 30
+      }
+    },
+    resetTempSubject() {
+      this.tempSubject = {
+        id: '',
+        examinationId: '',
+        subjectName: '',
+        type: 0,
+        content: '',
+        optionA: '',
+        optionB: '',
+        optionC: '',
+        optionD: '',
+        optionE: '',
+        optionF: '',
+        answer: '',
+        score: '',
+        analysis: '',
+        level: 2
       }
     },
     // 加载题目
@@ -329,7 +427,39 @@ export default {
         this.total = response.data.total
         this.listLoading = false
       })
-      this.dialogSubjectVisible = true
+    },
+    // 新建题目
+    handleCreateSubject() {
+      this.resetTempSubject()
+      this.dialogStatus = 'create'
+      this.dialogCategoryFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataSubjectForm'].clearValidate()
+      })
+    },
+    // 批量删除
+    handleDeletesSubject() {
+      if (checkMultipleSelect(this.multipleSubjectSelection, this)) {
+        let ids = ''
+        for (let i = 0; i < this.multipleSubjectSelection.length; i++) {
+          ids += this.multipleSubjectSelection[i].id + ','
+        }
+        this.$confirm('确定要删除吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          delAllSubject({ ids: ids }).then(() => {
+            this.handleSubjectManagement()
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        })
+      }
     },
     handleExport() {
 
@@ -342,7 +472,7 @@ export default {
 </script>
 
 <style scoped>
-  .tab-container{
-    margin: 30px;
+  .tree-container{
+    padding-top: 10px;
   }
 </style>

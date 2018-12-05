@@ -116,12 +116,14 @@
         :multiple="false"
         :auto-upload="true"
         :show-file-list="true"
-        :on-success="handleUploadMenuSuccess"
         :before-upload="beforeMenuUpload"
+        :on-progress="handleUploadProgress"
+        :on-success="handleUploadMenuSuccess"
         :action="importUrl"
         :headers="headers">
         <el-button size="small">选择文件</el-button>
         <div slot="tip" class="el-upload__tip">只能上传xlsx文件，且不超过1M</div>
+        <el-progress v-if="uploading === true" :percentage="percentage" :text-inside="true" :stroke-width="18" status="success"/>
       </el-upload>
     </el-dialog>
   </div>
@@ -200,7 +202,9 @@ export default {
       importUrl: '/admin/menu/import',
       headers: {
         Authorization: 'Bearer ' + getToken()
-      }
+      },
+      uploading: false,
+      percentage: 0
     }
   },
   created() {
@@ -399,9 +403,12 @@ export default {
     beforeMenuUpload() {
 
     },
+    handleUploadProgress(event, file, fileList) {
+      this.uploading = true
+      this.percentage = parseInt(file.percentage.toFixed(0))
+    },
     // 上传成功
     handleUploadMenuSuccess() {
-      debugger
       this.$notify({
         title: '成功',
         message: '导入成功',
@@ -410,6 +417,7 @@ export default {
       })
       this.dialogImportVisible = false
       this.getList()
+      this.uploading = false
     }
   }
 }

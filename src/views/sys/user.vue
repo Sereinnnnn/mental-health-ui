@@ -163,10 +163,12 @@
         :show-file-list="false"
         :on-success="handleUploadUserSuccess"
         :before-upload="beforeUploadUserUpload"
+        :on-progress="handleUploadProgress"
         :action="importUrl"
         :headers="headers">
         <el-button size="small">点击上传</el-button>
         <div slot="tip" class="el-upload__tip">只能上传xlns文件，且不超过500kb</div>
+        <el-progress v-if="uploading === true" :percentage="percentage" :text-inside="true" :stroke-width="18" status="success"/>
       </el-upload>
     </el-dialog>
 
@@ -260,7 +262,9 @@ export default {
       importUrl: '/admin/user/import',
       headers: {
         Authorization: 'Bearer ' + getToken()
-      }
+      },
+      uploading: false,
+      percentage: 0
     }
   },
   created() {
@@ -535,10 +539,15 @@ export default {
     beforeUploadUserUpload() {
       console.log('before upload.')
     },
+    handleUploadProgress(event, file, fileList) {
+      this.uploading = true
+      this.percentage = parseInt(file.percentage.toFixed(0))
+    },
     // 上传成功
     handleUploadUserSuccess() {
       console.log('upload success.')
       this.dialogImportVisible = false
+      this.uploading = false
       this.getList()
       this.$notify({
         title: '成功',

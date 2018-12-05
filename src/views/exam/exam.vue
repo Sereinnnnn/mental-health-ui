@@ -342,13 +342,15 @@
         :multiple="false"
         :auto-upload="true"
         :show-file-list="true"
-        :on-success="handleUploadSubjectSuccess"
         :before-upload="beforeUploadSubjectUpload"
+        :on-progress="handleUploadSubjectProgress"
+        :on-success="handleUploadSubjectSuccess"
         :action="importUrl"
         :headers="headers"
         :data="params">
         <el-button size="small">选择文件</el-button>
         <div slot="tip" class="el-upload__tip">只能上传xlsx文件，且不超过1M</div>
+        <el-progress v-if="uploadingSubject === true" :percentage="percentageSubject" :text-inside="true" :stroke-width="18" status="success"/>
       </el-upload>
     </el-dialog>
   </div>
@@ -521,7 +523,11 @@ export default {
       },
       params: {
         examinationId: ''
-      }
+      },
+      uploading: false,
+      percentage: 0,
+      uploadingSubject: false,
+      percentageSubject: 0
     }
   },
   created() {
@@ -1001,6 +1007,10 @@ export default {
       const isTextComputer = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       return (isText | isTextComputer)
     },
+    handleUploadSubjectProgress(event, file, fileList) {
+      this.uploadingSubject = true
+      this.percentageSubject = parseInt(file.percentage.toFixed(0))
+    },
     // 上传成功
     handleUploadSubjectSuccess() {
       this.dialogImportVisible = false
@@ -1011,6 +1021,7 @@ export default {
         type: 'success',
         duration: 2000
       })
+      this.uploadingSubject = false
     }
   }
 }

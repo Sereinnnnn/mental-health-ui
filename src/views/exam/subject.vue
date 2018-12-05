@@ -1,29 +1,47 @@
 <template>
-  <div class="tab-container">
-    <div class="filter-container">
-      <el-button v-if="category_btn_add" icon="el-icon-check" plain @click="handlerAddSuper">添加顶级分类</el-button>
-      <el-button v-if="category_btn_add" icon="el-icon-check" plain @click="handlerAdd">添加子分类</el-button>
-      <el-button v-if="category_btn_del" icon="el-icon-delete" plain @click="handleDelete">{{ $t('table.del') }}</el-button>
-      <el-button v-if="category_btn_import" icon="el-icon-upload2" plain @click="handleImport">{{ $t('table.import') }}</el-button>
-      <el-button v-if="category_btn_export" icon="el-icon-download" plain @click="handleExport">{{ $t('table.export') }}</el-button>
-
-      <el-row>
-        <el-col :span="3" style ="margin-top:10px;">
-          <el-tree
-            :data="treeData"
-            :filter-node-method="filterNode"
-            :props="defaultProps"
-            class="filter-tree"
-            node-key="id"
-            highlight-current
-            accordion
-            default-expand-all
-            @node-click="getNodeData"
-            @node-expand="nodeExpand"
-            @node-collapse="nodeCollapse"
-          />
-        </el-col>
-        <el-col :span="21" style="margin-top:10px;">
+  <div class="app-container">
+    <el-row>
+      <el-col :span="6">
+        <el-card class="box-card" style="margin-right: 5px;">
+          <div slot="header" class="clearfix">
+            <span>题目分类</span>
+          </div>
+          <div style="height:100px;">
+            <el-row>
+              <el-button v-if="category_btn_add" icon="el-icon-plus" size="mini" plain @click="handlerAddSuper">顶级分类</el-button>
+              <el-button v-if="category_btn_add" icon="el-icon-plus" size="mini" plain @click="handlerAdd">子分类</el-button>
+              <el-button v-if="category_btn_edit" icon="el-icon-edit" size="mini" plain @click="handleUpdate">{{ $t('table.edit') }}</el-button>
+              <el-button v-if="category_btn_del" icon="el-icon-delete" size="mini" plain @click="handleDelete">{{ $t('table.del') }}</el-button>
+            </el-row>
+            <el-row>
+              <el-tree
+                :data="treeData"
+                :filter-node-method="filterNode"
+                :props="defaultProps"
+                class="filter-tree"
+                node-key="id"
+                highlight-current
+                accordion
+                default-expand-all
+                @node-click="getNodeData"
+                @node-expand="nodeExpand"
+                @node-collapse="nodeCollapse"
+              />
+            </el-row>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="18">
+        <el-card class="box-card">
+          <div slot="header" class="clearfix">
+            <span>题目管理</span>
+          </div>
+          <div class="filter-container">
+            <el-input v-model="listQuery.sbujectName" placeholder="题目名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+            <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
+            <el-button v-if="course_btn_add" class="filter-item" style="margin-left: 10px;" icon="el-icon-check" plain @click="handleCreate">{{ $t('table.add') }}</el-button>
+            <el-button v-if="course_btn_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletes">{{ $t('table.del') }}</el-button>
+          </div>
           <el-table
             v-loading="listLoading"
             :data="list"
@@ -62,9 +80,9 @@
           <div class="pagination-container">
             <el-pagination v-show="total>0" :current-page="listQuery.pageNum" :page-sizes="[10,20,30, 50]" :page-size="listQuery.pageSize" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
           </div>
-        </el-col>
-      </el-row>
-    </div>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
@@ -87,7 +105,7 @@ export default {
       typeOptions: ['0', '1'],
       listLoading: true,
       listQuery: {
-        name: undefined
+        sbujectName: undefined
       },
       treeData: [],
       oExpandedKey: {

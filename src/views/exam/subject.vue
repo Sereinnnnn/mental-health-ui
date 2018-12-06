@@ -7,10 +7,10 @@
             <span>题目分类</span>
           </div>
           <el-row>
-            <el-button v-if="subject_category_btn_add" icon="el-icon-plus" size="mini" plain @click="handleAddSuperCategory">主分类</el-button>
-            <el-button v-if="subject_category_btn_add" icon="el-icon-plus" size="mini" plain @click="handleAddCategory">子分类</el-button>
-            <el-button v-if="subject_category_btn_edit" icon="el-icon-edit" size="mini" plain @click="handleUpdateCategory">{{ $t('table.edit') }}</el-button>
-            <el-button v-if="subject_category_btn_del" icon="el-icon-delete" size="mini" plain @click="handleDeleteCategory">{{ $t('table.del') }}</el-button>
+            <el-button v-if="subject_category_btn_add" class="category-btn" icon="el-icon-plus" size="mini" plain @click="handleAddSuperCategory">主分类</el-button>
+            <el-button v-if="subject_category_btn_add" class="category-btn" icon="el-icon-plus" size="mini" plain @click="handleAddCategory">子分类</el-button>
+            <el-button v-if="subject_category_btn_edit" class="category-btn" icon="el-icon-edit" size="mini" plain @click="handleUpdateCategory">{{ $t('table.edit') }}</el-button>
+            <el-button v-if="subject_category_btn_del" class="category-btn" icon="el-icon-delete" size="mini" plain @click="handleDeleteCategory">{{ $t('table.del') }}</el-button>
           </el-row>
           <el-row>
             <div class="tree-container">
@@ -37,10 +37,12 @@
             <span>题目管理</span>
           </div>
           <div class="filter-container">
-            <el-input v-model="listQuery.sbujectName" placeholder="题目名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+            <el-input v-model="listQuery.subjectName" placeholder="题目名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
             <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
             <el-button v-if="subject_category_btn_add" class="filter-item" style="margin-left: 10px;" icon="el-icon-check" plain @click="handleCreateSubject">{{ $t('table.add') }}</el-button>
             <el-button v-if="subject_category_btn_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletesSubject">{{ $t('table.del') }}</el-button>
+            <el-button v-if="exam_btn_subject_import" class="filter-item" icon="el-icon-upload2" plain @click="handleImportSubject">{{ $t('table.import') }}</el-button>
+            <el-button v-if="exam_btn_subject_export" class="filter-item" icon="el-icon-download" plain @click="handleExportSubject">{{ $t('table.export') }}</el-button>
           </div>
           <el-table
             v-loading="listLoading"
@@ -48,7 +50,10 @@
             :default-sort="{ prop: 'id', order: 'descending' }"
             border
             highlight-current-row
-            style="width: 100%;">
+            style="width: 100%;"
+            @cell-dblclick="handleUpdateSubject"
+            @selection-change="handleSubjectSelectionChange"
+            @sort-change="sortSubjectChange">
             <el-table-column type="selection" width="55"/>
             <el-table-column :label="$t('table.subjectName')" sortable prop="subject_name" property="subjectName" min-width="120">
               <template slot-scope="scope">
@@ -85,12 +90,19 @@
     </el-row>
 
     <!--题目分类信息表单-->
-    <el-dialog :title="textMap[categormFormStatus]" :visible.sync="dialogCategoryFormVisible" width="30%" top="20vh">
+    <el-dialog :title="textMap[categoryFormStatus]" :visible.sync="dialogCategoryFormVisible" width="30%" top="20vh">
       <el-form ref="dataCategoryForm" :rules="categoryRules" :model="tempCategory" :label-position="labelPosition" label-width="100px">
         <el-row>
           <el-col :span="24">
             <el-form-item :label="$t('table.categoryName')" prop="categoryName">
               <el-input :placeholder="$t('table.categoryName')" v-model="tempCategory.categoryName"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item :label="$t('table.sort')" prop="categoryName">
+              <el-input :placeholder="$t('table.sort')" v-model="tempCategory.sort"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -104,9 +116,124 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogCategoryFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button v-if="categormFormStatus === 'create'" type="primary" @click="createCategory">{{ $t('table.save') }}</el-button>
+        <el-button v-if="categoryFormStatus === 'create'" type="primary" @click="createCategory">{{ $t('table.save') }}</el-button>
         <el-button v-else type="primary" @click="updateCategory">{{ $t('table.save') }}</el-button>
       </div>
+    </el-dialog>
+
+    <!--题目信息表单-->
+    <el-dialog :title="textMap[subjectFormStatus]" :visible.sync="dialogSubjectFormVisible" width="80%" top="10vh">
+      <el-form ref="dataSubjectForm" :rules="subjectRules" :model="tempSubject" :label-position="labelPosition" label-width="100px">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.subjectName')" prop="subjectName">
+              <el-input v-model="tempSubject.subjectName"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.subject.type')" prop="type">
+              <el-select v-model="tempSubject.type" class="filter-item" placeholder="请选择题目类型" width="100%" @change="changeSubjectType">
+                <el-option v-for="item in subjectTypeData" :key="item.id" :label="item.subjectTypeName" :value="item.id">
+                  <span style="float: left">{{ item.subjectTypeName }}</span>
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.subject.score')" prop="score">
+              <el-input v-model="tempSubject.score"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.subject.level')" prop="level">
+              <el-rate v-model="tempSubject.level" :max="4" :texts="['简单', '一般', '略难', '非常难']" show-text/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row v-if="tempSubject.type !== 0">
+          <el-col :span="24">
+            <el-form-item :label="$t('table.subject.content')" prop="content">
+              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.content" type="textarea"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row v-if="tempSubject.type === 0">
+          <el-col :span="24">
+            <el-form-item :label="$t('table.subject.optionA')" prop="optionA">
+              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.optionA" type="textarea"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row v-if="tempSubject.type === 0">
+          <el-col :span="24">
+            <el-form-item :label="$t('table.subject.optionB')" prop="optionB">
+              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.optionB" type="textarea"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row v-if="tempSubject.type === 0">
+          <el-col :span="24">
+            <el-form-item :label="$t('table.subject.optionC')" prop="optionC">
+              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.optionC" type="textarea"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row v-if="tempSubject.type === 0">
+          <el-col :span="24">
+            <el-form-item :label="$t('table.subject.optionD')" prop="optionD">
+              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.optionD" type="textarea"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item :label="$t('table.subject.answer')" prop="answer">
+              <!-- 非选择 -->
+              <el-input v-if="tempSubject.type !== 0" :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.answer" type="textarea"/>
+              <!-- 选择题 -->
+              <el-radio-group v-if="tempSubject.type === 0" v-model="tempSubject.answer">
+                <el-radio :label="0">A</el-radio>
+                <el-radio :label="1">B</el-radio>
+                <el-radio :label="2">C</el-radio>
+                <el-radio :label="3">D</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item :label="$t('table.subject.analysis')" prop="analysis">
+              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.analysis" type="textarea"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogSubjectFormVisible = false">{{ $t('table.cancel') }}</el-button>
+        <el-button v-if="subjectFormStatus === 'create'" type="primary" @click="createSubjectData">{{ $t('table.save') }}</el-button>
+        <el-button v-else type="primary" @click="updateSubjectData">{{ $t('table.save') }}</el-button>
+        <el-button type="primary" @click="updateAndAddSubjectData">{{ $t('table.saveAndAdd') }}</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 导入题目 -->
+    <el-dialog :visible.sync="dialogImportVisible" :title="$t('table.import')">
+      <el-upload
+        :multiple="false"
+        :auto-upload="true"
+        :show-file-list="true"
+        :before-upload="beforeUploadSubjectUpload"
+        :on-progress="handleUploadSubjectProgress"
+        :on-success="handleUploadSubjectSuccess"
+        :action="importUrl"
+        :headers="headers"
+        :data="params">
+        <el-button size="small">选择文件</el-button>
+        <div slot="tip" class="el-upload__tip">只能上传xlsx文件，且不超过1M</div>
+        <el-progress v-if="uploadingSubject === true" :percentage="percentageSubject" :text-inside="true" :stroke-width="18" status="success"/>
+      </el-upload>
     </el-dialog>
   </div>
 </template>
@@ -117,12 +244,35 @@ import { fetchSubjectList, addSubject, putSubject, delSubject, delAllSubject } f
 import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
 import { checkMultipleSelect } from '@/utils/util'
+import waves from '@/directive/waves'
 
 export default {
   name: 'SubjectManagement',
+  directives: {
+    waves
+  },
   components: {},
+  filters: {
+    statusTypeFilter(status) {
+      const statusMap = {
+        0: 'success',
+        1: 'warning'
+      }
+      return statusMap[status]
+    },
+    subjectTypeFilter(type) {
+      const typeMap = {
+        0: '选择题',
+        1: '填空题',
+        2: '判断题',
+        3: '简答题'
+      }
+      return typeMap[type]
+    }
+  },
   data() {
     return {
+      baseUrl: '/exam',
       list: null,
       total: null,
       formAdd: true,
@@ -131,7 +281,8 @@ export default {
       typeOptions: ['0', '1'],
       listLoading: true,
       listQuery: {
-        sbujectName: undefined
+        subjectName: undefined,
+        categoryId: undefined
       },
       treeData: [],
       oExpandedKey: {
@@ -144,6 +295,7 @@ export default {
       },
       labelPosition: 'right',
       categoryFormStatus: '',
+      subjectFormStatus: '',
       textMap: {
         update: '编辑',
         create: '新建'
@@ -160,6 +312,7 @@ export default {
       tempSubject: {
         id: '',
         examinationId: '',
+        categoryId: '',
         subjectName: '',
         type: 0,
         content: '',
@@ -183,21 +336,40 @@ export default {
       rules: {
         categoryName: [{ required: true, message: '请输入分类名称', trigger: 'change' }]
       },
+      subjectRules: {},
       // 按钮权限
       subject_category_btn_add: false,
       subject_category_btn_edit: false,
       subject_category_btn_del: false,
       subject_category_btn_import: false,
       subject_category_btn_export: false,
+      exam_btn_subject: false,
+      exam_btn_subject_import: false,
+      exam_btn_subject_export: false,
       // 分类窗口状态
       dialogCategoryFormVisible: false,
+      // 题目
+      dialogSubjectFormVisible: false,
       // 导入窗口状态
       dialogImportVisible: false,
       // 导出窗口状态
       dialogExportVisible: false,
       // 选择的菜单
       multipleSelection: [],
-      importUrl: '/exam/subjectCategory/import',
+      importUrl: '/exam/subject/import',
+      // 题目类型
+      subjectTypeData: [
+        { id: 0, subjectTypeName: '选择题' },
+        { id: 3, subjectTypeName: '简答题' }
+      ],
+      // 多选题目
+      multipleSubjectSelection: [],
+      uploading: false,
+      uploadingSubject: false,
+      percentageSubject: 0,
+      params: {
+        categoryId: ''
+      },
       headers: {
         Authorization: 'Bearer ' + getToken()
       }
@@ -209,6 +381,11 @@ export default {
     this.subject_category_btn_add = this.permissions['exam:subject:category:add']
     this.subject_category_btn_edit = this.permissions['exam:subject:category:edit']
     this.subject_category_btn_del = this.permissions['exam:subject:category:del']
+    this.exam_btn_subject = this.permissions['exam:exam:subject']
+    this.exam_btn_subject_add = this.permissions['exam:exam:subject:add']
+    this.exam_btn_subject_del = this.permissions['exam:exam:subject:del']
+    this.exam_btn_subject_import = this.permissions['exam:exam:subject:import']
+    this.exam_btn_subject_export = this.permissions['exam:exam:subject:export']
   },
   computed: {
     ...mapGetters([
@@ -262,10 +439,14 @@ export default {
     },
     // 点击分类
     getNodeData(data) {
+      // 获取分类信息
       getObj(data.id).then(response => {
         this.category = response.data.data
       })
       this.currentCategoryId = data.id
+      this.listQuery.categoryId = this.currentCategoryId
+      // 获取题目信息
+      this.handleSubjectManagement()
     },
     handleFilter() {
       this.listQuery.pageNum = 1
@@ -279,10 +460,24 @@ export default {
       this.listQuery.pageNum = val
       this.getList()
     },
+    handleSubjectSelectionChange(val) {
+      this.multipleSubjectSelection = val
+    },
+    // 切换题目类型
+    changeSubjectType(value) {
+      console.log(value)
+    },
     // 修改分类
     handleUpdateCategory() {
+      if (this.currentCategoryId === '') {
+        this.$message({
+          message: '请选择分类',
+          type: 'warning'
+        })
+        return
+      }
       this.tempCategory = Object.assign({}, this.category) // copy obj
-      this.categormFormStatus = 'update'
+      this.categoryFormStatus = 'update'
       this.dialogCategoryFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataCategoryForm'].clearValidate()
@@ -292,7 +487,7 @@ export default {
     handleAddSuperCategory() {
       this.resetCategoryForm()
       this.tempCategory.parentId = -1
-      this.categormFormStatus = 'create'
+      this.categoryFormStatus = 'create'
       this.dialogCategoryFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataCategoryForm'].clearValidate()
@@ -308,7 +503,7 @@ export default {
         return
       }
       this.resetCategoryForm()
-      this.categormFormStatus = 'create'
+      this.categoryFormStatus = 'create'
       this.dialogCategoryFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataCategoryForm'].clearValidate()
@@ -327,7 +522,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        delObj(this.currentId).then(() => {
+        delObj(this.currentCategoryId).then(() => {
           this.getList()
           this.resetForm()
           this.onCancel()
@@ -390,6 +585,7 @@ export default {
       this.tempSubject = {
         id: '',
         examinationId: '',
+        categoryId: '',
         subjectName: '',
         type: 0,
         content: '',
@@ -406,12 +602,8 @@ export default {
       }
     },
     // 加载题目
-    handleSubjectManagement(row) {
+    handleSubjectManagement() {
       this.listLoading = true
-      // 保存当前题目列表的考试ID
-      if (row !== undefined) {
-        this.listQuery.examinationId = row.id
-      }
       fetchSubjectList(this.listQuery).then(response => {
         if (response.data.list.length > 0) {
           for (let i = 0; i < response.data.list.length; i++) {
@@ -428,13 +620,134 @@ export default {
         this.listLoading = false
       })
     },
-    // 新建题目
+    // 点击新建题目
     handleCreateSubject() {
+      if (this.currentCategoryId === '') {
+        this.$message({
+          message: '请选择分类',
+          type: 'warning'
+        })
+        return
+      }
       this.resetTempSubject()
-      this.dialogStatus = 'create'
-      this.dialogCategoryFormVisible = true
+      this.subjectFormStatus = 'create'
+      this.dialogSubjectFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataSubjectForm'].clearValidate()
+      })
+    },
+    // 修改题目
+    handleUpdateSubject(row) {
+      this.tempSubject = Object.assign({}, row) // copy obj
+      this.tempSubject.status = parseInt(status)
+      this.tempSubject.type = parseInt(row.type)
+      // 绑定分类ID
+      this.tempSubject.categoryId = this.currentCategoryId
+      this.subjectFormStatus = 'update'
+      this.dialogSubjectFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataSubjectForm'].clearValidate()
+      })
+    },
+    // 删除题目
+    handleDeleteSubject(row) {
+      this.$confirm('确定要删除吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        delSubject(row.id).then(() => {
+          this.dialogSubjectFormVisible = false
+          this.handleSubjectManagement()
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
+        })
+      })
+    },
+    // 保存题目
+    createSubjectData() {
+      this.$refs['dataSubjectForm'].validate((valid) => {
+        if (valid) {
+          // 绑定分类ID
+          this.tempSubject.categoryId = this.currentCategoryId
+          addSubject(this.tempSubject).then(() => {
+            this.dialogSubjectFormVisible = false
+            this.handleSubjectManagement()
+            this.$notify({
+              title: '成功',
+              message: '创建成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+    // 更新题目
+    updateSubjectData() {
+      this.$refs['dataSubjectForm'].validate((valid) => {
+        if (valid) {
+          const tempData = Object.assign({}, this.tempSubject)
+          putSubject(tempData).then(() => {
+            this.dialogSubjectFormVisible = false
+            this.handleSubjectManagement()
+            this.$notify({
+              title: '成功',
+              message: '更新成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+    // 更新并添加题目
+    updateAndAddSubjectData() {
+      this.$refs['dataSubjectForm'].validate((valid) => {
+        if (valid) {
+          // 绑定分类ID
+          this.tempSubject.categoryId = this.currentCategoryId
+          const tempData = Object.assign({}, this.tempSubject)
+          // 创建
+          if (this.subjectFormStatus === 'create') {
+            addSubject(tempData).then(() => {
+              this.resetTempSubject()
+              this.subjectFormStatus = 'create'
+              this.$nextTick(() => {
+                this.$refs['dataSubjectForm'].clearValidate()
+              })
+              this.handleSubjectManagement()
+              this.$notify({
+                title: '成功',
+                message: '创建成功',
+                type: 'success',
+                duration: 2000
+              })
+            })
+          } else {
+            // 更新
+            putSubject(tempData).then(() => {
+              this.resetTempSubject()
+              this.subjectFormStatus = 'create'
+              // 绑定分类ID
+              this.tempSubject.categoryId = this.currentCategoryId
+              this.$nextTick(() => {
+                this.$refs['dataSubjectForm'].clearValidate()
+              })
+              this.handleSubjectManagement()
+              this.$notify({
+                title: '成功',
+                message: '更新成功',
+                type: 'success',
+                duration: 2000
+              })
+            })
+          }
+        }
       })
     },
     // 批量删除
@@ -458,14 +771,70 @@ export default {
               duration: 2000
             })
           })
+        }).catch()
+      }
+    },
+    // 点击排序按钮
+    sortSubjectChange(column, prop, order) {
+      this.listQuery.sort = column.prop
+      this.listQuery.order = column.order
+      this.handleSubjectManagement()
+    },
+    // 导出
+    handleExportSubject() {
+      // 没选择题目，导出所有
+      if (this.multipleSubjectSelection.length === 0 || this.currentCategoryId === '') {
+        this.$confirm('是否导出所有题目?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'success'
+        }).then(() => {
+          window.location.href = this.baseUrl + '/subject/export?ids=&categoryId=' + this.currentCategoryId
+        }).catch(() => {
+
+        })
+      } else {
+        // 导出选中
+        this.$confirm('是否导出选中的题目?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'success'
+        }).then(() => {
+          let ids = ''
+          for (let i = 0; i < this.multipleSubjectSelection.length; i++) {
+            ids += this.multipleSubjectSelection[i].id + ','
+          }
+          window.location.href = this.baseUrl + '/subject/export?ids=' + ids
+        }).catch(() => {
+
         })
       }
     },
-    handleExport() {
-
+    // 导入
+    handleImportSubject() {
+      this.dialogImportVisible = true
     },
-    handleImport() {
-
+    // 上传前
+    beforeUploadSubjectUpload(file) {
+      const isText = file.type === 'application/vnd.ms-excel'
+      const isTextComputer = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      return (isText | isTextComputer)
+    },
+    handleUploadSubjectProgress(event, file, fileList) {
+      this.uploadingSubject = true
+      this.percentageSubject = parseInt(file.percentage.toFixed(0))
+    },
+    // 上传成功
+    handleUploadSubjectSuccess() {
+      this.dialogImportVisible = false
+      this.handleSubjectManagement()
+      this.$notify({
+        title: '成功',
+        message: '导入成功',
+        type: 'success',
+        duration: 2000
+      })
+      this.uploadingSubject = false
     }
   }
 }
@@ -474,5 +843,8 @@ export default {
 <style scoped>
   .tree-container{
     padding-top: 10px;
+  }
+  .category-btn {
+    margin: 5px;
   }
 </style>

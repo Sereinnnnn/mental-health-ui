@@ -506,8 +506,6 @@ export default {
       // 题目类型
       subjectTypeData: [
         { id: 0, subjectTypeName: '选择题' },
-        { id: 1, subjectTypeName: '填空题' },
-        { id: 2, subjectTypeName: '判断题' },
         { id: 3, subjectTypeName: '简答题' }
       ],
       // 多选考试
@@ -847,8 +845,6 @@ export default {
             duration: 2000
           })
         })
-        const index = this.subject.list.indexOf(row)
-        this.subject.list.splice(index, 1)
       })
     },
     // 保存题目
@@ -877,13 +873,6 @@ export default {
         if (valid) {
           const tempData = Object.assign({}, this.tempSubject)
           putSubject(tempData).then(() => {
-            for (const v of this.subject.list) {
-              if (v.id === this.tempSubject.id) {
-                const index = this.subject.list.indexOf(v)
-                this.subject.list.splice(index, 1, this.tempSubject)
-                break
-              }
-            }
             this.dialogSubjectFormVisible = false
             this.handleSubjectManagement()
             this.$notify({
@@ -902,13 +891,6 @@ export default {
         if (valid) {
           const tempData = Object.assign({}, this.tempSubject)
           putSubject(tempData).then(() => {
-            for (const v of this.subject.list) {
-              if (v.id === this.tempSubject.id) {
-                const index = this.subject.list.indexOf(v)
-                this.subject.list.splice(index, 1, this.tempSubject)
-                break
-              }
-            }
             this.resetTempSubject()
             this.dialogStatus = 'create'
             this.$nextTick(() => {

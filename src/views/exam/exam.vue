@@ -192,6 +192,7 @@
         <el-input :placeholder="$t('table.subjectName')" v-model="subject.listQuery.subjectName" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilterSubject"/>
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilterSubject">{{ $t('table.search') }}</el-button>
         <el-button v-if="exam_btn_subject_add" class="filter-item" icon="el-icon-check" plain @click="handleCreateSubject">{{ $t('table.add') }}</el-button>
+        <el-button v-if="exam_btn_subject_add" class="filter-item" icon="el-icon-check" plain @click="handleCreateSubjectFromSubjectBank">{{ $t('table.addFromSubjectBank') }}</el-button>
         <el-button v-if="exam_btn_subject_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletesSubject">{{ $t('table.del') }}</el-button>
         <el-button v-if="exam_btn_subject_import" class="filter-item" icon="el-icon-upload2" plain @click="handleImportSubject">{{ $t('table.import') }}</el-button>
         <el-button v-if="exam_btn_subject_export" class="filter-item" icon="el-icon-download" plain @click="handleExportSubject">{{ $t('table.export') }}</el-button>
@@ -353,6 +354,80 @@
         <el-progress v-if="uploadingSubject === true" :percentage="percentageSubject" :text-inside="true" :stroke-width="18" status="success"/>
       </el-upload>
     </el-dialog>
+
+    <!-- 题库列表 -->
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="category.dialogVisible" width="80%" top="10vh">
+      <el-row>
+        <el-col :span="4">
+          <el-card class="tree-box-card" style="margin-right: 5px;">
+            <div slot="header">
+              <span>题目分类</span>
+            </div>
+            <el-row>
+              <div class="tree-container">
+                <el-tree
+                  :data="category.treeData"
+                  :filter-node-method="filterNode"
+                  :props="category.defaultProps"
+                  class="filter-tree"
+                  node-key="id"
+                  highlight-current
+                  accordion
+                  default-expand-all
+                  @node-click="getNodeData"
+                  @node-expand="nodeExpand"
+                  @node-collapse="nodeCollapse"
+                />
+              </div>
+            </el-row>
+          </el-card>
+        </el-col>
+
+        <el-col :span="20">
+          <el-card class="box-card">
+            <div slot="header" class="clearfix">
+              <span>选择题目</span>
+            </div>
+            <el-table
+              v-loading="category.listLoading"
+              :data="category.list"
+              :default-sort="{ prop: 'id', order: 'descending' }"
+              border
+              highlight-current-row
+              style="width: 100%;">
+              <el-table-column type="selection" width="55"/>
+              <el-table-column :label="$t('table.subjectName')" sortable prop="subject_name" property="subjectName" min-width="120">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.subjectName }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column :label="$t('table.subject.type')" sortable prop="type" property="type" width="200">
+                <template slot-scope="scope">
+                  <el-tag type="success">{{ scope.row.type | subjectTypeFilter }}</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column :label="$t('table.subject.score')" sortable prop="score" property="score">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.score }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column :label="$t('table.subject.level')" sortable prop="level" property="level">'
+                <template slot-scope="scope">
+                  <el-rate v-model="scope.row.level" :max="4"/>
+                </template>
+              </el-table-column>
+            </el-table>
+            <div class="pagination-container">
+              <el-pagination v-show="category.total>0" :current-page="category.listQuery.pageNum" :page-sizes="[10,20,30, 50]" :page-size="category.listQuery.pageSize" :total="category.total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="category.dialogVisible = false">{{ $t('table.cancel') }}</el-button>
+        <el-button type="primary" @click="updateSubjectData">{{ $t('table.confirm') }}</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -360,6 +435,7 @@
 import { fetchList, addObj, putObj, delObj, delAllObj } from '@/api/exam/exam'
 import { fetchCourseList } from '@/api/exam/course'
 import { fetchSubjectList, addSubject, putSubject, delSubject, delAllSubject } from '@/api/exam/subject'
+import { fetchTree, getObj } from '@/api/exam/subjectCategory'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
@@ -426,13 +502,15 @@ export default {
           pageNum: 1,
           pageSize: 10,
           examinationId: '',
+          categoryId: '',
           sort: 'id',
           order: 'descending'
         },
         list: null,
         total: null,
         listLoading: true,
-        examinationId: ''
+        examinationId: '',
+        categoryId: ''
       },
       // 考试临时信息
       temp: {
@@ -458,6 +536,7 @@ export default {
       tempSubject: {
         id: '',
         examinationId: '',
+        categoryId: '',
         subjectName: '',
         type: 0,
         content: '',
@@ -488,7 +567,17 @@ export default {
         endTime: [{ required: true, message: '请选择结束时间', trigger: 'change' }],
         totalScore: [{ required: true, message: '请输入总分', trigger: 'change' }]
       },
-      subjectRules: {},
+      // 表单校验规则
+      subjectRules: {
+        subjectName: [{ required: true, message: '请输入题目名称', trigger: 'change' }],
+        score: [{ required: true, message: '请输入题目分值', trigger: 'change' }],
+        content: [{ required: true, message: '请输入题目内容', trigger: 'change' }],
+        optionA: [{ required: true, message: '请输入选项A', trigger: 'change' }],
+        optionB: [{ required: true, message: '请输入选项B', trigger: 'change' }],
+        optionC: [{ required: true, message: '请输入选项C', trigger: 'change' }],
+        optionD: [{ required: true, message: '请输入选项D', trigger: 'change' }],
+        answer: [{ required: true, message: '请输入答案', trigger: 'change' }]
+      },
       downloadLoading: false,
       labelPosition: 'right',
       // 按钮权限
@@ -525,7 +614,29 @@ export default {
       uploading: false,
       percentage: 0,
       uploadingSubject: false,
-      percentageSubject: 0
+      percentageSubject: 0,
+      // 题目分类数据
+      category: {
+        dialogVisible: false,
+        // 题目列表查询参数
+        listQuery: {
+          subjectName: undefined,
+          categoryId: undefined,
+          sort: '',
+          order: ''
+        },
+        // 题目列表数据
+        list: [],
+        // 分类树数据
+        treeData: [],
+        // 题目分类数据
+        defaultProps: {
+          children: 'children',
+          label: 'categoryName'
+        },
+        // 列表加载状态
+        listLoading: false
+      }
     }
   },
   created() {
@@ -553,6 +664,7 @@ export default {
     ])
   },
   methods: {
+    // 加载考试列表
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
@@ -609,6 +721,13 @@ export default {
       this.subject.listQuery.sort = column.prop
       this.subject.listQuery.order = column.order
       this.handleSubjectManagement()
+    },
+    // 点击分类
+    getNodeData(data) {
+      // 获取分类ID
+      this.category.listQuery.categoryId = data.id
+      // 获取题目信息
+      this.handleSubjectBankManagement()
     },
     resetTemp() {
       this.temp = {
@@ -783,6 +902,25 @@ export default {
       })
       this.dialogSubjectVisible = true
     },
+    // 加载题库类表
+    handleSubjectBankManagement() {
+      this.category.listLoading = true
+      fetchSubjectList(this.category.listQuery).then(response => {
+        if (response.data.list.length > 0) {
+          for (let i = 0; i < response.data.list.length; i++) {
+            const subject = response.data.list[i]
+            subject.type = parseInt(subject.type)
+            subject.level = parseInt(subject.level)
+            if (subject.type === 0) {
+              subject.answer = parseInt(subject.answer)
+            }
+          }
+        }
+        this.category.list = response.data.list
+        this.category.total = response.data.total
+        this.category.listLoading = false
+      })
+    },
     handleFilterSubject() {
       this.subject.listQuery.pageNum = 1
       this.handleSubjectManagement()
@@ -795,6 +933,15 @@ export default {
       this.$nextTick(() => {
         this.$refs['dataSubjectForm'].clearValidate()
       })
+    },
+    // 从题库新增
+    handleCreateSubjectFromSubjectBank() {
+      // 加载分类树
+      fetchTree(this.category.listQuery).then(response => {
+        this.category.treeData = response.data
+      })
+      this.category.dialogVisible = true
+      // 加载题目列表
     },
     resetTempSubject() {
       this.tempSubject = {
@@ -889,21 +1036,42 @@ export default {
     updateAndAddSubjectData() {
       this.$refs['dataSubjectForm'].validate((valid) => {
         if (valid) {
+          // 绑定考试ID
+          this.tempSubject.examinationId = this.subject.examinationId
           const tempData = Object.assign({}, this.tempSubject)
-          putSubject(tempData).then(() => {
-            this.resetTempSubject()
-            this.dialogStatus = 'create'
-            this.$nextTick(() => {
-              this.$refs['dataSubjectForm'].clearValidate()
+          // 创建
+          if (this.dialogStatus === 'create') {
+            addSubject(this.tempSubject).then(() => {
+              this.resetTempSubject()
+              this.dialogStatus = 'create'
+              this.$nextTick(() => {
+                this.$refs['dataSubjectForm'].clearValidate()
+              })
+              this.handleSubjectManagement()
+              this.$notify({
+                title: '成功',
+                message: '创建成功',
+                type: 'success',
+                duration: 2000
+              })
             })
-            this.handleSubjectManagement()
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
+          } else {
+            // 修改
+            putSubject(tempData).then(() => {
+              this.resetTempSubject()
+              this.dialogStatus = 'create'
+              this.$nextTick(() => {
+                this.$refs['dataSubjectForm'].clearValidate()
+              })
+              this.handleSubjectManagement()
+              this.$notify({
+                title: '成功',
+                message: '更新成功',
+                type: 'success',
+                duration: 2000
+              })
             })
-          })
+          }
         }
       })
     },

@@ -223,7 +223,6 @@
       <el-upload
         :multiple="false"
         :auto-upload="true"
-        :show-file-list="true"
         :before-upload="beforeUploadSubjectUpload"
         :on-progress="handleUploadSubjectProgress"
         :on-success="handleUploadSubjectSuccess"
@@ -282,7 +281,9 @@ export default {
       listLoading: true,
       listQuery: {
         subjectName: undefined,
-        categoryId: undefined
+        categoryId: undefined,
+        sort: '',
+        order: ''
       },
       treeData: [],
       oExpandedKey: {
@@ -333,10 +334,16 @@ export default {
         categoryName: [{ required: true, message: '请输入分类名称', trigger: 'change' }]
       },
       // 表单校验规则
-      rules: {
-        categoryName: [{ required: true, message: '请输入分类名称', trigger: 'change' }]
+      subjectRules: {
+        subjectName: [{ required: true, message: '请输入题目名称', trigger: 'change' }],
+        score: [{ required: true, message: '请输入题目分值', trigger: 'change' }],
+        content: [{ required: true, message: '请输入题目内容', trigger: 'change' }],
+        optionA: [{ required: true, message: '请输入选项A', trigger: 'change' }],
+        optionB: [{ required: true, message: '请输入选项B', trigger: 'change' }],
+        optionC: [{ required: true, message: '请输入选项C', trigger: 'change' }],
+        optionD: [{ required: true, message: '请输入选项D', trigger: 'change' }],
+        answer: [{ required: true, message: '请输入答案', trigger: 'change' }]
       },
-      subjectRules: {},
       // 按钮权限
       subject_category_btn_add: false,
       subject_category_btn_edit: false,
@@ -445,6 +452,7 @@ export default {
       })
       this.currentCategoryId = data.id
       this.listQuery.categoryId = this.currentCategoryId
+      this.params.categoryId = this.currentCategoryId
       // 获取题目信息
       this.handleSubjectManagement()
     },
@@ -517,20 +525,30 @@ export default {
         })
         return
       }
-      this.$confirm('确定要删除吗?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        delObj(this.currentCategoryId).then(() => {
-          this.getList()
-          this.resetForm()
-          this.onCancel()
-          this.$notify({
-            title: '成功',
-            message: '删除成功',
-            type: 'success',
-            duration: 2000
+      // 检查分类下是否有题目
+      fetchSubjectList(this.listQuery).then(response => {
+        if (response.data.list.length > 0) {
+          this.$message({
+            message: '该分类下还有题目',
+            type: 'warning'
+          })
+          return
+        }
+        this.$confirm('确定要删除吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          delObj(this.currentCategoryId).then(() => {
+            this.getList()
+            this.resetForm()
+            this.onCancel()
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            })
           })
         })
       })
@@ -641,8 +659,6 @@ export default {
       this.tempSubject = Object.assign({}, row) // copy obj
       this.tempSubject.status = parseInt(status)
       this.tempSubject.type = parseInt(row.type)
-      // 绑定分类ID
-      this.tempSubject.categoryId = this.currentCategoryId
       this.subjectFormStatus = 'update'
       this.dialogSubjectFormVisible = true
       this.$nextTick(() => {
@@ -812,6 +828,13 @@ export default {
     },
     // 导入
     handleImportSubject() {
+      if (this.currentCategoryId === '') {
+        this.$message({
+          message: '请选择分类',
+          type: 'warning'
+        })
+        return
+      }
       this.dialogImportVisible = true
     },
     // 上传前

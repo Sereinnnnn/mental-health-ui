@@ -190,7 +190,8 @@ export default {
     retrieve: '回收',
     categoryName: '分类名称',
     categoryDesc: '分类描述',
-    sort: '排序号'
+    sort: '排序号',
+    addFromSubjectBank: '从题库新增'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',

@@ -367,7 +367,6 @@
               <div class="tree-container">
                 <el-tree
                   :data="category.treeData"
-                  :filter-node-method="filterNode"
                   :props="category.defaultProps"
                   class="filter-tree"
                   node-key="id"
@@ -375,8 +374,6 @@
                   accordion
                   default-expand-all
                   @node-click="getNodeData"
-                  @node-expand="nodeExpand"
-                  @node-collapse="nodeCollapse"
                 />
               </div>
             </el-row>
@@ -394,8 +391,14 @@
               :default-sort="{ prop: 'id', order: 'descending' }"
               border
               highlight-current-row
-              style="width: 100%;">
-              <el-table-column type="selection" width="55"/>
+              style="width: 100%;"
+              @row-click = "handleSingleSubjectSelection"
+              @current-change="handleSingleSubjectCurrentChange">
+              <el-table-column align="center" width="55" label="" >
+                <template slot-scope="scope">
+                  <el-radio :label="scope.$index" v-model="category.tempRadio" @change.native="handleSingleSubjectSelectionChange(scope.$index, scope.row)">&nbsp;</el-radio>
+                </template>
+              </el-table-column>
               <el-table-column :label="$t('table.subjectName')" sortable prop="subject_name" property="subjectName" min-width="120">
                 <template slot-scope="scope">
                   <span>{{ scope.row.subjectName }}</span>
@@ -425,7 +428,7 @@
       </el-row>
       <div slot="footer" class="dialog-footer">
         <el-button @click="category.dialogVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button type="primary" @click="updateSubjectData">{{ $t('table.confirm') }}</el-button>
+        <el-button type="primary" @click="handleSelectSubject">{{ $t('table.confirm') }}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -435,6 +438,7 @@
 import { fetchList, addObj, putObj, delObj, delAllObj } from '@/api/exam/exam'
 import { fetchCourseList } from '@/api/exam/course'
 import { fetchSubjectList, addSubject, putSubject, delSubject, delAllSubject } from '@/api/exam/subject'
+import { fetchSubjectBankList } from '@/api/exam/subjectBank'
 import { fetchTree, getObj } from '@/api/exam/subjectCategory'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
@@ -601,6 +605,8 @@ export default {
       multipleSelection: [],
       // 多选题目
       multipleSubjectSelection: [],
+      // 单选题目
+      singleSubjectSelection: [],
       // 导入弹窗状态
       dialogImportVisible: false,
       // 导入题目的url
@@ -635,7 +641,8 @@ export default {
           label: 'categoryName'
         },
         // 列表加载状态
-        listLoading: false
+        listLoading: false,
+        tempRadio: ''
       }
     }
   },
@@ -712,6 +719,36 @@ export default {
     handleSubjectSelectionChange(val) {
       this.multipleSubjectSelection = val
     },
+    // 题库里选择题目
+    handleSingleSubjectSelectionChange(index, row) {
+      this.category.singleSubjectSelection = row
+    },
+    // 点击行时选择题目
+    handleSingleSubjectSelection(row) {
+      this.category.tempRadio = this.category.list.indexOf(row)
+    },
+    // 表格变化
+    handleSingleSubjectCurrentChange(row) {
+      this.category.singleSubjectSelection = row
+    },
+    // 选择题目
+    handleSelectSubject() {
+      // 隐藏弹框
+      this.category.dialogVisible = false
+      // 赋值给临时题目
+      this.tempSubject = this.category.singleSubjectSelection
+      // 清空题目ID
+      this.tempSubject.id = ''
+      // 清空分类ID
+      this.tempSubject.categoryId = ''
+      // 绑定考试ID
+      this.tempSubject.examinationId = this.subject.examinationId
+      // 状态为新建
+      this.dialogStatus = 'create'
+      // 显示题目信息表单
+      this.dialogSubjectFormVisible = true
+    },
+    // 排序事件
     sortChange(column, prop, order) {
       this.listQuery.sort = column.prop
       this.listQuery.order = column.order
@@ -902,10 +939,10 @@ export default {
       })
       this.dialogSubjectVisible = true
     },
-    // 加载题库类表
+    // 加载题库列表
     handleSubjectBankManagement() {
       this.category.listLoading = true
-      fetchSubjectList(this.category.listQuery).then(response => {
+      fetchSubjectBankList(this.category.listQuery).then(response => {
         if (response.data.list.length > 0) {
           for (let i = 0; i < response.data.list.length; i++) {
             const subject = response.data.list[i]

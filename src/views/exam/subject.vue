@@ -239,7 +239,7 @@
 
 <script>
 import { fetchTree, getObj, addObj, delObj, putObj } from '@/api/exam/subjectCategory'
-import { fetchSubjectList, addSubject, putSubject, delSubject, delAllSubject } from '@/api/exam/subject'
+import { fetchSubjectBankList, addSubjectBank, putSubjectBank, delSubjectBank, delAllSubjectBank } from '@/api/exam/subjectBank'
 import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
 import { checkMultipleSelect } from '@/utils/util'
@@ -363,7 +363,7 @@ export default {
       dialogExportVisible: false,
       // 选择的菜单
       multipleSelection: [],
-      importUrl: '/exam/subject/import',
+      importUrl: '/exam/subjectBank/import',
       // 题目类型
       subjectTypeData: [
         { id: 0, subjectTypeName: '选择题' },
@@ -517,6 +517,7 @@ export default {
         this.$refs['dataCategoryForm'].clearValidate()
       })
     },
+    // 删除分类
     handleDeleteCategory() {
       if (this.currentCategoryId === '') {
         this.$message({
@@ -526,7 +527,7 @@ export default {
         return
       }
       // 检查分类下是否有题目
-      fetchSubjectList(this.listQuery).then(response => {
+      fetchSubjectBankList(this.listQuery).then(response => {
         if (response.data.list.length > 0) {
           this.$message({
             message: '该分类下还有题目',
@@ -553,6 +554,7 @@ export default {
         })
       })
     },
+    // 新建分类
     createCategory() {
       this.$refs['dataCategoryForm'].validate((valid) => {
         if (valid) {
@@ -622,7 +624,7 @@ export default {
     // 加载题目
     handleSubjectManagement() {
       this.listLoading = true
-      fetchSubjectList(this.listQuery).then(response => {
+      fetchSubjectBankList(this.listQuery).then(response => {
         if (response.data.list.length > 0) {
           for (let i = 0; i < response.data.list.length; i++) {
             const subject = response.data.list[i]
@@ -672,7 +674,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        delSubject(row.id).then(() => {
+        delSubjectBank(row.id).then(() => {
           this.dialogSubjectFormVisible = false
           this.handleSubjectManagement()
           this.$notify({
@@ -690,7 +692,7 @@ export default {
         if (valid) {
           // 绑定分类ID
           this.tempSubject.categoryId = this.currentCategoryId
-          addSubject(this.tempSubject).then(() => {
+          addSubjectBank(this.tempSubject).then(() => {
             this.dialogSubjectFormVisible = false
             this.handleSubjectManagement()
             this.$notify({
@@ -708,7 +710,7 @@ export default {
       this.$refs['dataSubjectForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.tempSubject)
-          putSubject(tempData).then(() => {
+          putSubjectBank(tempData).then(() => {
             this.dialogSubjectFormVisible = false
             this.handleSubjectManagement()
             this.$notify({
@@ -730,7 +732,7 @@ export default {
           const tempData = Object.assign({}, this.tempSubject)
           // 创建
           if (this.subjectFormStatus === 'create') {
-            addSubject(tempData).then(() => {
+            addSubjectBank(tempData).then(() => {
               this.resetTempSubject()
               this.subjectFormStatus = 'create'
               this.$nextTick(() => {
@@ -746,7 +748,7 @@ export default {
             })
           } else {
             // 更新
-            putSubject(tempData).then(() => {
+            putSubjectBank(tempData).then(() => {
               this.resetTempSubject()
               this.subjectFormStatus = 'create'
               // 绑定分类ID
@@ -778,7 +780,7 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          delAllSubject({ ids: ids }).then(() => {
+          delAllSubjectBank({ ids: ids }).then(() => {
             this.handleSubjectManagement()
             this.$notify({
               title: '成功',
@@ -805,7 +807,7 @@ export default {
           cancelButtonText: '取消',
           type: 'success'
         }).then(() => {
-          window.location.href = this.baseUrl + '/subject/export?ids=&categoryId=' + this.currentCategoryId
+          window.location.href = this.baseUrl + '/subjectBank/export?ids=&categoryId=' + this.currentCategoryId
         }).catch(() => {
 
         })
@@ -820,7 +822,7 @@ export default {
           for (let i = 0; i < this.multipleSubjectSelection.length; i++) {
             ids += this.multipleSubjectSelection[i].id + ','
           }
-          window.location.href = this.baseUrl + '/subject/export?ids=' + ids
+          window.location.href = this.baseUrl + '/subjectBank/export?ids=' + ids
         }).catch(() => {
 
         })

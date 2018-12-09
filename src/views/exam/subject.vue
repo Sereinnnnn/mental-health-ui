@@ -39,10 +39,10 @@
           <div class="filter-container">
             <el-input v-model="listQuery.subjectName" placeholder="题目名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
             <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
-            <el-button v-if="subject_category_btn_add" class="filter-item" style="margin-left: 10px;" icon="el-icon-check" plain @click="handleCreateSubject">{{ $t('table.add') }}</el-button>
-            <el-button v-if="subject_category_btn_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletesSubject">{{ $t('table.del') }}</el-button>
-            <el-button v-if="exam_btn_subject_import" class="filter-item" icon="el-icon-upload2" plain @click="handleImportSubject">{{ $t('table.import') }}</el-button>
-            <el-button v-if="exam_btn_subject_export" class="filter-item" icon="el-icon-download" plain @click="handleExportSubject">{{ $t('table.export') }}</el-button>
+            <el-button v-if="subject_bank_btn_add" class="filter-item" style="margin-left: 10px;" icon="el-icon-check" plain @click="handleCreateSubject">{{ $t('table.add') }}</el-button>
+            <el-button v-if="subject_bank_btn_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletesSubject">{{ $t('table.del') }}</el-button>
+            <el-button v-if="subject_bank_btn_import" class="filter-item" icon="el-icon-upload2" plain @click="handleImportSubject">{{ $t('table.import') }}</el-button>
+            <el-button v-if="subject_bank_btn_export" class="filter-item" icon="el-icon-download" plain @click="handleExportSubject">{{ $t('table.export') }}</el-button>
           </div>
           <el-table
             v-loading="listLoading"
@@ -77,8 +77,8 @@
             </el-table-column>
             <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
               <template slot-scope="scope">
-                <el-button v-if="exam_btn_subject" type="primary" size="mini" @click="handleUpdateSubject(scope.row)">{{ $t('table.edit') }}</el-button>
-                <el-button v-if="exam_btn_subject" size="mini" type="danger" @click="handleDeleteSubject(scope.row)">{{ $t('table.delete') }}</el-button>
+                <el-button v-if="subject_bank_btn_edit" type="primary" size="mini" @click="handleUpdateSubject(scope.row)">{{ $t('table.edit') }}</el-button>
+                <el-button v-if="subject_bank_btn_del" size="mini" type="danger" @click="handleDeleteSubject(scope.row)">{{ $t('table.delete') }}</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -348,11 +348,12 @@ export default {
       subject_category_btn_add: false,
       subject_category_btn_edit: false,
       subject_category_btn_del: false,
-      subject_category_btn_import: false,
-      subject_category_btn_export: false,
-      exam_btn_subject: false,
-      exam_btn_subject_import: false,
-      exam_btn_subject_export: false,
+      subject_bank_btn: false,
+      subject_bank_btn_add: false,
+      subject_bank_btn_edit: false,
+      subject_bank_btn_del: false,
+      subject_bank_btn_import: false,
+      subject_bank_btn_export: false,
       // 分类窗口状态
       dialogCategoryFormVisible: false,
       // 题目
@@ -388,11 +389,12 @@ export default {
     this.subject_category_btn_add = this.permissions['exam:subject:category:add']
     this.subject_category_btn_edit = this.permissions['exam:subject:category:edit']
     this.subject_category_btn_del = this.permissions['exam:subject:category:del']
-    this.exam_btn_subject = this.permissions['exam:exam:subject']
-    this.exam_btn_subject_add = this.permissions['exam:exam:subject:add']
-    this.exam_btn_subject_del = this.permissions['exam:exam:subject:del']
-    this.exam_btn_subject_import = this.permissions['exam:exam:subject:import']
-    this.exam_btn_subject_export = this.permissions['exam:exam:subject:export']
+    this.subject_bank_btn = this.permissions['exam:subject:bank']
+    this.subject_bank_btn_add = this.permissions['exam:subject:bank:add']
+    this.subject_bank_btn_del = this.permissions['exam:subject:bank:del']
+    this.subject_bank_btn_edit = this.permissions['exam:subject:bank:edit']
+    this.subject_bank_btn_import = this.permissions['exam:subject:bank:import']
+    this.subject_bank_btn_export = this.permissions['exam:subject:bank:export']
   },
   computed: {
     ...mapGetters([
@@ -526,6 +528,7 @@ export default {
         })
         return
       }
+      // TODO 检查是否有子分类
       // 检查分类下是否有题目
       fetchSubjectBankList(this.listQuery).then(response => {
         if (response.data.list.length > 0) {
@@ -541,15 +544,15 @@ export default {
           type: 'warning'
         }).then(() => {
           delObj(this.currentCategoryId).then(() => {
-            this.getList()
-            this.resetForm()
-            this.onCancel()
             this.$notify({
               title: '成功',
               message: '删除成功',
               type: 'success',
               duration: 2000
             })
+            this.getList()
+            this.resetForm()
+            this.onCancel()
           })
         })
       })

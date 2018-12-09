@@ -2,8 +2,7 @@
 
 import Layout from '@/views/layout/Layout'
 
-const componentsRouter = {
-  path: '/components',
+const componentsRouter = {  path: '/components',
   component: Layout,
   redirect: 'noredirect',
   name: 'ComponentDemo',

@@ -77,16 +77,19 @@ export default {
     github: '项目地址',
     screenfull: '全屏',
     theme: '换肤',
-    size: '布局大小'
+    size: '布局大小',
+    hi: '嗨'
   },
   login: {
-    title: '系统登录',
+    title: '欢迎使用考试管理系统',
     logIn: '登录',
     username: '账号',
     password: '密码',
     any: '随便填',
     thirdparty: '第三方登录',
-    thirdpartyTips: '本地不能模拟，请结合自己业务进行模拟！！！'
+    thirdpartyTips: '本地不能模拟，请结合自己业务进行模拟！！！',
+    forget: '忘记密码',
+    info: '你咋忘不了吃呢？'
   },
   documentation: {
     documentation: '文档',

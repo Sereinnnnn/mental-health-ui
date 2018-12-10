@@ -21,6 +21,7 @@ import './mock' // simulation data
 
 import * as filters from './filters' // global filters
 import '@/styles/index.scss' // global css
+import VueParticles from 'vue-particles'
 
 Vue.use(Element, {
   size: Cookies.get('size') || 'medium', // set element-ui default size
@@ -31,6 +32,9 @@ Vue.use(Element, {
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])
 })
+
+// 使用登录页粒子效果插件
+Vue.use(VueParticles)
 
 Vue.config.productionTip = false
 

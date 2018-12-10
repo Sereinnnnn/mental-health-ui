@@ -1,79 +1,60 @@
 <template>
-  <div class="login-container">
-
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-
-      <div class="title-container">
-        <!--<el-row>
-          <el-col :span="12" :offset="6">
-            <img class="logo" src="/src/assets/logo.png" style="width:200px;height: 200px; cursor:pointer;">
-          </el-col>
-        </el-row>-->
-        <h3 class="title">{{ $t('login.title') }}</h3>
-      </div>
-
-      <el-form-item prop="username">
-        <span class="svg-container svg-container_login">
-          <svg-icon icon-class="user" />
-        </span>
-        <el-input
-          v-model="loginForm.username"
-          :placeholder="$t('login.username')"
-          name="username"
-          type="text"
-          auto-complete="on"
-        />
-      </el-form-item>
-
-      <el-form-item prop="password">
-        <span class="svg-container">
-          <svg-icon icon-class="password" />
-        </span>
-        <el-input
-          :type="passwordType"
-          v-model="loginForm.password"
-          :placeholder="$t('login.password')"
-          name="password"
-          auto-complete="on"
-          @keyup.enter.native="handleLogin" />
-        <span class="show-pwd" @click="showPwd">
-          <svg-icon icon-class="eye" />
-        </span>
-      </el-form-item>
-
-      <el-row :span="24">
-        <el-col :span="14">
-          <el-form-item prop="code">
-            <span class="svg-container svg-container_login">
-              <svg-icon icon-class="size" />
-            </span>
-            <el-input :maxlength="code.len" v-model="loginForm.code" size="small" auto-complete="off" placeholder="请输入验证码" @keyup.enter.native="handleLogin" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="10">
-          <div class="login-code">
-            <span v-if="code.type === 'text'" class="login-code-img" @click="refreshCode">{{ code.value }}</span>
-            <img v-else :src="code.src" alt="验证码" class="login-code-img" @click="refreshCode">
-          </div>
-        </el-col>
-      </el-row>
-
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">{{ $t('login.logIn') }}</el-button>
-    </el-form>
-
-    <el-dialog :title="$t('login.thirdparty')" :visible.sync="showDialog" append-to-body>
-      {{ $t('login.thirdpartyTips') }}
-      <br>
-      <br>
-      <br>
-      <social-sign />
-    </el-dialog>
-
+  <div class="bg">
+    <div class="login-wrap animated flipInY">
+      <h3>{{ $t('login.title') }}</h3>
+      <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
+        <el-form-item prop="username">
+          <el-input :placeholder="$t('login.username')" v-model="loginForm.username" name="username" type="text" auto-complete="on"/>
+        </el-form-item>
+        <el-form-item prop="password">
+          <el-input :placeholder="$t('login.password')" :type="passwordType" v-model="loginForm.password" name="password" auto-complete="on" @keyup.enter.native="handleLogin"/>
+        </el-form-item>
+        <el-form-item prop="code">
+          <el-row :span="24">
+            <el-col :span="14">
+              <el-input :maxlength="code.len" v-model="loginForm.code" size="small" auto-complete="off" placeholder="请输入验证码" @keyup.enter.native="handleLogin" />
+            </el-col>
+            <el-col :span="10">
+              <div class="login-code">
+                <span v-if="code.type === 'text'" class="login-code-img" @click="refreshCode">{{ code.value }}</span>
+                <img v-else :src="code.src" alt="验证码" class="login-code-img" @click="refreshCode">
+              </div>
+            </el-col>
+          </el-row>
+        </el-form-item>
+        <el-form-item>
+          <el-row type="flex" justify="space-between">
+            <el-checkbox v-model="loginForm.rememberMe" style="color:#eee">记住密码</el-checkbox>
+            <a href="" style="color:#eee" @click.prevent="openMsg">{{ $t('login.forget') }}</a>
+          </el-row>
+        </el-form-item>
+        <el-form-item>
+          <el-button :loading="loading" type="primary" @click.native.prevent="handleLogin">{{ $t('login.logIn') }}</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+    <!-- 粒子漂浮物 -->
+    <vue-particles
+      :particle-opacity="0.7"
+      :particles-number="30"
+      :particle-size="5"
+      :lines-width="2"
+      :line-linked="true"
+      :line-opacity="0.4"
+      :lines-distance="150"
+      :move-speed="3"
+      :hover-effect="true"
+      :click-effect="true"
+      click-mode="push"
+      color="#fff"
+      shape-type="star"
+      hover-mode="grab"
+      lines-color="#fff"
+    />
   </div>
 </template>
 
 <script>
-import { isvalidUsername } from '@/utils/validate'
 import LangSelect from '@/components/LangSelect'
 import SocialSign from './socialsignin'
 import { randomLenNum } from '@/utils/util'
@@ -97,7 +78,8 @@ export default {
         username: 'admin',
         password: '123456',
         code: '',
-        randomStr: ''
+        randomStr: '',
+        rememberMe: false
       },
       code: {
         src: '/admin/code',
@@ -134,7 +116,7 @@ export default {
     this.refreshCode()
   },
   computed: {
-    ...mapGetters(["tagWel"])
+    ...mapGetters(['tagWel'])
   },
   destroyed() {
 
@@ -171,136 +153,69 @@ export default {
           return false
         }
       })
+    },
+    openMsg() {
+      // 使用了国际化
+      this.$message.warning(this.$t('login.info'))
     }
   }
 }
 </script>
 
 <style rel="stylesheet/scss" lang="scss">
-  /* 修复input 背景不协调 和光标变色 */
-  /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
-
-  $bg:#283443;
-  $light_gray:#eee;
-  $cursor: #fff;
-
-  @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
-    .login-container .el-input input{
-      color: $cursor;
-      &::first-line {
-        color: $light_gray;
-      }
-    }
-  }
-
-  .login-page h1 {
-    font-weight: 300;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    font-size: 36px;
-    color: #fff;
-  }
-
-  /* reset element-ui css */
-  .login-container {
-    .el-input {
-      display: inline-block;
-      height: 47px;
-      width: 85%;
-      input {
-        background: transparent;
-        border: 0px;
-        -webkit-appearance: none;
-        border-radius: 0px;
-        padding: 12px 5px 12px 15px;
-        color: $light_gray;
-        height: 47px;
-        caret-color: $cursor;
-        &:-webkit-autofill {
-          -webkit-box-shadow: 0 0 0px 1000px $bg inset !important;
-          -webkit-text-fill-color: $cursor !important;
-        }
-      }
-    }
-    .el-form-item {
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(0, 0, 0, 0.1);
-      border-radius: 5px;
-      color: #454545;
-    }
-  }
-</style>
-
-<style rel="stylesheet/scss" lang="scss" scoped>
-$bg:#2d3a4b;
-$dark_gray:#889aa4;
-$light_gray:#eee;
-
-.login-container {
-  position: fixed;
-  height: 100%;
-  width: 100%;
-  background-color: $bg;
-  .login-form {
-    position: absolute;
-    left: 0;
-    right: 0;
-    width: 520px;
-    max-width: 100%;
-    padding: 35px 35px 15px 35px;
-    margin: 120px auto;
-  }
-  .tips {
-    font-size: 14px;
-    color: #fff;
-    margin-bottom: 10px;
-    span {
-      &:first-of-type {
-        margin-right: 16px;
-      }
-    }
-  }
-  .svg-container {
-    padding: 6px 5px 6px 15px;
-    color: $dark_gray;
-    vertical-align: middle;
-    width: 30px;
-    display: inline-block;
-    &_login {
-      font-size: 20px;
-    }
-  }
-  .title-container {
+  .bg {
     position: relative;
-    .title {
-      font-size: 26px;
-      color: $light_gray;
-      margin: 0px auto 40px auto;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url('../../../static/img/sky.jpg');
+    background-position: -20% 10%;
+    background-size: contain;
+    #particles-js {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+  }
+  .login-wrap {
+    width: 330px;
+    border-radius: 5px;
+    padding: 20px;
+    z-index: 3;
+    margin-right: -37%;
+    background: rgba(216,220,229,0.5);
+    .el-form-item {
+      margin-bottom: 25px !important;
+    }
+    h3 {
       text-align: center;
-      font-weight: bold;
+      color: #ebedef;
+      margin-top: 0px;
+      margin-bottom: 5px;
+      span {
+        color: #20a0ff;
+      }
     }
-    .logo {
-      top: 5px;
+    form {
+      margin-top: 25px;
+      .el-form-item {
+        margin-bottom: 15px;
+      }
     }
-  }
-  .show-pwd {
-    position: absolute;
-    right: 10px;
-    top: 7px;
-    font-size: 16px;
-    color: $dark_gray;
-    cursor: pointer;
-    user-select: none;
-  }
-  .thirdparty-button {
-    position: absolute;
-    right: 35px;
-    bottom: 28px;
+    a {
+      text-decoration: none;
+      color: #1f2d3d;
+    }
+    button {
+      width: 100%;
+      font-weight: 600;
+    }
   }
   .login-code-img {
-     margin-top: 2px;
-     height: 45px;
-    padding-left: 20px;
-   }
-}
+    margin-left: 15px;
+  }
 </style>

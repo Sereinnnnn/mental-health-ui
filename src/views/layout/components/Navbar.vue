@@ -6,6 +6,7 @@
 
     <div class="right-menu">
       <template v-if="device!=='mobile'">
+        <a class="animated fadeIn hi">{{ $t('navbar.hi') }}，{{ userInfo.name }}</a>
         <error-log class="errLog-container right-menu-item"/>
 
         <el-tooltip :content="$t('navbar.screenfull')" effect="dark" placement="bottom">
@@ -155,6 +156,10 @@ export default {
           font-size: 12px;
         }
       }
+    }
+    .hi {
+      vertical-align: 15px;
+      margin-right: 30px;
     }
   }
 }

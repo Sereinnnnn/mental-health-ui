@@ -18,8 +18,7 @@
 import { mapGetters } from 'vuex'
 import SidebarItem from './SidebarItem'
 import { validatenull } from '@/utils/validate'
-import { initMenu } from '@/utils/util'
-import { setUrlPath } from '@/utils/util'
+import { initMenu, setUrlPath } from '@/utils/util'
 
 export default {
   components: { SidebarItem },

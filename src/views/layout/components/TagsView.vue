@@ -6,10 +6,10 @@
         ref="tag"
         :class="isActive(tag)?'active':''"
         :to="tag"
-        :key="tag.path"
+        :key="tag.fullPath"
         class="tags-view-item"
         @contextmenu.prevent.native="openMenu(tag,$event)">
-        {{ tag.name }}
+        {{ tag.tempName === undefined ? tag.name : tag.tempName }}
         <span class="el-icon-close" @click.prevent.stop="closeSelectedTag(tag)"/>
       </router-link>
     </scroll-pane>
@@ -37,6 +37,17 @@ export default {
   },
   computed: {
     visitedViews() {
+      // 处理第三方链接的菜单
+      const views = this.$store.state.tagsView.visitedViews
+      if (views !== undefined && views.length > 0) {
+        for (let i = 0; i < views.length; i++) {
+          const view = views[i]
+          if (view.fullPath.indexOf('name=') !== -1) {
+            const tempName = view.fullPath.substring(view.fullPath.indexOf('name=') + 5, view.fullPath.length)
+            view.tempName = decodeURI(tempName)
+          }
+        }
+      }
       return this.$store.state.tagsView.visitedViews
     }
   },
@@ -64,7 +75,7 @@ export default {
       return false
     },
     isActive(route) {
-      return route.path === this.$route.path
+      return route.fullPath === this.$route.fullPath
     },
     addViewTags() {
       const route = this.generateRoute()

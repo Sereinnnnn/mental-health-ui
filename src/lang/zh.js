@@ -176,6 +176,7 @@ export default {
     subjectManagement: '题目管理',
     subjectName: '题目名称',
     subject: {
+      serialNumber: '题目序号',
       type: '题目类型',
       level: '难度',
       score: '题目分值',

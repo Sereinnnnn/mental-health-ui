@@ -4,11 +4,20 @@
 
 在线考试系统vue前端
 
-#### 首页
+#### 功能演示
 
-![image](doc/img/dashboard.png)
+![image](doc/images/image_admin.png)
 
+![image](doc/images/image_admin_menu.png)
 
-#### 个人资料
+![image](doc/images/image_admin_zipkin.png)
 
-![image](doc/img/message.png)
+![image](doc/images/image_admin_exam.png)
+
+![image](doc/images/image_admin_exam_subject.png)
+
+![image](doc/images/image_admin_subject.png)
+
+![image](doc/images/image_admin_attachment.png)
+
+![image](doc/images/image_admin_msg.png)

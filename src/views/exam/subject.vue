@@ -47,7 +47,7 @@
           <el-table
             v-loading="listLoading"
             :data="list"
-            :default-sort="{ prop: 'id', order: 'descending' }"
+            :default-sort="{ prop: 'serial_number', order: 'descending' }"
             border
             highlight-current-row
             style="width: 100%;"
@@ -55,22 +55,27 @@
             @selection-change="handleSubjectSelectionChange"
             @sort-change="sortSubjectChange">
             <el-table-column type="selection" width="55"/>
-            <el-table-column :label="$t('table.subjectName')" sortable prop="subject_name" property="subjectName" min-width="120">
+            <el-table-column :label="$t('table.subject.serialNumber')" sortable prop="serial_number" property="serialNumber" min-width="20">
               <template slot-scope="scope">
-                <span>{{ scope.row.subjectName }}</span>
+                <span>{{ scope.row.serialNumber }}</span>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('table.subject.type')" sortable prop="type" property="type" width="200">
+            <el-table-column :label="$t('table.subjectName')" sortable prop="subject_name" property="subjectName" min-width="120">
+              <template slot-scope="scope">
+                <span>{{ scope.row.subjectName | subjectNameFilter }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column :label="$t('table.subject.type')" sortable prop="type" property="type" width="120">
               <template slot-scope="scope">
                 <el-tag type="success">{{ scope.row.type | subjectTypeFilter }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('table.subject.score')" sortable prop="score" property="score">
+            <el-table-column :label="$t('table.subject.score')" sortable prop="score" property="score" width="120">
               <template slot-scope="scope">
                 <span>{{ scope.row.score }}</span>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('table.subject.level')" sortable prop="level" property="level">'
+            <el-table-column :label="$t('table.subject.level')" sortable prop="level" property="level" width="120">
               <template slot-scope="scope">
                 <el-rate v-model="scope.row.level" :max="4"/>
               </template>
@@ -127,7 +132,7 @@
         <el-row>
           <el-col :span="12">
             <el-form-item :label="$t('table.subjectName')" prop="subjectName">
-              <el-input v-model="tempSubject.subjectName"/>
+              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.subjectName" type="textarea"/>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -142,13 +147,20 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item :label="$t('table.subject.score')" prop="score">
-              <el-input v-model="tempSubject.score"/>
+            <el-form-item :label="$t('table.subject.serialNumber')" prop="serialNumber">
+              <el-input v-model="tempSubject.serialNumber"/>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item :label="$t('table.subject.level')" prop="level">
               <el-rate v-model="tempSubject.level" :max="4" :texts="['简单', '一般', '略难', '非常难']" show-text/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.subject.score')" prop="score">
+              <el-input v-model="tempSubject.score"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -194,10 +206,10 @@
               <el-input v-if="tempSubject.type !== 0" :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.answer" type="textarea"/>
               <!-- 选择题 -->
               <el-radio-group v-if="tempSubject.type === 0" v-model="tempSubject.answer">
-                <el-radio :label="0">A</el-radio>
-                <el-radio :label="1">B</el-radio>
-                <el-radio :label="2">C</el-radio>
-                <el-radio :label="3">D</el-radio>
+                <el-radio :label="'A'">A</el-radio>
+                <el-radio :label="'B'">B</el-radio>
+                <el-radio :label="'C'">C</el-radio>
+                <el-radio :label="'D'">D</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
@@ -267,6 +279,12 @@ export default {
         3: '简答题'
       }
       return typeMap[type]
+    },
+    subjectNameFilter(subjectName) {
+      if (subjectName.length > 50) {
+        return subjectName.substring(0, 50) + '...'
+      }
+      return subjectName
     }
   },
   data() {
@@ -633,9 +651,6 @@ export default {
             const subject = response.data.list[i]
             subject.type = parseInt(subject.type)
             subject.level = parseInt(subject.level)
-            if (subject.type === 0) {
-              subject.answer = parseInt(subject.answer)
-            }
           }
         }
         this.list = response.data.list

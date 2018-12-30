@@ -195,7 +195,12 @@ export default {
     categoryName: '分类名称',
     categoryDesc: '分类描述',
     sort: '排序号',
-    addFromSubjectBank: '从题库新增'
+    addFromSubjectBank: '从题库新增',
+    score: {
+      userName: '考生姓名',
+      score: '成绩',
+      examTime: '考试时间'
+    }
   },
   errorLog: {
     tips: '请点击右上角bug小图标',

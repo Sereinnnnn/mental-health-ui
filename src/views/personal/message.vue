@@ -87,7 +87,7 @@ import { updateObjInfo } from '@/api/admin/user'
 import { mapState } from 'vuex'
 import { ATTACHMENT_URL } from '@/config/attachment'
 import { getToken } from '@/utils/auth'
-import { delObj } from '@/api/admin/attachment'
+import { delAttachment } from '@/api/admin/attachment'
 
 export default {
   name: 'PersonalMessage',
@@ -157,7 +157,7 @@ export default {
       this.$refs['form'].validate((valid) => {
         if (valid) {
           // 删除旧头像
-          delObj(this.avatarId).then(() => {
+          delAttachment(this.avatarId).then(() => {
             this.avatarId = res.data.id
             // 更新头像信息
             updateObjInfo(this.userInfo).then(response => {

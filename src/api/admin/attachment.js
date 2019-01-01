@@ -38,7 +38,7 @@ export function putObj(obj) {
   })
 }
 
-export function delObj(id) {
+export function delAttachment(id) {
   return request({
     url: '/admin/attachment/' + id,
     method: 'delete'

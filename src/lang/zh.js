@@ -203,8 +203,8 @@ export default {
       examTime: '考试时间'
     },
     knowledge: {
-      knowledgeName: '知识名称',
-      knowledgeDesc: '知识描述',
+      knowledgeName: '名称',
+      knowledgeDesc: '描述',
       status: '状态'
     }
   },

@@ -32,11 +32,13 @@
       </el-table-column>
       <el-table-column :label="$t('table.knowledge.status')" sortable prop="status" min-width="90" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.status }}</span>
+          <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
         <template slot-scope="scope">
+          <el-button v-if="scope.row.status == 1" type="warning" size="mini" @click="handlePublic(scope.row, 0)">{{ $t('table.public') }}</el-button>
+          <el-button v-if="scope.row.status == 0" type="success" size="mini" @click="handlePublic(scope.row, 1)">{{ $t('table.retrieve') }}</el-button>
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
           <el-button size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
           </el-button>
@@ -51,14 +53,9 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="60%" top="10vh">
       <el-form ref="dataForm" :rules="rules" :model="temp" :label-position="labelPosition" label-width="100px">
         <el-row>
-          <el-col :span="12">
+          <el-col :span="24">
             <el-form-item :label="$t('table.knowledge.knowledgeName')" prop="knowledgeName">
               <el-input v-model="temp.knowledgeName"/>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.knowledge.status')" prop="status">
-              <el-input v-model="temp.status"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -67,6 +64,24 @@
             <el-form-item :label="$t('table.knowledge.knowledgeDesc')">
               <el-input :autosize="{ minRows: 3, maxRows: 5}" :placeholder="$t('table.knowledge.knowledgeDesc')" v-model="temp.knowledgeDesc" type="textarea"/>
             </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-upload
+              :show-file-list="showFileList"
+              :on-success="handleUploadSuccess"
+              :on-exceed="handleExceed"
+              :on-remove="handleRemove"
+              :action="uploadUrl"
+              :headers="headers"
+              :data="params"
+              :limit="1"
+              :file-list="fileList"
+              class="upload-demo"
+              multiple>
+              <el-button v-waves type="primary" class="filter-item">上传<i class="el-icon-upload el-icon--right" style="margin-left: 10px;"/></el-button>
+            </el-upload>
           </el-col>
         </el-row>
       </el-form>
@@ -84,11 +99,25 @@ import { fetchKnowledgeList, addObj, putObj, delObj, delAllObj } from '@/api/exa
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 import { checkMultipleSelect } from '@/utils/util'
+import { getToken } from '@/utils/auth' // getToken from cookie
+import { getObj, delAttachment } from '@/api/admin/attachment'
 
 export default {
   name: 'KnowledgeManagement',
   directives: {
     waves
+  },
+  filters: {
+    statusTypeFilter(status) {
+      const statusMap = {
+        0: 'success',
+        1: 'warning'
+      }
+      return statusMap[status]
+    },
+    statusFilter(status) {
+      return status == '0' ? '已发布' : '未发布'
+    }
   },
   data() {
     return {
@@ -108,7 +137,7 @@ export default {
         knowledgeName: '',
         knowledgeDesc: '',
         attachmentId: '',
-        status: ''
+        status: '0'
       },
       checkedKeys: [],
       dialogFormVisible: false,
@@ -123,7 +152,17 @@ export default {
       downloadLoading: false,
       labelPosition: 'right',
       // 多选
-      multipleSelection: []
+      multipleSelection: [],
+      uploading: false,
+      showFileList: true,
+      headers: {
+        Authorization: 'Bearer ' + getToken()
+      },
+      params: {
+        busiType: '2'
+      },
+      uploadUrl: 'admin/attachment/upload',
+      fileList: []
     }
   },
   created() {
@@ -186,7 +225,7 @@ export default {
         knowledgeName: '',
         knowledgeDesc: '',
         attachmentId: '',
-        status: ''
+        status: '0'
       }
     },
     handleCreate() {
@@ -215,27 +254,21 @@ export default {
       })
     },
     handleUpdate(row) {
-      this.temp = Object.assign({}, row) // copy obj
+      this.temp = Object.assign({}, row)
       this.temp.status = parseInt(this.temp.status)
-      this.temp.readonly = true
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
+      // 获取附件列表
+      this.getFileList(this.temp.attachmentId)
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           putObj(tempData).then(() => {
-            for (const v of this.list) {
-              if (v.id === this.temp.id) {
-                const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.temp)
-                break
-              }
-            }
             this.dialogFormVisible = false
             this.getList()
             this.$notify({
@@ -293,6 +326,64 @@ export default {
           })
         })
       }
+    },
+    handleUploadSuccess(response) {
+      this.uploading = false
+      // 关联知识
+      this.temp.attachmentId = response.data.id
+      this.updateData()
+    },
+    // 查询附件列表
+    getFileList(attachmentId) {
+      if (attachmentId !== '') {
+        getObj(attachmentId).then(response => {
+          const data = response.data.data
+          const attachment = {
+            name: data.attachName,
+            url: ''
+          }
+          this.fileList = []
+          this.fileList.push(attachment)
+        }).catch(() => {
+          this.fileList = []
+        })
+      }
+    },
+    // 限制
+    handleExceed(files, fileList) {
+      this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`)
+    },
+    // 删除附件
+    handleRemove(file, fileList) {
+      delAttachment(this.temp.attachmentId).then(() => {
+        this.$notify({
+          title: '提示',
+          message: '删除成功',
+          type: 'success',
+          duration: 2000
+        })
+      }).catch(() => {
+        this.$notify({
+          title: '提示',
+          message: '删除失败',
+          type: 'warn',
+          duration: 2000
+        })
+      })
+    },
+    // 发布知识
+    handlePublic(row, status) {
+      const tempData = Object.assign({}, row)
+      tempData.status = status
+      putObj(tempData).then(() => {
+        this.getList()
+        this.$notify({
+          title: '成功',
+          message: '更新成功',
+          type: 'success',
+          duration: 2000
+        })
+      })
     }
   }
 }

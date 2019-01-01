@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import { fetchList, addObj, putObj, delObj } from '@/api/admin/attachment'
+import { fetchList, addObj, putObj, delAttachment } from '@/api/admin/attachment'
 import waves from '@/directive/waves'
 import { ATTACHMENT_URL } from '@/config/attachment'
 import { getToken } from '@/utils/auth' // getToken from cookie
@@ -112,6 +112,8 @@ export default {
       let attachType
       if (type === '1') {
         attachType = '用户头像'
+      } else if (type === '2') {
+        attachType = '知识库附件'
       } else {
         attachType = '普通附件'
       }
@@ -154,6 +156,10 @@ export default {
         {
           display_name: '用户头像',
           key: '1'
+        },
+        {
+          display_name: '知识库文件',
+          key: '2'
         }
       ],
       uploading: false,
@@ -169,7 +175,6 @@ export default {
       fetchList(this.listQuery).then(response => {
         this.list = response.data.list
         this.total = response.data.total
-        // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
         }, 500)
@@ -208,12 +213,6 @@ export default {
         attachSize: ''
       }
     },
-    handleUpload() {
-      this.resetTemp()
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
@@ -238,13 +237,6 @@ export default {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           putObj(tempData).then(() => {
-            for (const v of this.list) {
-              if (v.id === this.temp.id) {
-                const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.temp)
-                break
-              }
-            }
             this.getList()
             this.$notify({
               title: '成功',
@@ -263,7 +255,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        delObj(row.id).then(() => {
+        delAttachment(row.id).then(() => {
           this.getList()
           this.$notify({
             title: '成功',
@@ -272,8 +264,6 @@ export default {
             duration: 2000
           })
         })
-        const index = this.list.indexOf(row)
-        this.list.splice(index, 1)
       })
     },
     handleUploadSuccess() {

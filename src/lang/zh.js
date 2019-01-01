@@ -197,9 +197,15 @@ export default {
     sort: '排序号',
     addFromSubjectBank: '从题库新增',
     score: {
-      userName: '考生姓名',
+      userName: '姓名',
+      deptName: '部门',
       score: '成绩',
       examTime: '考试时间'
+    },
+    knowledge: {
+      knowledgeName: '知识名称',
+      knowledgeDesc: '知识描述',
+      status: '状态'
     }
   },
   errorLog: {

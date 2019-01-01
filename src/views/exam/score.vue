@@ -2,7 +2,8 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input v-model="listQuery.examinationName" placeholder="考试名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-button v-if="score_btn_export" class="filter-item" icon="el-icon-download" plain @click="handleExport">{{ $t('table.export') }}</el-button>
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
+      <el-button v-if="score_btn_export" class="filter-item" icon="el-icon-download" plain @click="handleExportScore">{{ $t('table.export') }}</el-button>
     </div>
 
     <el-table
@@ -14,7 +15,6 @@
       border
       highlight-current-row
       style="width: 100%;"
-      @row-dblclick="handleUpdate"
       @selection-change="handleSelectionChange"
       @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
@@ -26,6 +26,11 @@
       <el-table-column :label="$t('table.score.userName')" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.userName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('table.score.deptName')" min-width="90" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.deptName }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.score.score')" min-width="90" align="center">
@@ -130,15 +135,31 @@ export default {
         examinationName: ''
       }
     },
-    handleUpdate(row) {
-      this.temp = Object.assign({}, row) // copy obj
-      this.temp.status = parseInt(this.temp.status)
-      this.temp.readonly = true
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
+    handleExportScore() {
+      if (this.total > 0) {
+        if (this.multipleSelection.length === 0) {
+          this.$confirm('确定要导出全部成绩数据吗?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            window.location.href = '/exam/score/export?ids='
+          })
+        } else {
+          let ids = ''
+          for (let i = 0; i < this.multipleSelection.length; i++) {
+            ids += this.multipleSelection[i].id + ','
+          }
+          window.location.href = '/exam/score/export?ids=' + ids
+        }
+      } else {
+        this.$notify({
+          title: '提示',
+          message: '无数据导出',
+          type: 'warn',
+          duration: 2000
+        })
+      }
     }
   }
 }

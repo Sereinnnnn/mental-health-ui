@@ -2,7 +2,7 @@ const _import = require('./_import')
 export default [{
   path: '/',
   name: '主页',
-  redirect: '/wel'
+  redirect: '/dashboard'
 }, {
   path: '*',
   redirect: '/404',

@@ -8,13 +8,12 @@ const proxyConfig = require('./proxyConfig');
 
 module.exports = {
   dev: {
+    env: require('./dev.env'),
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: proxyConfig.proxyList,
-
     // Various Dev Server settings
-
     // can be overwritten by process.env.HOST
     // if you want dev by ip, please set host: '0.0.0.0'
     host: 'localhost',
@@ -23,7 +22,6 @@ module.exports = {
     errorOverlay: true,
     notifyOnErrors: false,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
-
     // Use Eslint Loader?
     // If true, your code will be linted during bundling and
     // linting errors and warnings will be shown in the console.
@@ -31,11 +29,9 @@ module.exports = {
     // If true, eslint errors and warnings will also be shown in the error overlay
     // in the browser.
     showEslintErrorsInOverlay: false,
-
     /**
      * Source Maps
      */
-
     // https://webpack.js.org/configuration/devtool/#development
     devtool: 'cheap-source-map',
 
@@ -48,13 +44,12 @@ module.exports = {
   },
 
   build: {
+    env: require('./prod.env'),
     // Template for index.html
     index: path.resolve(__dirname, '../dist/index.html'),
-
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
-
     /**
      * You can set by youself according to actual condition
      * You will need to set this if you plan to deploy your site under a sub path,

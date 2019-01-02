@@ -122,7 +122,7 @@ export default {
   },
   data() {
     return {
-      uploadUrl: 'admin/attachment/upload',
+      uploadUrl: 'zuul/admin/attachment/upload',
       tableKey: 0,
       list: null,
       total: null,

@@ -4,7 +4,7 @@ import { Message } from 'element-ui'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css'// progress bar style
 import { getToken } from '@/utils/auth' // getToken from cookie
-
+import { setTitle } from '@/utils/util'
 NProgress.configure({ showSpinner: false })// NProgress Configuration
 
 // permission judge function
@@ -18,6 +18,15 @@ const whiteList = ['/login', '/auth-redirect', '/404', '/401', '/lock']// no red
 
 router.beforeEach((to, from, next) => {
   NProgress.start() // start progress bar
+  const value = to.query.src ? to.query.src : to.path
+  const label = to.query.name ? to.query.name : to.name
+  if (whiteList.indexOf(value) === -1) {
+    store.commit('ADD_TAG', {
+      label: label,
+      value: value,
+      query: to.query
+    })
+  }
   if (getToken()) { // determine if there has token
     /* has token*/
     if (to.path === '/login') {
@@ -54,6 +63,18 @@ router.beforeEach((to, from, next) => {
   }
 })
 
+// 寻找子菜单的父类
+function findMenuParent(tag) {
+  const tagCurrent = []
+  tagCurrent.push(tag)
+  return tagCurrent
+}
+
 router.afterEach(() => {
-  NProgress.done() // finish progress bar
+  NProgress.done() // 结束进度条
+  setTimeout(() => {
+    const tag = store.getters.tag
+    setTitle(tag.label)
+    store.commit('SET_TAG_CURRENT', findMenuParent(tag))
+  }, 0)
 })

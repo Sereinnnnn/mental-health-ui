@@ -1,17 +1,19 @@
-const errorLog = {
+import { getStore, setStore } from '@/utils/store'
+
+const errLog = {
   state: {
-    logs: []
+    errLog: getStore({ name: 'errLog' }) || []
   },
   mutations: {
-    ADD_ERROR_LOG: (state, log) => {
-      state.logs.push(log)
-    }
-  },
-  actions: {
-    addErrorLog({ commit }, log) {
-      commit('ADD_ERROR_LOG', log)
+    ADD_LOG: (state, log) => {
+      state.errLog.push(log)
+      setStore({ name: 'errLog', content: state.errLog })
+    },
+    CLEAR_ALL_LOG: (state, action) => {
+      state.errLog = []
+      setStore({ name: 'errLog', content: state.errLog })
     }
   }
 }
 
-export default errorLog
+export default errLog

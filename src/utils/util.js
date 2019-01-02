@@ -232,3 +232,11 @@ export const checkMultipleSelect = (multipleSelection, obj) => {
   }
   return true
 }
+
+/**
+ * 设置浏览器头部标题
+ */
+export const setTitle = function(title) {
+  title = title ? `${title}——在线考试` : '在线考试'
+  window.document.title = title
+}

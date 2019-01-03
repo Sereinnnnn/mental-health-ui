@@ -162,7 +162,7 @@ export default {
       },
       oTreeNodeChildren: {
       },
-      aExpandedKeys: ['1', '7', '14', '15'],
+      aExpandedKeys: ['1', '7', '14', '15', 'b93eba1199b6420a82d285a8919bcd23'],
       defaultProps: {
         children: 'children',
         label: 'name'

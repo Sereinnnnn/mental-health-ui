@@ -94,7 +94,7 @@ export default {
   components: {},
   data() {
     return {
-      uploadUrl: '/admin/attachment/upload',
+      uploadUrl: '/zuul/admin/attachment/upload',
       labelPosition: 'right',
       disabled: true,
       rules: {

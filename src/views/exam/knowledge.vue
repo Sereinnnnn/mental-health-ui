@@ -161,7 +161,7 @@ export default {
       params: {
         busiType: '2'
       },
-      uploadUrl: 'admin/attachment/upload',
+      uploadUrl: 'zuul/admin/attachment/upload',
       fileList: []
     }
   },

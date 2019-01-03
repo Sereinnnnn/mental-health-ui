@@ -44,18 +44,10 @@ iconfontVersion.forEach(ele => {
   loadStyle(iconfontUrl.replace('$key', ele))
 })
 
-export function createApp() {
-  const app = new Vue({
-    el: '#app',
-    router,
-    store,
-    i18n,
-    render: h => h(App)
-  })
-  return {
-    app,
-    router,
-    store
-  }
-}
-
+new Vue({
+  el: '#app',
+  router,
+  store,
+  i18n,
+  render: h => h(App)
+})

@@ -7,8 +7,6 @@
     <div class="right-menu">
       <template v-if="device!=='mobile'">
         <a class="animated fadeIn hi">{{ $t('navbar.hi') }}，{{ userInfo.name }}</a>
-        <error-log class="errLog-container right-menu-item"/>
-
         <el-tooltip :content="$t('navbar.screenfull')" effect="dark" placement="bottom">
           <screenfull class="screenfull right-menu-item"/>
         </el-tooltip>
@@ -51,7 +49,6 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
-import ErrorLog from '@/components/ErrorLog'
 import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import LangSelect from '@/components/LangSelect'
@@ -62,7 +59,6 @@ export default {
   components: {
     Breadcrumb,
     Hamburger,
-    ErrorLog,
     Screenfull,
     SizeSelect,
     LangSelect,

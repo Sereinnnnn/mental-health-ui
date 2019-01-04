@@ -1,5 +1,8 @@
 const getters = {
   tag: state => state.tags.tag,
+  tagList: state => state.tags.tagList,
+  tagCurrent: state => state.tags.tagCurrent,
+  tagWel: state => state.tags.tagWel,
   sidebar: state => state.app.sidebar,
   language: state => state.app.language,
   size: state => state.app.size,
@@ -16,7 +19,6 @@ const getters = {
   permissions: state => state.user.permissions,
   addRouters: state => state.permission.addRouters,
   menu: state => state.user.menu,
-  isCollapse: state => state.common.isCollapse,
-  errorLogs: state => state.errorLog.logs
+  isCollapse: state => state.common.isCollapse
 }
 export default getters

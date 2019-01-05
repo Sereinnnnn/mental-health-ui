@@ -77,7 +77,8 @@ export default {
     screenfull: '全屏',
     theme: '换肤',
     size: '布局大小',
-    hi: '嗨'
+    hi: '嗨',
+    lock: '锁屏'
   },
   login: {
     title: '欢迎使用考试管理系统',

@@ -7,6 +7,11 @@
     <div class="right-menu">
       <template v-if="device!=='mobile'">
         <a class="animated fadeIn hi">{{ $t('navbar.hi') }}，{{ userInfo.name }}</a>
+
+        <el-tooltip :content="$t('navbar.lock')" effect="dark" placement="bottom">
+          <lock class="lock right-menu-item"/>
+        </el-tooltip>
+
         <el-tooltip :content="$t('navbar.screenfull')" effect="dark" placement="bottom">
           <screenfull class="screenfull right-menu-item"/>
         </el-tooltip>
@@ -53,6 +58,7 @@ import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import LangSelect from '@/components/LangSelect'
 import ThemePicker from '@/components/ThemePicker'
+import Lock from '@/components/Lock'
 import { mapState } from 'vuex'
 
 export default {
@@ -62,7 +68,8 @@ export default {
     Screenfull,
     SizeSelect,
     LangSelect,
-    ThemePicker
+    ThemePicker,
+    Lock
   },
   data() {
     return {
@@ -123,6 +130,9 @@ export default {
     .right-menu-item {
       display: inline-block;
       margin: 0 8px;
+    }
+    .lock {
+      height: 20px;
     }
     .screenfull {
       height: 20px;

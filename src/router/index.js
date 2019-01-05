@@ -84,6 +84,11 @@ export const constantRouterMap = [
         icon: 'people'
       }
     }]
+  },
+  {
+    path: '/lock',
+    name: '锁屏页',
+    component: () => import('@/views/lock/index')
   }
 ]
 

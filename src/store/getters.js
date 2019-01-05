@@ -3,6 +3,7 @@ const getters = {
   tagList: state => state.tags.tagList,
   tagCurrent: state => state.tags.tagCurrent,
   tagWel: state => state.tags.tagWel,
+  lockPasswd: state => state.common.lockPasswd,
   sidebar: state => state.app.sidebar,
   language: state => state.app.language,
   size: state => state.app.size,

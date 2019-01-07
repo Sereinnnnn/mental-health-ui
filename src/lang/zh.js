@@ -206,6 +206,20 @@ export default {
       knowledgeName: '名称',
       knowledgeDesc: '描述',
       status: '状态'
+    },
+    log: {
+      title: '标题',
+      ip: 'IP',
+      userAgent: '浏览器',
+      requestUri: '请求接口',
+      type: '请求类型',
+      method: '请求方式',
+      params: '参数',
+      exception: '异常信息',
+      serviceId: '服务ID',
+      time: '耗时(ms)',
+      creator: '操作人',
+      createDate: '操作时间'
     }
   },
   excel: {

@@ -156,8 +156,30 @@ export default {
       this.userInfo.avatar = ATTACHMENT_URL + '/download?id=' + res.data.id
       this.$refs['form'].validate((valid) => {
         if (valid) {
-          // 删除旧头像
-          delAttachment(this.avatarId).then(() => {
+          if (this.avatarId !== '') {
+            // 删除旧头像
+            delAttachment(this.avatarId).then(() => {
+              this.avatarId = res.data.id
+              // 更新头像信息
+              updateObjInfo(this.userInfo).then(response => {
+                if (response.data.data) {
+                  this.$notify({
+                    title: '成功',
+                    message: '头像上传成功',
+                    type: 'success',
+                    duration: 2000
+                  })
+                }
+              }).catch(() => {
+                this.$notify({
+                  title: '失败',
+                  message: '头像上传失败',
+                  type: 'error',
+                  duration: 2000
+                })
+              })
+            })
+          } else {
             this.avatarId = res.data.id
             // 更新头像信息
             updateObjInfo(this.userInfo).then(response => {
@@ -177,7 +199,7 @@ export default {
                 duration: 2000
               })
             })
-          })
+          }
         }
       })
     },

@@ -46,3 +46,14 @@ export function putObj(obj) {
   })
 }
 
+// 导出
+export function exportObj(obj) {
+  return request({
+    url: '/admin/menu/export',
+    method: 'post',
+    responseType: 'arraybuffer',
+    headers: { 'filename': 'utf-8' },
+    data: obj
+  })
+}
+

@@ -1,37 +1,35 @@
 <template>
   <div class="app-container">
     <el-row>
-      <el-col :span="5">
-        <el-card class="tree-box-card" style="margin-right: 5px;">
-          <div slot="header">
-            <span>题目分类</span>
+      <el-col :span="4">
+        <div class="category-header">
+          题目分类
+        </div>
+        <el-row>
+          <el-button v-if="subject_category_btn_add" class="category-btn" icon="el-icon-plus" size="mini" plain @click="handleAddSuperCategory">主分类</el-button>
+          <el-button v-if="subject_category_btn_add" class="category-btn" icon="el-icon-plus" size="mini" plain @click="handleAddCategory">子分类</el-button>
+          <el-button v-if="subject_category_btn_edit" class="category-btn" icon="el-icon-edit" size="mini" plain @click="handleUpdateCategory">{{ $t('table.edit') }}</el-button>
+          <el-button v-if="subject_category_btn_del" class="category-btn" icon="el-icon-delete" size="mini" plain @click="handleDeleteCategory">{{ $t('table.del') }}</el-button>
+        </el-row>
+        <el-row>
+          <div class="tree-container">
+            <el-tree
+              :data="treeData"
+              :filter-node-method="filterNode"
+              :props="defaultProps"
+              class="filter-tree"
+              node-key="id"
+              highlight-current
+              accordion
+              default-expand-all
+              @node-click="getNodeData"
+              @node-expand="nodeExpand"
+              @node-collapse="nodeCollapse"
+            />
           </div>
-          <el-row>
-            <el-button v-if="subject_category_btn_add" class="category-btn" icon="el-icon-plus" size="mini" plain @click="handleAddSuperCategory">主分类</el-button>
-            <el-button v-if="subject_category_btn_add" class="category-btn" icon="el-icon-plus" size="mini" plain @click="handleAddCategory">子分类</el-button>
-            <el-button v-if="subject_category_btn_edit" class="category-btn" icon="el-icon-edit" size="mini" plain @click="handleUpdateCategory">{{ $t('table.edit') }}</el-button>
-            <el-button v-if="subject_category_btn_del" class="category-btn" icon="el-icon-delete" size="mini" plain @click="handleDeleteCategory">{{ $t('table.del') }}</el-button>
-          </el-row>
-          <el-row>
-            <div class="tree-container">
-              <el-tree
-                :data="treeData"
-                :filter-node-method="filterNode"
-                :props="defaultProps"
-                class="filter-tree"
-                node-key="id"
-                highlight-current
-                accordion
-                default-expand-all
-                @node-click="getNodeData"
-                @node-expand="nodeExpand"
-                @node-collapse="nodeCollapse"
-              />
-            </div>
-          </el-row>
-        </el-card>
+        </el-row>
       </el-col>
-      <el-col :span="19">
+      <el-col :span="20">
         <el-card class="box-card">
           <div slot="header" class="clearfix">
             <span>题目管理</span>
@@ -63,6 +61,11 @@
             <el-table-column :label="$t('table.subjectName')" sortable prop="subject_name" property="subjectName" min-width="120">
               <template slot-scope="scope">
                 <span>{{ scope.row.subjectName | subjectNameFilter }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column :label="$t('table.subject.category')" property="categoryName" min-width="60">
+              <template slot-scope="scope">
+                <span>{{ scope.row.categoryName}}</span>
               </template>
             </el-table-column>
             <el-table-column :label="$t('table.subject.type')" sortable prop="type" property="type" width="120">
@@ -884,10 +887,14 @@ export default {
 </script>
 
 <style scoped>
+  .category-header {
+    margin: 12px;
+  }
   .tree-container{
     padding-top: 10px;
   }
   .category-btn {
     margin: 5px;
+    padding: 6px 13px;
   }
 </style>

@@ -52,9 +52,10 @@
 </template>
 
 <script>
-import { fetchScoreList } from '@/api/exam/score'
+import { fetchScoreList, exportObj } from '@/api/exam/score'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
+import { exportExcel } from '@/utils/util'
 
 export default {
   name: 'ScoreManagement',
@@ -143,14 +144,20 @@ export default {
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
-            window.location.href = '/exam/score/export?ids='
+            exportObj({ ids: '' }).then(response => {
+              // 导出Excel
+              exportExcel(response)
+            })
           })
         } else {
           let ids = ''
           for (let i = 0; i < this.multipleSelection.length; i++) {
             ids += this.multipleSelection[i].id + ','
           }
-          window.location.href = '/exam/score/export?ids=' + ids
+          exportObj({ ids: ids }).then(response => {
+            // 导出Excel
+            exportExcel(response)
+          })
         }
       } else {
         this.$notify({

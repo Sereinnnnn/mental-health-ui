@@ -10,7 +10,7 @@
       v-loading="listLoading"
       :key="tableKey"
       :data="list"
-      :default-sort="{ prop: 'id', order: 'descending' }"
+      :default-sort="{ prop: 'create_date', order: 'descending' }"
       border
       highlight-current-row
       style="width: 100%;"
@@ -18,14 +18,19 @@
       @selection-change="handleSelectionChange"
       @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column :label="$t('table.log.title')" sortable prop="title" min-width="90" align="center">
+      <el-table-column :label="$t('table.log.type')" width="120px" align="center">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.type | statusTypeFilter">{{ scope.row.type | statusFilter }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('table.log.title')" prop="title" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.title }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.log.serviceId')" min-width="90" align="center">
+      <el-table-column :label="$t('table.log.ip')" min-width="90" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.serviceId }}</span>
+          <span>{{ scope.row.ip }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.log.requestUri')" min-width="90" align="center">
@@ -38,14 +43,9 @@
           <span>{{ scope.row.method }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.log.type')" width="120px" align="center">
+      <el-table-column :label="$t('table.log.time')" align="center" width="160px">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.type | statusTypeFilter">{{ scope.row.type | statusFilter }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('table.log.ip')" min-width="90" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.ip }}</span>
+          <span>{{ scope.row.time }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.log.creator')" align="center" min-width="90">
@@ -56,11 +56,6 @@
       <el-table-column :label="$t('table.log.createDate')" sortable prop="createDate" align="center" width="160px">
         <template slot-scope="scope">
           <span>{{ scope.row.createDate }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('table.log.time')" align="center" width="160px">
-        <template slot-scope="scope">
-          <span>{{ scope.row.time }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.actions')" class-name="status-col" width="200px">
@@ -171,8 +166,9 @@ export default {
   filters: {
     statusTypeFilter(status) {
       const statusMap = {
-        1: 'success',
-        2: 'danger'
+        0: 'success',
+        1: 'danger',
+        9: 'danger'
       }
       return statusMap[status]
     },

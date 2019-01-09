@@ -240,3 +240,18 @@ export const setTitle = function(title) {
   title = title ? `${title}——在线考试` : '在线考试'
   window.document.title = title
 }
+
+/**
+ * 导出Excel
+ */
+export const exportExcel = function(response) {
+  const blob = new Blob([response.data], { type: 'application/vnd.ms-excel;charset=utf-8' })
+  const link = document.createElement('a')
+  link.href = window.URL.createObjectURL(blob)
+  // 获取文件名
+  const disposition = response.headers['content-disposition']
+  if (disposition !== undefined) {
+    link.download = decodeURI(disposition.substring(disposition.indexOf('=') + 2, disposition.length - 1))
+    link.click()
+  }
+}

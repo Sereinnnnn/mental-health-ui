@@ -11,7 +11,6 @@
         <el-col :span="5" style ="margin-top:10px;">
           <el-tree
             :data="treeData"
-            :default-expanded-keys="aExpandedKeys"
             :filter-node-method="filterNode"
             :props="defaultProps"
             class="filter-tree"
@@ -130,9 +129,10 @@
 </template>
 
 <script>
-import { fetchTree, getObj, addObj, delObj, putObj } from '@/api/admin/menu'
+import { fetchTree, getObj, addObj, delObj, putObj, exportObj } from '@/api/admin/menu'
 import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
+import { exportExcel } from '@/utils/util'
 
 export default {
   name: 'MenuManagement',
@@ -162,7 +162,6 @@ export default {
       },
       oTreeNodeChildren: {
       },
-      aExpandedKeys: ['1', '7', '14', '15', 'b93eba1199b6420a82d285a8919bcd23'],
       defaultProps: {
         children: 'children',
         label: 'name'
@@ -380,7 +379,10 @@ export default {
           cancelButtonText: '取消',
           type: 'success'
         }).then(() => {
-          window.location.href = '/admin/menu/export?ids=' + menus
+          exportObj({ ids: menus }).then(response => {
+            // 导出Excel
+            exportExcel(response)
+          })
         }).catch(() => {
 
         })
@@ -393,7 +395,10 @@ export default {
           for (let i = 0; i < keys.length; i++) {
             menus = menus + keys[i] + ','
           }
-          window.location.href = '/admin/menu/export?ids=' + menus
+          exportObj({ ids: menus }).then(response => {
+            // 导出Excel
+            exportExcel(response)
+          })
         }).catch(() => {
 
         })

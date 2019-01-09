@@ -13,7 +13,7 @@
       ref="multipleTable"
       :key="tableKey"
       :data="list"
-      :default-sort="{ prop: 'id', order: 'descending' }"
+      :default-sort="{ prop: 'username', order: 'descending' }"
       border
       highlight-current-row
       style="width: 100%;"
@@ -176,13 +176,13 @@
 </template>
 
 <script>
-import { fetchList, addObj, putObj, delObj, delAllObj } from '@/api/admin/user'
+import { fetchList, addObj, putObj, delObj, delAllObj, exportObj } from '@/api/admin/user'
 import waves from '@/directive/waves'
 import { fetchTree } from '@/api/admin/dept'
 import { deptRoleList } from '@/api/admin/role'
 import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
-import { checkMultipleSelect } from '@/utils/util'
+import { checkMultipleSelect, exportExcel } from '@/utils/util'
 
 export default {
   name: 'User',
@@ -488,14 +488,20 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          window.location.href = '/admin/user/export?ids='
+          exportObj({ ids: '' }).then(response => {
+            // 导出Excel
+            exportExcel(response)
+          })
         })
       } else {
         let ids = ''
         for (let i = 0; i < this.multipleSelection.length; i++) {
           ids += this.multipleSelection[i].id + ','
         }
-        window.location.href = '/admin/user/export?ids=' + ids
+        exportObj({ ids: ids }).then(response => {
+          // 导出Excel
+          exportExcel(response)
+        })
       }
     },
     // 导入

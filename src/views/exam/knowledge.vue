@@ -314,7 +314,7 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          delAllObj({ ids: ids }).then(() => {
+          delAllObj({ idString: ids }).then(() => {
             this.dialogFormVisible = false
             this.getList()
             this.$notify({

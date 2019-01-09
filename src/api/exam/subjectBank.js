@@ -52,3 +52,14 @@ export function delAllSubjectBank(obj) {
     data: obj
   })
 }
+
+// 导出
+export function exportSubjectBank(obj) {
+  return request({
+    url: '/exam/subjectBank/export',
+    method: 'post',
+    responseType: 'arraybuffer',
+    headers: { 'filename': 'utf-8' },
+    data: obj
+  })
+}

@@ -254,10 +254,10 @@
 
 <script>
 import { fetchTree, getObj, addObj, delObj, putObj } from '@/api/exam/subjectCategory'
-import { fetchSubjectBankList, addSubjectBank, putSubjectBank, delSubjectBank, delAllSubjectBank } from '@/api/exam/subjectBank'
+import { fetchSubjectBankList, addSubjectBank, putSubjectBank, delSubjectBank, delAllSubjectBank, exportSubjectBank } from '@/api/exam/subjectBank'
 import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
-import { checkMultipleSelect } from '@/utils/util'
+import { checkMultipleSelect, exportExcel } from '@/utils/util'
 import waves from '@/directive/waves'
 
 export default {
@@ -801,7 +801,7 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          delAllSubjectBank({ ids: ids }).then(() => {
+          delAllSubjectBank({ idString: ids }).then(() => {
             this.handleSubjectManagement()
             this.$notify({
               title: '成功',
@@ -828,7 +828,10 @@ export default {
           cancelButtonText: '取消',
           type: 'success'
         }).then(() => {
-          window.location.href = this.baseUrl + '/subjectBank/export?ids=&categoryId=' + this.currentCategoryId
+          exportSubjectBank({ idString: '', categoryId: this.currentCategoryId }).then(response => {
+            // 导出Excel
+            exportExcel(response)
+          })
         }).catch(() => {
 
         })
@@ -843,7 +846,10 @@ export default {
           for (let i = 0; i < this.multipleSubjectSelection.length; i++) {
             ids += this.multipleSubjectSelection[i].id + ','
           }
-          window.location.href = this.baseUrl + '/subjectBank/export?ids=' + ids
+          exportSubjectBank({ idString: ids, categoryId: '' }).then(response => {
+            // 导出Excel
+            exportExcel(response)
+          })
         }).catch(() => {
 
         })

@@ -168,12 +168,13 @@ export default {
       const statusMap = {
         0: 'success',
         1: 'danger',
+        2: 'danger',
         9: 'danger'
       }
       return statusMap[status]
     },
     statusFilter(status) {
-      return status === '0' ? '正常访问' : '访问异常'
+      return status === '0' ? '正常' : '访问'
     }
   },
   data() {
@@ -286,7 +287,7 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          delAllObj({ ids: ids }).then(() => {
+          delAllObj({ idString: ids }).then(() => {
             this.dialogFormVisible = false
             this.getList()
             this.$notify({

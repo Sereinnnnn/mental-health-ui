@@ -449,13 +449,13 @@
 <script>
 import { fetchList, addObj, putObj, delObj, delAllObj } from '@/api/exam/exam'
 import { fetchCourseList } from '@/api/exam/course'
-import { fetchSubjectList, addSubject, putSubject, delSubject, delAllSubject } from '@/api/exam/subject'
+import { fetchSubjectList, addSubject, putSubject, delSubject, delAllSubject, exportSubject } from '@/api/exam/subject'
 import { fetchSubjectBankList } from '@/api/exam/subjectBank'
 import { fetchTree, getObj } from '@/api/exam/subjectCategory'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
-import { checkMultipleSelect } from '@/utils/util'
+import { checkMultipleSelect, exportExcel } from '@/utils/util'
 
 export default {
   name: 'ExamManagement',
@@ -903,7 +903,7 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          delAllObj({ ids: ids }).then(() => {
+          delAllObj({ idString: ids }).then(() => {
             this.getList()
             this.$notify({
               title: '成功',
@@ -1154,7 +1154,7 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          delAllSubject({ ids: ids }).then(() => {
+          delAllSubject({ idString: ids }).then(() => {
             this.handleSubjectManagement()
             this.$notify({
               title: '成功',
@@ -1169,16 +1169,17 @@ export default {
     // 导出
     handleExportSubject() {
       // 没选择题目，导出所有
-      if (this.multipleSelection.length === 0) {
+      if (this.multipleSubjectSelection.length === 0) {
         this.$confirm('是否导出所有题目?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'success'
         }).then(() => {
-          window.location.href = this.baseUrl + '/subject/export?ids=&examinationId=' + this.subject.examinationId
-        }).catch(() => {
-
-        })
+          exportSubject({ idString: '', examinationId: this.subject.examinationId }).then(response => {
+            // 导出Excel
+            exportExcel(response)
+          })
+        }).catch(() => {})
       } else {
         // 导出选中
         this.$confirm('是否导出选中的题目?', '提示', {
@@ -1187,13 +1188,14 @@ export default {
           type: 'success'
         }).then(() => {
           let ids = ''
-          for (let i = 0; i < this.multipleSelection.length; i++) {
-            ids += this.multipleSelection[i].id + ','
+          for (let i = 0; i < this.multipleSubjectSelection.length; i++) {
+            ids += this.multipleSubjectSelection[i].id + ','
           }
-          window.location.href = this.baseUrl + '/subject/export?ids=' + ids
-        }).catch(() => {
-
-        })
+          exportSubject({ idString: ids, examinationId: '' }).then(response => {
+            // 导出Excel
+            exportExcel(response)
+          })
+        }).catch(() => {})
       }
     },
     // 导入

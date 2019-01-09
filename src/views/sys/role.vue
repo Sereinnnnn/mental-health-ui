@@ -16,6 +16,7 @@
       highlight-current-row
       style="width: 100%;"
       @cell-dblclick="handleUpdate"
+      @selection-change="handleSelectionChange"
       @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
       <el-table-column :label="$t('table.roleCode')" sortable prop="role_code" min-width="90" align="center">
@@ -126,6 +127,7 @@ import { fetchList, addObj, putObj, delObj, fetchDeptTree, fetchRoleTree, permis
 import { fetchTree } from '@/api/admin/menu'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
+import { checkMultipleSelect } from '@/utils/util'
 
 export default {
   name: 'RoleManagement',
@@ -170,6 +172,7 @@ export default {
       treeDeptData: [],
       treePermissionData: [],
       checkedKeys: [],
+      multipleSelection: [],
       dialogFormVisible: false,
       dialogDeptVisible: false,
       dialogPermissionVisible: false,
@@ -245,6 +248,9 @@ export default {
           type: 'success'
         })
       })
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val
     },
     sortChange(column, prop, order) {
       this.listQuery.sort = column.prop
@@ -346,8 +352,7 @@ export default {
     },
     // 批量删除
     handleDeletes() {
-      if (this.checkMultipleSelect()) {
-        console.log(this.multipleSelection)
+      if (checkMultipleSelect(this.multipleSelection, this )) {
         let ids = ''
         for (let i = 0; i < this.multipleSelection.length; i++) {
           ids += this.multipleSelection[i].id + ','
@@ -357,7 +362,7 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          delAllObj({ ids: ids }).then(() => {
+          delAllObj({ idString: ids }).then(() => {
             this.dialogFormVisible = false
             this.getList()
             this.$notify({

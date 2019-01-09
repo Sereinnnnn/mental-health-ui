@@ -144,7 +144,7 @@ export default {
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
-            exportObj({ ids: '' }).then(response => {
+            exportObj({ idString: '' }).then(response => {
               // 导出Excel
               exportExcel(response)
             })
@@ -154,7 +154,7 @@ export default {
           for (let i = 0; i < this.multipleSelection.length; i++) {
             ids += this.multipleSelection[i].id + ','
           }
-          exportObj({ ids: ids }).then(response => {
+          exportObj({ idString: ids }).then(response => {
             // 导出Excel
             exportExcel(response)
           })

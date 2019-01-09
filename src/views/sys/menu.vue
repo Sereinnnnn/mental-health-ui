@@ -379,7 +379,7 @@ export default {
           cancelButtonText: '取消',
           type: 'success'
         }).then(() => {
-          exportObj({ ids: menus }).then(response => {
+          exportObj({ idString: menus }).then(response => {
             // 导出Excel
             exportExcel(response)
           })
@@ -395,7 +395,7 @@ export default {
           for (let i = 0; i < keys.length; i++) {
             menus = menus + keys[i] + ','
           }
-          exportObj({ ids: menus }).then(response => {
+          exportObj({ idString: menus }).then(response => {
             // 导出Excel
             exportExcel(response)
           })

@@ -39,6 +39,11 @@
           <span>{{ scope.row.deptName }}</span>
         </template>
       </el-table-column>
+      <el-table-column :label="$t('table.isDefault')" align="center" width="120px">
+        <template slot-scope="scope">
+          {{ scope.row.isDefault | isDefaultFilter }}
+        </template>
+      </el-table-column>
       <el-table-column :label="$t('table.status')" align="center" width="120px">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
@@ -69,6 +74,12 @@
         </el-form-item>
         <el-form-item :label="$t('table.roleDesc')" prop="roleDesc">
           <el-input v-model="temp.roleDesc"/>
+        </el-form-item>
+        <el-form-item :label="$t('table.isDefault')">
+          <el-radio-group v-model="temp.isDefault">
+            <el-radio :label="1">是</el-radio>
+            <el-radio :label="0">否</el-radio>
+          </el-radio-group>
         </el-form-item>
         <el-form-item :label="$t('table.status')">
           <el-radio-group v-model="temp.status">
@@ -144,6 +155,9 @@ export default {
     },
     statusFilter(status) {
       return status === '0' ? '启用' : '禁用'
+    },
+    isDefaultFilter(status) {
+      return status === '1' ? '是' : '否'
     }
   },
   data() {
@@ -166,7 +180,8 @@ export default {
         roleDesc: '',
         status: 0,
         deptId: '',
-        deptName: ''
+        deptName: '',
+        isDefault: '0'
       },
       treeData: [],
       treeDeptData: [],
@@ -265,7 +280,8 @@ export default {
         roleDesc: '',
         status: 0,
         deptId: '',
-        deptName: ''
+        deptName: '',
+        isDefault: '0'
       }
     },
     handleCreate() {
@@ -298,6 +314,7 @@ export default {
       this.temp.born = new Date(parseInt(this.temp.born))
       this.temp.sex = parseInt(this.temp.sex)
       this.temp.status = parseInt(this.temp.status)
+      this.temp.isDefault = parseInt(this.temp.isDefault)
       this.temp.readonly = true
       this.dialogStatus = 'update'
       this.dialogFormVisible = true

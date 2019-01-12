@@ -132,6 +132,7 @@ export default {
     author: '作者',
     readings: '阅读数',
     status: '状态',
+    isDefault: '是否默认',
     actions: '操作',
     edit: '编辑',
     publish: '发布',

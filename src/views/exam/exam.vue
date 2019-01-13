@@ -74,82 +74,100 @@
     </div>
 
     <!--考试信息表单-->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="80%" top="10vh">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="70%" top="10vh">
       <el-form ref="dataForm" :rules="rules" :model="temp" :label-position="labelPosition" label-width="100px">
         <el-row>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.examinationName')" prop="examinationName">
-              <el-input v-model="temp.examinationName" :readonly="temp.readonly"/>
-            </el-form-item>
+          <el-col :span="18">
+            <el-row>
+              <el-col :span="24">
+                <el-form-item :label="$t('table.examinationName')" prop="examinationName">
+                  <el-input v-model="temp.examinationName" :readonly="temp.readonly"/>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item :label="$t('table.totalScore')" prop="totalScore">
+                  <el-input v-model="temp.totalScore"/>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item :label="$t('table.college')" prop="collegeId">
+                  <el-input v-model="temp.collegeId"/>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item :label="$t('table.major')" prop="majorId">
+                  <el-input v-model="temp.majorId"/>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item :label="$t('table.course')" prop="course.id">
+                  <el-input v-model="temp.course.courseName" @focus="selectCourse"/>
+                  <input v-model="temp.course.id" type="hidden">
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item :label="$t('table.startTime')" prop="startTime">
+                  <el-date-picker v-model="temp.startTime" :placeholder="$t('table.startTime')" type="datetime" format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm"/>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item :label="$t('table.endTime')" prop="endTime">
+                  <el-date-picker v-model="temp.endTime" :placeholder="$t('table.endTime')" type="datetime" format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm"/>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item :label="$t('table.type')" prop="type">
+                  <el-radio-group v-model="temp.type">
+                    <el-radio :label="0">正式考试</el-radio>
+                    <el-radio :label="1">模拟考试</el-radio>
+                    <el-radio :label="2">在线练习</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item :label="$t('table.status')">
+                  <el-radio-group v-model="temp.status">
+                    <el-radio :label="0">已发布</el-radio>
+                    <el-radio :label="1">未发布</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="24">
+                <el-form-item :label="$t('table.attention')">
+                  <el-input :autosize="{ minRows: 3, maxRows: 5}" :placeholder="$t('table.attention')" v-model="temp.attention" type="textarea"/>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="24">
+                <el-form-item :label="$t('table.remark')">
+                  <el-input :autosize="{ minRows: 3, maxRows: 5}" v-model="temp.remark" type="textarea" placeholder="备注"/>
+                </el-form-item>
+              </el-col>
+            </el-row>
           </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.totalScore')" prop="totalScore">
-              <el-input v-model="temp.totalScore"/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.college')" prop="collegeId">
-              <el-input v-model="temp.collegeId"/>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.major')" prop="majorId">
-              <el-input v-model="temp.majorId"/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.course')" prop="course.id">
-              <el-input v-model="temp.course.courseName" @focus="selectCourse"/>
-              <input v-model="temp.course.id" type="hidden">
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.startTime')" prop="startTime">
-              <el-date-picker v-model="temp.startTime" :placeholder="$t('table.startTime')" type="datetime" format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm"/>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.endTime')" prop="endTime">
-              <el-date-picker v-model="temp.endTime" :placeholder="$t('table.endTime')" type="datetime" format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm"/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.type')" prop="type">
-              <el-radio-group v-model="temp.type">
-                <el-radio :label="0">正式考试</el-radio>
-                <el-radio :label="1">模拟考试</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.status')">
-              <el-radio-group v-model="temp.status">
-                <el-radio :label="0">已发布</el-radio>
-                <el-radio :label="1">未发布</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24">
-            <el-form-item :label="$t('table.attention')">
-              <el-input :autosize="{ minRows: 3, maxRows: 5}" :placeholder="$t('table.attention')" v-model="temp.attention" type="textarea"/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24">
-            <el-form-item :label="$t('table.remark')">
-              <el-input :autosize="{ minRows: 3, maxRows: 5}" v-model="temp.remark" type="textarea" placeholder="备注"/>
-            </el-form-item>
+          <el-col :span="5" :offset="1">
+            <el-upload
+              :show-file-list="false"
+              :on-success="handleAvatarSuccess"
+              :before-upload="beforeAvatarUpload"
+              :action="uploadUrl"
+              :headers="headers"
+              :data="params"
+              class="avatar-uploader">
+              <img v-if="temp.avatar" :src="getAvatar(temp.avatar)" class="avatar">
+              <i v-else class="el-icon-plus avatar-uploader-icon"/>
+            </el-upload>
           </el-col>
         </el-row>
       </el-form>
@@ -456,6 +474,8 @@ import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
 import { checkMultipleSelect, exportExcel } from '@/utils/util'
+import { ATTACHMENT_URL } from '@/config/attachment'
+import { delAttachment } from '@/api/admin/attachment'
 
 export default {
   name: 'ExamManagement',
@@ -474,7 +494,12 @@ export default {
       return status === '0' ? '已发布' : '未发布'
     },
     typeFilter(type) {
-      return type === '0' ? '正式考试' : '模拟考试'
+      const typeMap = {
+        0: '正式考试',
+        1: '模拟考试',
+        2: '在线练习'
+      }
+      return typeMap[type]
     },
     subjectTypeFilter(type) {
       const typeMap = {
@@ -494,6 +519,13 @@ export default {
   },
   data() {
     return {
+      uploadUrl: '/zuul/admin/attachment/upload',
+      headers: {
+        Authorization: 'Bearer ' + getToken()
+      },
+      params: {
+        busiType: '1'
+      },
       baseUrl: '/exam',
       tableKey: 0,
       list: null,
@@ -1223,7 +1255,90 @@ export default {
         duration: 2000
       })
       this.uploadingSubject = false
+    },
+    // 图片上传前
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === 'image/jpeg'
+      const isLt2M = file.size / 1024 / 1024 < 2
+
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG 格式!')
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!')
+      }
+      return isJPG && isLt2M
+    },
+    // 上传成功
+    handleAvatarSuccess(res, file) {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          if (this.temp.avatar !== '') {
+            // 删除旧头像
+            delAttachment(this.temp.avatar).then(() => {
+              // 更新头像信息
+              this.temp.avatar = res.data.id
+              putObj(Object.assign({}, this.temp)).then(() => {
+                this.$notify({
+                  title: '成功',
+                  message: '上传成功',
+                  type: 'success',
+                  duration: 2000
+                })
+                this.dialogFormVisible = false
+                this.getList()
+              }).catch(() => {
+                this.$notify({
+                  title: '失败',
+                  message: '上传失败',
+                  type: 'error',
+                  duration: 2000
+                })
+              })
+            })
+          } else {
+            // 更新头像信息
+            this.temp.avatar = res.data.id
+            putObj(Object.assign({}, this.temp)).then(() => {
+              this.$notify({
+                title: '成功',
+                message: '上传成功',
+                type: 'success',
+                duration: 2000
+              })
+              this.dialogFormVisible = false
+              this.getList()
+            }).catch(() => {
+              this.$notify({
+                title: '失败',
+                message: '头像上传失败',
+                type: 'error',
+                duration: 2000
+              })
+            })
+          }
+        }
+      })
+    },
+    getAvatar(attachmentId) {
+      return ATTACHMENT_URL + '/download?id=' + attachmentId
     }
   }
 }
 </script>
+
+<style scoped>
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
+</style>

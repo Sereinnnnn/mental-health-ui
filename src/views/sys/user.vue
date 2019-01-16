@@ -159,17 +159,23 @@
 
     <!-- 导入用户 -->
     <el-dialog :visible.sync="dialogImportVisible" :title="$t('table.import')">
-      <el-upload
-        :show-file-list="false"
-        :on-success="handleUploadUserSuccess"
-        :before-upload="beforeUploadUserUpload"
-        :on-progress="handleUploadProgress"
-        :action="importUrl"
-        :headers="headers">
-        <el-button size="small">点击上传</el-button>
-        <div slot="tip" class="el-upload__tip">只能上传xlns文件，且不超过500kb</div>
-        <el-progress v-if="uploading === true" :percentage="percentage" :text-inside="true" :stroke-width="18" status="success"/>
-      </el-upload>
+      <el-row>
+        <el-col :span="24">
+          <el-upload
+            drag
+            :show-file-list="false"
+            :on-success="handleUploadUserSuccess"
+            :before-upload="beforeUploadUserUpload"
+            :on-progress="handleUploadProgress"
+            :action="importUrl"
+            :headers="headers"
+            style="text-align: center;">
+            <i class="el-icon-upload"></i>
+            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+            <div slot="tip" class="el-upload__tip">只能上传xlsx文件</div>
+          </el-upload>
+        </el-col>
+      </el-row>
     </el-dialog>
 
   </div>
@@ -542,8 +548,16 @@ export default {
       })
     },
     // 上传前
-    beforeUploadUserUpload() {
-      console.log('before upload.')
+    beforeUploadUserUpload(file) {
+      const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      const isLt10M = file.size / 1024 / 1024 < 10
+      if (!isExcel) {
+        this.$message.error('上传附件只能是 excel 格式!')
+      }
+      if (!isLt10M) {
+        this.$message.error('上传附件大小不能超过 10MB!')
+      }
+      return isExcel && isLt10M
     },
     handleUploadProgress(event, file, fileList) {
       this.uploading = true

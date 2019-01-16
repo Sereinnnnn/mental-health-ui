@@ -1,8 +1,8 @@
 <template>
   <div class="tab-container">
     <div class="filter-container">
-      <el-button v-if="menu_btn_add" icon="el-icon-check" plain @click="handlerAddSuper">添加顶级菜单</el-button>
-      <el-button v-if="menu_btn_add" icon="el-icon-check" plain @click="handlerAdd">添加子菜单</el-button>
+      <el-button v-if="menu_btn_add" icon="el-icon-check" type="primary" @click="handlerAddSuper">添加顶级菜单</el-button>
+      <el-button v-if="menu_btn_add" icon="el-icon-check" type="primary" @click="handlerAdd">添加子菜单</el-button>
       <el-button v-if="menu_btn_del" icon="el-icon-delete" plain @click="handleDelete">{{ $t('table.del') }}</el-button>
       <el-button v-if="menu_btn_import" icon="el-icon-upload2" plain @click="handleImport">{{ $t('table.import') }}</el-button>
       <el-button v-if="menu_btn_export" icon="el-icon-download" plain @click="handleExport">{{ $t('table.export') }}</el-button>
@@ -111,19 +111,25 @@
 
     <!-- 导入菜单 -->
     <el-dialog :visible.sync="dialogImportVisible" :title="$t('table.import')">
-      <el-upload
-        :multiple="false"
-        :auto-upload="true"
-        :show-file-list="true"
-        :before-upload="beforeMenuUpload"
-        :on-progress="handleUploadProgress"
-        :on-success="handleUploadMenuSuccess"
-        :action="importUrl"
-        :headers="headers">
-        <el-button size="small">选择文件</el-button>
-        <div slot="tip" class="el-upload__tip">只能上传xlsx文件，且不超过1M</div>
-        <el-progress v-if="uploading === true" :percentage="percentage" :text-inside="true" :stroke-width="18" status="success"/>
-      </el-upload>
+      <el-row>
+        <el-col :span="24">
+          <el-upload
+            drag
+            :multiple="false"
+            :auto-upload="true"
+            :show-file-list="true"
+            :before-upload="beforeMenuUpload"
+            :on-progress="handleUploadProgress"
+            :on-success="handleUploadMenuSuccess"
+            :action="importUrl"
+            :headers="headers"
+            style="text-align: center;">
+            <i class="el-icon-upload"></i>
+            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+            <div slot="tip" class="el-upload__tip">只能上传xlsx文件</div>
+          </el-upload>
+        </el-col>
+      </el-row>
     </el-dialog>
   </div>
 </template>
@@ -405,8 +411,16 @@ export default {
       }
     },
     // 上传前
-    beforeMenuUpload() {
-
+    beforeMenuUpload(file) {
+      const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      const isLt10M = file.size / 1024 / 1024 < 10
+      if (!isExcel) {
+        this.$message.error('上传附件只能是 excel 格式!')
+      }
+      if (!isLt10M) {
+        this.$message.error('上传附件大小不能超过 10MB!')
+      }
+      return isExcel && isLt10M
     },
     handleUploadProgress(event, file, fileList) {
       this.uploading = true

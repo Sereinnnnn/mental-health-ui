@@ -54,17 +54,26 @@
                   </el-row>
                 </el-col>
                 <el-col :span="10" :offset="2">
-                  <el-upload
-                    :show-file-list="false"
-                    :on-success="handleAvatarSuccess"
-                    :before-upload="beforeAvatarUpload"
-                    :action="uploadUrl"
-                    :headers="headers"
-                    :data="params"
-                    class="avatar-uploader">
-                    <img v-if="userInfo.avatar" :src="userInfo.avatar" class="avatar">
-                    <i v-else class="el-icon-plus avatar-uploader-icon"/>
-                  </el-upload>
+                  <el-row>
+                    <el-col :span="12" :offset="6">
+                      <el-upload
+                        :show-file-list="false"
+                        :on-success="handleAvatarSuccess"
+                        :before-upload="beforeAvatarUpload"
+                        :action="uploadUrl"
+                        :headers="headers"
+                        :data="params"
+                        class="avatar-uploader">
+                        <img v-if="userInfo.avatar" :src="userInfo.avatar" class="avatar">
+                        <i v-else class="el-icon-plus avatar-uploader-icon"/>
+                      </el-upload>
+                    </el-col>
+                  </el-row>
+                  <el-row>
+                    <el-col :span="12" :offset="6" style="text-align: center">
+                      <h4>头像</h4>
+                    </el-col>
+                  </el-row>
                 </el-col>
               </el-row>
               <el-row>

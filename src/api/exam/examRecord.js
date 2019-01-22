@@ -1,15 +1,15 @@
 import request from '@/router/axios'
 
-export function scoreList() {
+export function examRecordList() {
   return request({
-    url: '/exam/score/scoreList',
+    url: '/exam/examRecord/examRecordList',
     method: 'get'
   })
 }
 
-export function fetchScoreList(query) {
+export function fetchExamRecordList(query) {
   return request({
-    url: '/exam/score/scoreList',
+    url: '/exam/examRecord/examRecordList',
     method: 'get',
     params: query
   })
@@ -17,14 +17,14 @@ export function fetchScoreList(query) {
 
 export function getObj(id) {
   return request({
-    url: '/exam/score/' + id,
+    url: '/exam/examRecord/' + id,
     method: 'get'
   })
 }
 
 export function addObj(obj) {
   return request({
-    url: '/exam/score/',
+    url: '/exam/examRecord/',
     method: 'post',
     data: obj
   })
@@ -32,7 +32,7 @@ export function addObj(obj) {
 
 export function putObj(obj) {
   return request({
-    url: '/exam/score/',
+    url: '/exam/examRecord/',
     method: 'put',
     data: obj
   })
@@ -40,14 +40,14 @@ export function putObj(obj) {
 
 export function delObj(id) {
   return request({
-    url: '/exam/score/' + id,
+    url: '/exam/examRecord/' + id,
     method: 'delete'
   })
 }
 
 export function delAllObj(obj) {
   return request({
-    url: '/exam/score/deleteAll',
+    url: '/exam/examRecord/deleteAll',
     method: 'post',
     data: obj
   })
@@ -56,7 +56,7 @@ export function delAllObj(obj) {
 // 导出
 export function exportObj(obj) {
   return request({
-    url: '/exam/score/export',
+    url: '/exam/examRecord/export',
     method: 'post',
     responseType: 'arraybuffer',
     headers: { 'filename': 'utf-8' },

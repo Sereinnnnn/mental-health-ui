@@ -40,7 +40,7 @@
       </el-table-column>
       <el-table-column :label="$t('table.score.examTime')" min-width="90" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.examTime }}</span>
+          <span>{{ scope.row.startTime }}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import { fetchScoreList, exportObj } from '@/api/exam/score'
+import { fetchExamRecordList, exportObj } from '@/api/exam/examRecord'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 import { exportExcel } from '@/utils/util'
@@ -87,7 +87,7 @@ export default {
   },
   created() {
     this.getList()
-    this.score_btn_export = this.permissions['exam:score:export']
+    this.score_btn_export = this.permissions['exam:examRecord:export']
   },
   computed: {
     ...mapGetters([
@@ -98,7 +98,7 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchScoreList(this.listQuery).then(response => {
+      fetchExamRecordList(this.listQuery).then(response => {
         this.list = response.data.list
         this.total = response.data.total
         setTimeout(() => {

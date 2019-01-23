@@ -3,7 +3,7 @@
     <div class="filter-container">
       <el-input v-model="listQuery.examinationName" placeholder="考试名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
-      <el-button v-if="score_btn_export" class="filter-item" icon="el-icon-download" plain @click="handleExportScore">{{ $t('table.export') }}</el-button>
+      <el-button v-if="exam_record_btn_export" class="filter-item" icon="el-icon-download" plain @click="handleExportExamRecord">{{ $t('table.export') }}</el-button>
     </div>
 
     <el-table
@@ -23,22 +23,22 @@
           <span>{{ scope.row.examinationName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.score.userName')" min-width="90" align="center">
+      <el-table-column :label="$t('table.examRecord.userName')" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.userName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.score.deptName')" min-width="90" align="center">
+      <el-table-column :label="$t('table.examRecord.deptName')" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.deptName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.score.score')" min-width="90" align="center">
+      <el-table-column :label="$t('table.examRecord.score')" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.score }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.score.examTime')" min-width="90" align="center">
+      <el-table-column :label="$t('table.examRecord.examTime')" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.startTime }}</span>
         </template>
@@ -58,7 +58,7 @@ import { mapGetters } from 'vuex'
 import { exportExcel } from '@/utils/util'
 
 export default {
-  name: 'ScoreManagement',
+  name: 'ExamRecordManagement',
   directives: {
     waves
   },
@@ -80,14 +80,14 @@ export default {
         examinationName: ''
       },
       checkedKeys: [],
-      score_btn_export: false,
+      exam_record_btn_export: false,
       // 多选
       multipleSelection: []
     }
   },
   created() {
     this.getList()
-    this.score_btn_export = this.permissions['exam:examRecord:export']
+    this.exam_record_btn_export = this.permissions['exam:examRecord:export']
   },
   computed: {
     ...mapGetters([
@@ -136,7 +136,7 @@ export default {
         examinationName: ''
       }
     },
-    handleExportScore() {
+    handleExportExamRecord() {
       if (this.total > 0) {
         if (this.multipleSelection.length === 0) {
           this.$confirm('确定要导出全部成绩数据吗?', '提示', {

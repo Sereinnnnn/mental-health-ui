@@ -48,6 +48,11 @@
           <span>{{ scope.row.endTime }}</span>
         </template>
       </el-table-column>
+      <el-table-column :label="$t('table.totalSubject')" sortable prop="total_subject" align="center" width="120px">
+        <template slot-scope="scope">
+          <span>{{ scope.row.totalSubject }}</span>
+        </template>
+      </el-table-column>
       <el-table-column :label="$t('table.totalScore')" sortable prop="total_score" align="center" width="120px">
         <template slot-scope="scope">
           <span>{{ scope.row.totalScore }}</span>
@@ -582,6 +587,7 @@ export default {
         endTime: '',
         duration: '',
         totalScore: '',
+        totalSubject: '0',
         status: 0,
         avatar: '',
         collegeId: '',

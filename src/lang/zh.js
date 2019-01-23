@@ -174,6 +174,7 @@ export default {
     startTime: '开始时间',
     endTime: '结束时间',
     totalScore: '总分',
+    totalSubject: '题目数',
     subjectManagement: '题目管理',
     subjectName: '题目名称',
     subject: {
@@ -198,7 +199,7 @@ export default {
     categoryDesc: '分类描述',
     sort: '排序号',
     addFromSubjectBank: '从题库新增',
-    score: {
+    examRecord: {
       userName: '姓名',
       deptName: '部门',
       score: '成绩',

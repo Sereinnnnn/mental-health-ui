@@ -22,8 +22,8 @@ const attachment = {
     }
   },
   mutations: {
-    SET_ATTACHMENT_CONFIG: (state, attachment_config) => {
-      state.attachmentConfig = attachment_config
+    SET_ATTACHMENT_CONFIG: (state, attachmentConfig) => {
+      state.attachmentConfig = attachmentConfig
       setStore({
         name: 'attachment_config',
         content: state.attachmentConfig,

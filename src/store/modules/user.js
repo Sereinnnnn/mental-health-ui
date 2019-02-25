@@ -109,6 +109,8 @@ const user = {
           commit('SET_REFRESH_TOKEN', '')
           commit('SET_ROLES', [])
           commit('DEL_ALL_TAG')
+          // 清除附件配置信息
+          commit('SET_ATTACHMENT_CONFIG', {})
           removeToken()
           resolve()
         }).catch(error => {
@@ -131,6 +133,8 @@ const user = {
         commit('SET_REFRESH_TOKEN', '')
         commit('SET_ROLES', [])
         commit('DEL_ALL_TAG')
+        // 清除附件配置信息
+        commit('SET_ATTACHMENT_CONFIG', {})
         removeToken()
         resolve()
       })

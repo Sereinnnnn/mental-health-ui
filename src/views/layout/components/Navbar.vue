@@ -27,7 +27,7 @@
 
       <el-dropdown class="avatar-container right-menu-item" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="userInfo.avatar" class="user-avatar">
+          <img :src="userInfo.avatarUrl" class="user-avatar">
           <i class="el-icon-caret-bottom"/>
         </div>
         <el-dropdown-menu slot="dropdown">
@@ -59,6 +59,8 @@ import SizeSelect from '@/components/SizeSelect'
 import LangSelect from '@/components/LangSelect'
 import ThemePicker from '@/components/ThemePicker'
 import Lock from '@/components/Lock'
+import { getAttachmentPreviewUrl } from '@/utils/util'
+
 import { mapState } from 'vuex'
 
 export default {

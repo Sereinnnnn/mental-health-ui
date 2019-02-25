@@ -255,3 +255,13 @@ export const exportExcel = function(response) {
     link.click()
   }
 }
+
+/**
+ * 返回附件的预览地址
+ * @param attachmentConfig
+ * @param fastFileId
+ * @returns {string}
+ */
+export const getAttachmentPreviewUrl = function(attachmentConfig, fastFileId) {
+  return attachmentConfig.host + '/' + fastFileId
+}

@@ -53,3 +53,10 @@ export function delAllObj(obj) {
   })
 }
 
+export function attachmentConfig() {
+  return request({
+    url: '/admin/attachment/attachmentConfig',
+    method: 'get'
+  })
+}
+

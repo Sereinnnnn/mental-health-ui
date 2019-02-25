@@ -64,7 +64,7 @@
                         :headers="headers"
                         :data="params"
                         class="avatar-uploader">
-                        <img v-if="userInfo.avatar" :src="userInfo.avatar" class="avatar">
+                        <img v-if="userInfo.avatarUrl" :src="userInfo.avatarUrl" class="avatar">
                         <i v-else class="el-icon-plus avatar-uploader-icon"/>
                       </el-upload>
                     </el-col>
@@ -94,9 +94,9 @@
 <script>
 import { updateObjInfo } from '@/api/admin/user'
 import { mapState } from 'vuex'
-import { ATTACHMENT_URL } from '@/config/attachment'
 import { getToken } from '@/utils/auth'
 import { delAttachment } from '@/api/admin/attachment'
+import { getAttachmentPreviewUrl } from '@/utils/util'
 
 export default {
   name: 'PersonalMessage',
@@ -115,19 +115,16 @@ export default {
       },
       params: {
         busiType: '1'
-      },
-      avatarId: ''
+      }
     }
   },
   created() {
     this.userInfo.sex = parseInt(this.userInfo.sex)
-    if (this.userInfo.avatar !== null) {
-      this.avatarId = this.userInfo.avatar.substring(this.userInfo.avatar.lastIndexOf('=') + 1, this.userInfo.avatar.length)
-    }
   },
   computed: {
     ...mapState({
-      userInfo: state => state.user.userInfo
+      userInfo: state => state.user.userInfo,
+      attachmentConfig: state => state.attachment.attachmentConfig
     })
   },
   methods: {
@@ -162,13 +159,14 @@ export default {
       })
     },
     handleAvatarSuccess(res, file) {
-      this.userInfo.avatar = ATTACHMENT_URL + '/download?id=' + res.data.id
+      this.userInfo.avatar = res.data.fastFileId
+      this.userInfo.avatarUrl = getAttachmentPreviewUrl(this.attachmentConfig, this.userInfo.avatar)
       this.$refs['form'].validate((valid) => {
         if (valid) {
-          if (this.avatarId !== '') {
+          if (this.userInfo.avatarId !== '') {
             // 删除旧头像
-            delAttachment(this.avatarId).then(() => {
-              this.avatarId = res.data.id
+            delAttachment(this.userInfo.avatarId).then(() => {
+              this.userInfo.avatarId = res.data.id
               // 更新头像信息
               updateObjInfo(this.userInfo).then(response => {
                 if (response.data.data) {
@@ -189,7 +187,7 @@ export default {
               })
             })
           } else {
-            this.avatarId = res.data.id
+            this.userInfo.avatarId = res.data.id
             // 更新头像信息
             updateObjInfo(this.userInfo).then(response => {
               if (response.data.data) {

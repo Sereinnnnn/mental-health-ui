@@ -1,7 +1,7 @@
 import { loginByUsername, logout, getUserInfo } from '@/api/admin/login'
 import { setToken, removeToken } from '@/utils/auth'
 import { setStore, getStore } from '@/utils/store'
-import { encryption } from '@/utils/util'
+import { encryption, getAttachmentPreviewUrl } from '@/utils/util'
 import { GetMenu } from '@/api/admin/menu'
 import { validatenull } from '@/utils/validate'
 
@@ -76,6 +76,13 @@ const user = {
       return new Promise((resolve, reject) => {
         getUserInfo(state.token).then(response => {
           const data = response.data.data
+          if (data.user.avatarId === null) {
+            data.user.avatarUrl = data.user.avatar
+          } else {
+            // 获取附件配置
+            const attachmentConfig = getStore({ name: 'attachment_config' })
+            data.user.avatarUrl = getAttachmentPreviewUrl(attachmentConfig, data.user.avatar)
+          }
           commit('SET_ROLES', data.roles)
           commit('SET_USER_INFO', data.user)
           commit('SET_PERMISSIONS', data.permissions)

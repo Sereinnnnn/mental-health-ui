@@ -11,7 +11,7 @@ const getters = {
   visitedViews: state => state.tagsView.visitedViews,
   cachedViews: state => state.tagsView.cachedViews,
   access_token: state => state.user.access_token,
-  avatar: state => state.user.avatar,
+  avatar: state => state.user.avatarUrl,
   name: state => state.user.name,
   introduction: state => state.user.introduction,
   status: state => state.user.status,
@@ -20,6 +20,7 @@ const getters = {
   permissions: state => state.user.permissions,
   addRouters: state => state.permission.addRouters,
   menu: state => state.user.menu,
-  isCollapse: state => state.common.isCollapse
+  isCollapse: state => state.common.isCollapse,
+  attachmentConfig: state => state.attachment.attachmentConfig
 }
 export default getters

@@ -60,7 +60,7 @@
                         :show-file-list="false"
                         :on-success="handleAvatarSuccess"
                         :before-upload="beforeAvatarUpload"
-                        :action="uploadUrl"
+                        :action="attachmentConfig.zuulUploadUrl"
                         :headers="headers"
                         :data="params"
                         class="avatar-uploader">
@@ -96,14 +96,13 @@ import { updateObjInfo } from '@/api/admin/user'
 import { mapState } from 'vuex'
 import { getToken } from '@/utils/auth'
 import { delAttachment } from '@/api/admin/attachment'
-import { getAttachmentPreviewUrl } from '@/utils/util'
+import { getAttachmentPreviewUrl, isNotEmpty, notifySuccess, notifyFail } from '@/utils/util'
 
 export default {
   name: 'PersonalMessage',
   components: {},
   data() {
     return {
-      uploadUrl: '/zuul/admin/attachment/upload',
       labelPosition: 'right',
       disabled: true,
       rules: {
@@ -133,89 +132,62 @@ export default {
         if (valid) {
           updateObjInfo(this.userInfo).then(response => {
             if (response.data.data) {
-              this.$notify({
-                title: '成功',
-                message: '修改成功',
-                type: 'success',
-                duration: 2000
-              })
+              notifySuccess(this, '修改成功')
             } else {
-              this.$notify({
-                title: '失败',
-                message: response.data.msg,
-                type: 'error',
-                duration: 2000
-              })
+              notifyFail(this, response.data.msg)
             }
           }).catch(() => {
-            this.$notify({
-              title: '失败',
-              message: '修改失败',
-              type: 'error',
-              duration: 2000
-            })
+            notifyFail(this, '修改失败')
           })
         }
       })
     },
     handleAvatarSuccess(res, file) {
+      if (!isNotEmpty(res.data) || !isNotEmpty(res.data.fastFileId)) {
+        notifyFail(this, '头像上传失败')
+        return
+      }
       this.userInfo.avatar = res.data.fastFileId
       this.userInfo.avatarUrl = getAttachmentPreviewUrl(this.attachmentConfig, this.userInfo.avatar)
       this.$refs['form'].validate((valid) => {
         if (valid) {
-          if (this.userInfo.avatarId !== '') {
+          if (isNotEmpty(this.userInfo.avatarId)) {
             // 删除旧头像
             delAttachment(this.userInfo.avatarId).then(() => {
               this.userInfo.avatarId = res.data.id
               // 更新头像信息
               updateObjInfo(this.userInfo).then(response => {
-                if (response.data.data) {
-                  this.$notify({
-                    title: '成功',
-                    message: '头像上传成功',
-                    type: 'success',
-                    duration: 2000
-                  })
+                if (!isNotEmpty(response.data.data)) {
+                  notifySuccess(this, '头像上传成功')
                 }
-              }).catch(() => {
-                this.$notify({
-                  title: '失败',
-                  message: '头像上传失败',
-                  type: 'error',
-                  duration: 2000
-                })
+              }).catch((error) => {
+                console.log(error)
+                notifyFail(this, '头像上传失败')
               })
+            }).catch((error) => {
+              console.log(error)
+              notifyFail(this, '头像上传失败')
             })
           } else {
             this.userInfo.avatarId = res.data.id
             // 更新头像信息
             updateObjInfo(this.userInfo).then(response => {
               if (response.data.data) {
-                this.$notify({
-                  title: '成功',
-                  message: '头像上传成功',
-                  type: 'success',
-                  duration: 2000
-                })
+                notifySuccess(this, '头像上传成功')
               }
-            }).catch(() => {
-              this.$notify({
-                title: '失败',
-                message: '头像上传失败',
-                type: 'error',
-                duration: 2000
-              })
+            }).catch((error) => {
+              console.log(error)
+              notifyFail(this, '头像上传失败')
             })
           }
         }
       })
     },
     beforeAvatarUpload(file) {
-      const isJPG = file.type === 'image/jpeg'
+      const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
       const isLt2M = file.size / 1024 / 1024 < 2
-
       if (!isJPG) {
-        this.$message.error('上传头像图片只能是 JPG 格式!')
+        this.$message.error('上传头像图片只能是 jpg/png 格式!')
       }
       if (!isLt2M) {
         this.$message.error('上传头像图片大小不能超过 2MB!')

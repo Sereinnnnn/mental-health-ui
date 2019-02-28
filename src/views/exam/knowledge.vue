@@ -73,7 +73,7 @@
               :on-success="handleUploadSuccess"
               :on-exceed="handleExceed"
               :on-remove="handleRemove"
-              :action="uploadUrl"
+              :action="attachmentConfig.zuulUploadUrl"
               :headers="headers"
               :data="params"
               :limit="1"
@@ -97,8 +97,8 @@
 <script>
 import { fetchKnowledgeList, addObj, putObj, delObj, delAllObj } from '@/api/exam/knowledge'
 import waves from '@/directive/waves'
-import { mapGetters } from 'vuex'
-import { checkMultipleSelect } from '@/utils/util'
+import { mapGetters, mapState } from 'vuex'
+import { checkMultipleSelect, notifySuccess, notifyFail, messageSuccess } from '@/utils/util'
 import { getToken } from '@/utils/auth' // getToken from cookie
 import { getObj, delAttachment } from '@/api/admin/attachment'
 
@@ -161,7 +161,6 @@ export default {
       params: {
         busiType: '2'
       },
-      uploadUrl: 'zuul/admin/attachment/upload',
       fileList: []
     }
   },
@@ -172,7 +171,10 @@ export default {
     ...mapGetters([
       'elements',
       'permissions'
-    ])
+    ]),
+    ...mapState({
+      attachmentConfig: state => state.attachment.attachmentConfig
+    })
   },
   methods: {
     getList() {
@@ -201,10 +203,7 @@ export default {
       row.status = status
       putObj(row).then(() => {
         this.dialogFormVisible = false
-        this.$message({
-          message: '操作成功',
-          type: 'success'
-        })
+        messageSuccess(this, '操作成功')
       })
     },
     handleSelectionChange(val) {
@@ -243,12 +242,7 @@ export default {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.getList()
-            this.$notify({
-              title: '成功',
-              message: '创建成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '创建成功')
           })
         }
       })
@@ -271,12 +265,7 @@ export default {
           putObj(tempData).then(() => {
             this.dialogFormVisible = false
             this.getList()
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '更新成功')
           })
         }
       })
@@ -291,16 +280,11 @@ export default {
         delObj(row.id).then(() => {
           this.dialogFormVisible = false
           this.getList()
-          this.$notify({
-            title: '成功',
-            message: '删除成功',
-            type: 'success',
-            duration: 2000
-          })
+          notifySuccess(this, '删除成功')
         })
         const index = this.list.indexOf(row)
         this.list.splice(index, 1)
-      })
+      }).catch(() => {})
     },
     // 批量删除
     handleDeletes() {
@@ -317,14 +301,9 @@ export default {
           delAllObj({ idString: ids }).then(() => {
             this.dialogFormVisible = false
             this.getList()
-            this.$notify({
-              title: '成功',
-              message: '删除成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '删除成功')
           })
-        })
+        }).catch(() => {})
       }
     },
     handleUploadSuccess(response) {
@@ -356,19 +335,9 @@ export default {
     // 删除附件
     handleRemove(file, fileList) {
       delAttachment(this.temp.attachmentId).then(() => {
-        this.$notify({
-          title: '提示',
-          message: '删除成功',
-          type: 'success',
-          duration: 2000
-        })
+        notifySuccess(this, '删除成功')
       }).catch(() => {
-        this.$notify({
-          title: '提示',
-          message: '删除失败',
-          type: 'warn',
-          duration: 2000
-        })
+        notifyFail(this, '删除失败')
       })
     },
     // 发布知识
@@ -377,12 +346,7 @@ export default {
       tempData.status = status
       putObj(tempData).then(() => {
         this.getList()
-        this.$notify({
-          title: '成功',
-          message: '更新成功',
-          type: 'success',
-          duration: 2000
-        })
+        notifySuccess(this, '更新成功')
       })
     }
   }

@@ -44,6 +44,7 @@
 <script>
 import { updateObjInfo } from '@/api/admin/user'
 import { mapState } from 'vuex'
+import { notifySuccess, notifyFail } from '@/utils/util'
 
 export default {
   name: 'PersonalPassword',
@@ -95,12 +96,7 @@ export default {
         if (valid) {
           updateObjInfo(this.userInfo).then(response => {
             if (response.data.data) {
-              this.$notify({
-                title: '成功',
-                message: '修改成功',
-                type: 'success',
-                duration: 2000
-              })
+              notifySuccess(this, '修改成功')
               // 修改密码之后强制重新登录
               if (this.userInfo.newPassword !== '') {
                 this.$store.dispatch('LogOut').then(() => {
@@ -110,20 +106,10 @@ export default {
                 this.$router.push({ path: '/' })
               }
             } else {
-              this.$notify({
-                title: '失败',
-                message: response.data.msg,
-                type: 'error',
-                duration: 2000
-              })
+              notifyFail(this, response.data.msg)
             }
           }).catch(() => {
-            this.$notify({
-              title: '失败',
-              message: '修改失败',
-              type: 'error',
-              duration: 2000
-            })
+            notifyFail(this, '修改失败')
           })
         }
       })

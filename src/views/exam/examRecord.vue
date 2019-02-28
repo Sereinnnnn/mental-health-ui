@@ -148,7 +148,7 @@ export default {
               // 导出Excel
               exportExcel(response)
             })
-          })
+          }).catch(() => {})
         } else {
           let ids = ''
           for (let i = 0; i < this.multipleSelection.length; i++) {

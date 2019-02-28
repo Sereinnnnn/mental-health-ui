@@ -6,11 +6,7 @@
 
 #### 功能演示
 
-![image](doc/images/image_admin.png)
-
 ![image](doc/images/image_admin_menu.png)
-
-![image](doc/images/image_admin_zipkin.png)
 
 ![image](doc/images/image_admin_exam.png)
 
@@ -18,6 +14,10 @@
 
 ![image](doc/images/image_admin_subject.png)
 
-![image](doc/images/image_admin_attachment.png)
-
 ![image](doc/images/image_admin_msg.png)
+
+***
+
+### 关于
+
+作者：1633736729@qq.com

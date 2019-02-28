@@ -10,7 +10,7 @@
         :show-file-list="showFileList"
         :on-success="handleUploadSuccess"
         :on-progress="handleUploadProgress"
-        :action="uploadUrl"
+        :action="attachmentConfig.zuulUploadUrl"
         :headers="headers"
         :data="params"
         class="upload-demo"
@@ -73,8 +73,9 @@
 <script>
 import { fetchList, addObj, putObj, delAttachment } from '@/api/admin/attachment'
 import waves from '@/directive/waves'
-import { ATTACHMENT_URL } from '@/config/attachment'
 import { getToken } from '@/utils/auth' // getToken from cookie
+import { notifySuccess, messageSuccess } from '@/utils/util'
+import { mapState } from 'vuex'
 
 const calendarTypeOptions = [
   { key: 'CN', display_name: 'China' },
@@ -122,7 +123,6 @@ export default {
   },
   data() {
     return {
-      uploadUrl: 'zuul/admin/attachment/upload',
       tableKey: 0,
       list: null,
       total: null,
@@ -169,6 +169,11 @@ export default {
   created() {
     this.getList()
   },
+  computed: {
+    ...mapState({
+      attachmentConfig: state => state.attachment.attachmentConfig
+    })
+  },
   methods: {
     getList() {
       this.listLoading = true
@@ -195,10 +200,7 @@ export default {
     handleModifyStatus(row, status) {
       row.status = status
       putObj(row).then(() => {
-        this.$message({
-          message: '操作成功',
-          type: 'success'
-        })
+        messageSuccess(this, '操作成功')
       })
     },
     sortChange(column, prop, order) {
@@ -219,12 +221,7 @@ export default {
           addObj(this.temp).then(() => {
             this.list.unshift(this.temp)
             this.getList()
-            this.$notify({
-              title: '成功',
-              message: '创建成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '创建成功')
           })
         }
       })
@@ -238,12 +235,7 @@ export default {
           const tempData = Object.assign({}, this.temp)
           putObj(tempData).then(() => {
             this.getList()
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '更新成功')
           })
         }
       })
@@ -257,24 +249,14 @@ export default {
       }).then(() => {
         delAttachment(row.id).then(() => {
           this.getList()
-          this.$notify({
-            title: '成功',
-            message: '删除成功',
-            type: 'success',
-            duration: 2000
-          })
+          notifySuccess(this, '删除成功')
         })
-      })
+      }).catch(() => {})
     },
     handleUploadSuccess() {
       this.uploading = false
       this.getList()
-      this.$notify({
-        title: '成功',
-        message: '上传成功',
-        type: 'success',
-        duration: 2000
-      })
+      notifySuccess(this, '上传成功')
     },
     handleUploadProgress(event, file, fileList) {
       this.uploading = true

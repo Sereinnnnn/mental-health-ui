@@ -263,7 +263,7 @@ import { fetchTree, getObj, addObj, delObj, putObj } from '@/api/exam/subjectCat
 import { fetchSubjectBankList, addSubjectBank, putSubjectBank, delSubjectBank, delAllSubjectBank, exportSubjectBank } from '@/api/exam/subjectBank'
 import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
-import { checkMultipleSelect, exportExcel } from '@/utils/util'
+import { checkMultipleSelect, exportExcel, notifySuccess, notifyFail } from '@/utils/util'
 import waves from '@/directive/waves'
 
 export default {
@@ -571,12 +571,7 @@ export default {
           type: 'warning'
         }).then(() => {
           delObj(this.currentCategoryId).then(() => {
-            this.$notify({
-              title: '成功',
-              message: '删除成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '删除成功')
             this.getList()
             this.resetForm()
             this.onCancel()
@@ -591,12 +586,7 @@ export default {
           addObj(this.tempCategory).then(() => {
             this.dialogCategoryFormVisible = false
             this.getList()
-            this.$notify({
-              title: '成功',
-              message: '创建成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '创建成功')
           })
         }
       })
@@ -609,12 +599,7 @@ export default {
           putObj(tempData).then(() => {
             this.dialogCategoryFormVisible = false
             this.getList()
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '更新成功')
           })
         }
       })
@@ -704,12 +689,7 @@ export default {
         delSubjectBank(row.id).then(() => {
           this.dialogSubjectFormVisible = false
           this.handleSubjectManagement()
-          this.$notify({
-            title: '成功',
-            message: '删除成功',
-            type: 'success',
-            duration: 2000
-          })
+          notifySuccess(this, '删除成功')
         })
       })
     },
@@ -722,12 +702,7 @@ export default {
           addSubjectBank(this.tempSubject).then(() => {
             this.dialogSubjectFormVisible = false
             this.handleSubjectManagement()
-            this.$notify({
-              title: '成功',
-              message: '创建成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '创建成功')
           })
         }
       })
@@ -740,12 +715,7 @@ export default {
           putSubjectBank(tempData).then(() => {
             this.dialogSubjectFormVisible = false
             this.handleSubjectManagement()
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '更新成功')
           })
         }
       })
@@ -766,12 +736,7 @@ export default {
                 this.$refs['dataSubjectForm'].clearValidate()
               })
               this.handleSubjectManagement()
-              this.$notify({
-                title: '成功',
-                message: '创建成功',
-                type: 'success',
-                duration: 2000
-              })
+              notifySuccess(this, '创建成功')
             })
           } else {
             // 更新
@@ -784,12 +749,7 @@ export default {
                 this.$refs['dataSubjectForm'].clearValidate()
               })
               this.handleSubjectManagement()
-              this.$notify({
-                title: '成功',
-                message: '更新成功',
-                type: 'success',
-                duration: 2000
-              })
+              notifySuccess(this, '更新成功')
             })
           }
         }
@@ -809,14 +769,9 @@ export default {
         }).then(() => {
           delAllSubjectBank({ idString: ids }).then(() => {
             this.handleSubjectManagement()
-            this.$notify({
-              title: '成功',
-              message: '删除成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '删除成功')
           })
-        }).catch()
+        }).catch(() => {})
       }
     },
     // 点击排序按钮
@@ -856,9 +811,7 @@ export default {
             // 导出Excel
             exportExcel(response)
           })
-        }).catch(() => {
-
-        })
+        }).catch(() => {})
       }
     },
     // 导入
@@ -892,12 +845,7 @@ export default {
     handleUploadSubjectSuccess() {
       this.dialogImportVisible = false
       this.handleSubjectManagement()
-      this.$notify({
-        title: '成功',
-        message: '导入成功',
-        type: 'success',
-        duration: 2000
-      })
+      notifySuccess(this, '导入成功')
       this.uploadingSubject = false
     }
   }

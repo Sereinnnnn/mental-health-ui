@@ -138,7 +138,7 @@ import { fetchList, addObj, putObj, delObj, fetchDeptTree, fetchRoleTree, permis
 import { fetchTree } from '@/api/admin/menu'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
-import { checkMultipleSelect } from '@/utils/util'
+import { checkMultipleSelect, notifySuccess, messageSuccess } from '@/utils/util'
 
 export default {
   name: 'RoleManagement',
@@ -258,10 +258,7 @@ export default {
       row.status = status
       putObj(row).then(() => {
         this.dialogFormVisible = false
-        this.$message({
-          message: '操作成功',
-          type: 'success'
-        })
+        messageSuccess(this, '操作成功')
       })
     },
     handleSelectionChange(val) {
@@ -299,12 +296,7 @@ export default {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.getList()
-            this.$notify({
-              title: '成功',
-              message: '创建成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '创建成功')
           })
         }
       })
@@ -336,12 +328,7 @@ export default {
             }
             this.dialogFormVisible = false
             this.getList()
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '更新成功')
           })
         }
       })
@@ -356,16 +343,11 @@ export default {
         delObj(row.id).then(() => {
           this.dialogFormVisible = false
           this.getList()
-          this.$notify({
-            title: '成功',
-            message: '删除成功',
-            type: 'success',
-            duration: 2000
-          })
+          notifySuccess(this, '删除成功')
         })
         const index = this.list.indexOf(row)
         this.list.splice(index, 1)
-      })
+      }).catch(() => {})
     },
     // 批量删除
     handleDeletes() {
@@ -382,14 +364,9 @@ export default {
           delAllObj({ idString: ids }).then(() => {
             this.dialogFormVisible = false
             this.getList()
-            this.$notify({
-              title: '成功',
-              message: '删除成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '删除成功')
           })
-        })
+        }).catch(() => {})
       }
     },
     // 所属部门
@@ -438,12 +415,7 @@ export default {
           })
           .then(response => {
             this.checkedKeys = response.data
-            this.$notify({
-              title: '成功',
-              message: '修改成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '修改成功')
           })
       })
     }

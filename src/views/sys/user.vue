@@ -188,7 +188,7 @@ import { fetchTree } from '@/api/admin/dept'
 import { deptRoleList } from '@/api/admin/role'
 import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
-import { checkMultipleSelect, exportExcel } from '@/utils/util'
+import { checkMultipleSelect, exportExcel, isNotEmpty, notifySuccess, messageSuccess } from '@/utils/util'
 
 export default {
   name: 'User',
@@ -345,10 +345,7 @@ export default {
       row.status = status
       putObj(row).then(() => {
         this.dialogFormVisible = false
-        this.$message({
-          message: '操作成功',
-          type: 'success'
-        })
+        messageSuccess(this, '操作成功')
       })
     },
     resetTemp() {
@@ -383,12 +380,7 @@ export default {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.getList()
-            this.$notify({
-              title: '成功',
-              message: '创建成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '创建成功')
           })
         }
       })
@@ -406,9 +398,9 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
       // 根据部门ID获取角色
-      if (row.deptId !== null && row.deptId !== undefined) {
+      if (isNotEmpty(row.deptId)) {
         deptRoleList(row.deptId).then(response => {
-          if (row.roleList !== null && row.roleList !== undefined) {
+          if (isNotEmpty(row.roleList)) {
             for (let i = 0; i < row.roleList.length; i++) {
               this.role[i] = row.roleList[i].id
             }
@@ -432,12 +424,7 @@ export default {
             }
             this.dialogFormVisible = false
             this.getList()
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '更新成功')
           })
         }
       })
@@ -450,16 +437,11 @@ export default {
       }).then(() => {
         delObj(row.id).then(() => {
           this.dialogFormVisible = false
-          this.$notify({
-            title: '成功',
-            message: '删除成功',
-            type: 'success',
-            duration: 2000
-          })
+          notifySuccess(this, '删除成功')
         })
         const index = this.list.indexOf(row)
         this.list.splice(index, 1)
-      })
+      }).catch(() => {})
     },
     // 批量删除
     handleDeletes() {
@@ -476,14 +458,9 @@ export default {
           delAllObj({ idString: ids }).then(() => {
             this.dialogFormVisible = false
             this.getList()
-            this.$notify({
-              title: '成功',
-              message: '删除成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '删除成功')
           })
-        })
+        }).catch(() => {})
       }
     },
     // 导出
@@ -498,7 +475,7 @@ export default {
             // 导出Excel
             exportExcel(response)
           })
-        })
+        }).catch(() => {})
       } else {
         let ids = ''
         for (let i = 0; i < this.multipleSelection.length; i++) {
@@ -532,7 +509,7 @@ export default {
         this.treeDeptData = response.data
         this.dialogDeptVisible = true
         this.role = ''
-        if (this.treeDeptData.id !== null && this.treeDeptData.id !== undefined) {
+        if (isNotEmpty(this.treeDeptData.id)) {
           deptRoleList(this.treeDeptData.id).then(response => {
             this.roleData = response.data
           })
@@ -569,12 +546,7 @@ export default {
       this.dialogImportVisible = false
       this.uploading = false
       this.getList()
-      this.$notify({
-        title: '成功',
-        message: '导入成功',
-        type: 'success',
-        duration: 2000
-      })
+      notifySuccess(this, '导入成功')
     }
   }
 }

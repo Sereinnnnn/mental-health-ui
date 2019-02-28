@@ -72,6 +72,7 @@
 <script>
 import { fetchTree, getObj, addObj, delObj, putObj } from '@/api/admin/dept'
 import { mapGetters } from 'vuex'
+import { notifySuccess, isNotEmpty } from '@/utils/util'
 
 export default {
   name: 'DeptManagement',
@@ -204,7 +205,7 @@ export default {
       this.formStatus = 'create'
     },
     handleDelete() {
-      if (this.currentId === '') {
+      if (!isNotEmpty(this.currentId)) {
         this.$message({
           message: '请选择要删除的记录',
           type: 'warning'
@@ -220,14 +221,9 @@ export default {
           this.getList()
           this.resetForm()
           this.onCancel()
-          this.$notify({
-            title: '成功',
-            message: '删除成功',
-            type: 'success',
-            duration: 2000
-          })
+          notifySuccess(this, '删除成功')
         })
-      })
+      }).catch(() => {})
     },
     create() {
       this.$refs['form'].validate((valid) => {
@@ -235,22 +231,12 @@ export default {
           if (this.form.id) {
             putObj(this.form).then(() => {
               this.getList()
-              this.$notify({
-                title: '成功',
-                message: '更新成功',
-                type: 'success',
-                duration: 2000
-              })
+              notifySuccess(this, '更新成功')
             })
           } else {
             addObj(this.form).then(() => {
               this.getList()
-              this.$notify({
-                title: '成功',
-                message: '创建成功',
-                type: 'success',
-                duration: 2000
-              })
+              notifySuccess(this, '创建成功')
             })
           }
         }

@@ -138,7 +138,7 @@
 import { fetchTree, getObj, addObj, delObj, putObj, exportObj } from '@/api/admin/menu'
 import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
-import { exportExcel } from '@/utils/util'
+import { exportExcel, notifySuccess } from '@/utils/util'
 
 export default {
   name: 'MenuManagement',
@@ -311,14 +311,9 @@ export default {
           this.getList()
           this.resetForm()
           this.onCancel()
-          this.$notify({
-            title: '成功',
-            message: '删除成功',
-            type: 'success',
-            duration: 2000
-          })
+          notifySuccess(this, '删除成功')
         })
-      })
+      }).catch(() => {})
     },
     create() {
       this.$refs['form'].validate((valid) => {
@@ -326,22 +321,12 @@ export default {
           if (this.form.id) {
             putObj(this.form).then(() => {
               this.getList()
-              this.$notify({
-                title: '成功',
-                message: '更新成功',
-                type: 'success',
-                duration: 2000
-              })
+              notifySuccess(this, '更新成功')
             })
           } else {
             addObj(this.form).then(() => {
               this.getList()
-              this.$notify({
-                title: '成功',
-                message: '创建成功',
-                type: 'success',
-                duration: 2000
-              })
+              notifySuccess(this, '创建成功')
             })
           }
           this.getList()
@@ -389,9 +374,7 @@ export default {
             // 导出Excel
             exportExcel(response)
           })
-        }).catch(() => {
-
-        })
+        }).catch(() => {})
       } else {
         this.$confirm('是否导出选中的菜单?', '提示', {
           confirmButtonText: '确定',
@@ -405,9 +388,7 @@ export default {
             // 导出Excel
             exportExcel(response)
           })
-        }).catch(() => {
-
-        })
+        }).catch(() => {})
       }
     },
     // 上传前
@@ -428,12 +409,7 @@ export default {
     },
     // 上传成功
     handleUploadMenuSuccess() {
-      this.$notify({
-        title: '成功',
-        message: '导入成功',
-        type: 'success',
-        duration: 2000
-      })
+      notifySuccess(this, '导入成功')
       this.dialogImportVisible = false
       this.getList()
       this.uploading = false

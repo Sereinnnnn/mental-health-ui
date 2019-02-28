@@ -166,11 +166,11 @@
               :show-file-list="false"
               :on-success="handleAvatarSuccess"
               :before-upload="beforeAvatarUpload"
-              :action="uploadUrl"
+              :action="attachmentConfig.zuulUploadUrl"
               :headers="headers"
               :data="params"
               class="avatar-uploader">
-              <img v-if="temp.avatar" :src="getAvatar(temp.avatar)" class="avatar">
+              <img v-if="temp.avatar" :src="getAttachmentPreviewUrl(temp.avatar)" class="avatar">
               <i v-else class="el-icon-plus avatar-uploader-icon"/>
             </el-upload>
           </el-col>
@@ -480,12 +480,11 @@ import { fetchList, addObj, putObj, delObj, delAllObj } from '@/api/exam/exam'
 import { fetchCourseList } from '@/api/exam/course'
 import { fetchSubjectList, addSubject, putSubject, delSubject, delAllSubject, exportSubject } from '@/api/exam/subject'
 import { fetchSubjectBankList } from '@/api/exam/subjectBank'
-import { fetchTree, getObj } from '@/api/exam/subjectCategory'
+import { fetchTree } from '@/api/exam/subjectCategory'
 import waves from '@/directive/waves'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { getToken } from '@/utils/auth'
-import { checkMultipleSelect, exportExcel } from '@/utils/util'
-import { ATTACHMENT_URL } from '@/config/attachment'
+import { checkMultipleSelect, exportExcel, getAttachmentPreviewUrl, isNotEmpty, notifySuccess, notifyFail, messageSuccess } from '@/utils/util'
 import { delAttachment } from '@/api/admin/attachment'
 
 export default {
@@ -530,7 +529,6 @@ export default {
   },
   data() {
     return {
-      uploadUrl: '/zuul/admin/attachment/upload',
       headers: {
         Authorization: 'Bearer ' + getToken()
       },
@@ -590,6 +588,7 @@ export default {
         totalSubject: '0',
         status: 0,
         avatar: '',
+        avatarId: '',
         collegeId: '',
         majorId: '',
         course: {
@@ -730,7 +729,10 @@ export default {
     ...mapGetters([
       'elements',
       'permissions'
-    ])
+    ]),
+    ...mapState({
+      attachmentConfig: state => state.attachment.attachmentConfig
+    })
   },
   methods: {
     // 加载考试列表
@@ -769,10 +771,7 @@ export default {
       row.status = status
       putObj(row).then(() => {
         this.dialogFormVisible = false
-        this.$message({
-          message: '操作成功',
-          type: 'success'
-        })
+        messageSuccess(this, '操作成功')
       })
     },
     handleSelectionChange(val) {
@@ -864,12 +863,7 @@ export default {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.getList()
-            this.$notify({
-              title: '成功',
-              message: '创建成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '创建成功')
           })
         }
       })
@@ -878,7 +872,7 @@ export default {
       this.temp = Object.assign({}, row) // copy obj
       this.temp.status = parseInt(this.temp.status)
       this.temp.type = parseInt(this.temp.type)
-      if (this.temp.course === null) {
+      if (isNotEmpty(this.temp.course)) {
         this.temp.course = {
           id: '',
           courseName: ''
@@ -904,12 +898,7 @@ export default {
             }
             this.dialogFormVisible = false
             this.getList()
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '更新成功')
           })
         }
       })
@@ -924,16 +913,11 @@ export default {
         delObj(row.id).then(() => {
           this.dialogFormVisible = false
           this.getList()
-          this.$notify({
-            title: '成功',
-            message: '删除成功',
-            type: 'success',
-            duration: 2000
-          })
+          notifySuccess(this, '删除成功')
         })
         const index = this.list.indexOf(row)
         this.list.splice(index, 1)
-      })
+      }).catch(() => {})
     },
     // 批量删除
     handleDeletes() {
@@ -949,14 +933,9 @@ export default {
         }).then(() => {
           delAllObj({ idString: ids }).then(() => {
             this.getList()
-            this.$notify({
-              title: '成功',
-              message: '删除成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '删除成功')
           })
-        })
+        }).catch(() => {})
       }
     },
     // 选择课程
@@ -1078,14 +1057,9 @@ export default {
         delSubject(row.id).then(() => {
           this.dialogSubjectFormVisible = false
           this.handleSubjectManagement()
-          this.$notify({
-            title: '成功',
-            message: '删除成功',
-            type: 'success',
-            duration: 2000
-          })
+          notifySuccess(this, '删除成功')
         })
-      })
+      }).catch(() => {})
     },
     // 保存题目
     createSubjectData() {
@@ -1097,12 +1071,7 @@ export default {
             this.subject.list.unshift(this.tempSubject)
             this.dialogSubjectFormVisible = false
             this.handleSubjectManagement()
-            this.$notify({
-              title: '成功',
-              message: '创建成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '创建成功')
           })
         }
       })
@@ -1115,12 +1084,7 @@ export default {
           putSubject(tempData).then(() => {
             this.dialogSubjectFormVisible = false
             this.handleSubjectManagement()
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '更新成功')
           })
         }
       })
@@ -1141,12 +1105,7 @@ export default {
                 this.$refs['dataSubjectForm'].clearValidate()
               })
               this.handleSubjectManagement()
-              this.$notify({
-                title: '成功',
-                message: '创建成功',
-                type: 'success',
-                duration: 2000
-              })
+              notifySuccess(this, '创建成功')
             })
           } else {
             // 修改
@@ -1157,12 +1116,7 @@ export default {
                 this.$refs['dataSubjectForm'].clearValidate()
               })
               this.handleSubjectManagement()
-              this.$notify({
-                title: '成功',
-                message: '更新成功',
-                type: 'success',
-                duration: 2000
-              })
+              notifySuccess(this, '更新成功')
             })
           }
         }
@@ -1178,12 +1132,7 @@ export default {
       tempData.status = status
       putObj(tempData).then(() => {
         this.getList()
-        this.$notify({
-          title: '成功',
-          message: '更新成功',
-          type: 'success',
-          duration: 2000
-        })
+        notifySuccess(this, '更新成功')
       })
     },
     // 批量删除
@@ -1200,14 +1149,9 @@ export default {
         }).then(() => {
           delAllSubject({ idString: ids }).then(() => {
             this.handleSubjectManagement()
-            this.$notify({
-              title: '成功',
-              message: '删除成功',
-              type: 'success',
-              duration: 2000
-            })
+            notifySuccess(this, '删除成功')
           })
-        })
+        }).catch(() => {})
       }
     },
     // 导出
@@ -1266,21 +1210,16 @@ export default {
     handleUploadSubjectSuccess() {
       this.dialogImportVisible = false
       this.handleSubjectManagement()
-      this.$notify({
-        title: '成功',
-        message: '导入成功',
-        type: 'success',
-        duration: 2000
-      })
+      notifySuccess(this, '导入成功')
       this.uploadingSubject = false
     },
     // 图片上传前
     beforeAvatarUpload(file) {
-      const isJPG = file.type === 'image/jpeg'
+      const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
       const isLt2M = file.size / 1024 / 1024 < 2
 
       if (!isJPG) {
-        this.$message.error('上传头像图片只能是 JPG 格式!')
+        this.$message.error('上传头像图片只能是 jpg/png 格式!')
       }
       if (!isLt2M) {
         this.$message.error('上传头像图片大小不能超过 2MB!')
@@ -1291,55 +1230,34 @@ export default {
     handleAvatarSuccess(res, file) {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          if (this.temp.avatar !== '') {
+          if (isNotEmpty(this.temp.avatar)) {
             // 删除旧头像
-            delAttachment(this.temp.avatar).then(() => {
+            delAttachment(this.temp.avatarId).then(() => {
               // 更新头像信息
-              this.temp.avatar = res.data.id
+              this.temp.avatarId = res.data.id
+              this.temp.avatar = res.data.fastFileId
               putObj(Object.assign({}, this.temp)).then(() => {
-                this.$notify({
-                  title: '成功',
-                  message: '上传成功',
-                  type: 'success',
-                  duration: 2000
-                })
+                notifySuccess(this, '上传成功')
                 this.dialogFormVisible = false
                 this.getList()
               }).catch(() => {
-                this.$notify({
-                  title: '失败',
-                  message: '上传失败',
-                  type: 'error',
-                  duration: 2000
-                })
+                notifyFail(this, '上传失败')
               })
             })
           } else {
             // 更新头像信息
-            this.temp.avatar = res.data.id
+            this.temp.avatarId = res.data.id
+            this.temp.avatar = res.data.fastFileId
             putObj(Object.assign({}, this.temp)).then(() => {
-              this.$notify({
-                title: '成功',
-                message: '上传成功',
-                type: 'success',
-                duration: 2000
-              })
+              notifySuccess(this, '上传成功')
               this.dialogFormVisible = false
               this.getList()
             }).catch(() => {
-              this.$notify({
-                title: '失败',
-                message: '头像上传失败',
-                type: 'error',
-                duration: 2000
-              })
+              notifyFail(this, '上传失败')
             })
           }
         }
       })
-    },
-    getAvatar(attachmentId) {
-      return ATTACHMENT_URL + '/download?id=' + attachmentId
     }
   }
 }

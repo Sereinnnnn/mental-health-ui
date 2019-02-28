@@ -4,7 +4,7 @@
       <img src="https://wpimg.wallstcn.com/e7d23d71-cf19-4b90-a1cc-f56af8c0903d.png">
     </div>
     <div style="position:relative;">
-      <pan-thumb :image="avatar" class="panThumb"/>
+      <pan-thumb :image="userInfo.avatarUrl" class="panThumb"/>
       <mallki class-name="mallki-text" text="vue-element-admin"/>
       <div style="padding-top:35px;" class="progress-item">
         <span>Vue</span>
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+  import { mapGetters, mapState } from 'vuex'
   import PanThumb from '@/components/PanThumb'
   import Mallki from '@/components/TextHoverEffect/Mallki'
 
@@ -56,7 +56,10 @@
         'name',
         'avatar',
         'roles'
-      ])
+      ]),
+      ...mapState({
+        userInfo: state => state.user.userInfo
+      })
     }
   }
 </script>

@@ -7,7 +7,7 @@ import user from './modules/user'
 import getters from './getters'
 import common from './modules/common'
 import tags from './modules/tags'
-import attachment from './modules/attachment'
+import sysConfig from './modules/sysConfig'
 
 Vue.use(Vuex)
 
@@ -19,7 +19,7 @@ const store = new Vuex.Store({
     tagsView,
     user,
     common,
-    attachment
+    sysConfig
   },
   getters
 })

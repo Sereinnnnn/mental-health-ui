@@ -73,7 +73,7 @@
               :on-success="handleUploadSuccess"
               :on-exceed="handleExceed"
               :on-remove="handleRemove"
-              :action="attachmentConfig.zuulUploadUrl"
+              :action="sysConfig.zuulUploadUrl"
               :headers="headers"
               :data="params"
               :limit="1"
@@ -173,7 +173,7 @@ export default {
       'permissions'
     ]),
     ...mapState({
-      attachmentConfig: state => state.attachment.attachmentConfig
+      sysConfig: state => state.sysConfig.sysConfig
     })
   },
   methods: {
@@ -317,7 +317,7 @@ export default {
       if (attachmentId !== '') {
         getObj(attachmentId).then(response => {
           const data = response.data.data
-          const attachment = {
+          const sysConfig = {
             name: data.attachName,
             url: ''
           }

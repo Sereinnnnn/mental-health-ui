@@ -166,11 +166,11 @@
               :show-file-list="false"
               :on-success="handleAvatarSuccess"
               :before-upload="beforeAvatarUpload"
-              :action="attachmentConfig.zuulUploadUrl"
+              :action="sysConfig.zuulUploadUrl"
               :headers="headers"
               :data="params"
               class="avatar-uploader">
-              <img v-if="temp.avatar" :src="getAttachmentPreviewUrl(temp.avatar)" class="avatar">
+              <img v-if="temp.avatar" :src="getExaminationAvatar(temp.avatar)" class="avatar">
               <i v-else class="el-icon-plus avatar-uploader-icon"/>
             </el-upload>
           </el-col>
@@ -731,7 +731,7 @@ export default {
       'permissions'
     ]),
     ...mapState({
-      attachmentConfig: state => state.attachment.attachmentConfig
+      sysConfig: state => state.sysConfig.sysConfig
     })
   },
   methods: {
@@ -872,7 +872,7 @@ export default {
       this.temp = Object.assign({}, row) // copy obj
       this.temp.status = parseInt(this.temp.status)
       this.temp.type = parseInt(this.temp.type)
-      if (isNotEmpty(this.temp.course)) {
+      if (!isNotEmpty(this.temp.course)) {
         this.temp.course = {
           id: '',
           courseName: ''
@@ -1258,6 +1258,9 @@ export default {
           }
         }
       })
+    },
+    getExaminationAvatar(avatar) {
+      return getAttachmentPreviewUrl(this.sysConfig, avatar)
     }
   }
 }

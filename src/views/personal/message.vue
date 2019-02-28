@@ -55,12 +55,12 @@
                 </el-col>
                 <el-col :span="10" :offset="2">
                   <el-row>
-                    <el-col :span="12" :offset="6">
+                    <el-col :span="12" :offset="6" style="text-align: center">
                       <el-upload
                         :show-file-list="false"
                         :on-success="handleAvatarSuccess"
                         :before-upload="beforeAvatarUpload"
-                        :action="attachmentConfig.zuulUploadUrl"
+                        :action="sysConfig.zuulUploadUrl"
                         :headers="headers"
                         :data="params"
                         class="avatar-uploader">
@@ -123,7 +123,7 @@ export default {
   computed: {
     ...mapState({
       userInfo: state => state.user.userInfo,
-      attachmentConfig: state => state.attachment.attachmentConfig
+      sysConfig: state => state.sysConfig.sysConfig
     })
   },
   methods: {
@@ -148,7 +148,7 @@ export default {
         return
       }
       this.userInfo.avatar = res.data.fastFileId
-      this.userInfo.avatarUrl = getAttachmentPreviewUrl(this.attachmentConfig, this.userInfo.avatar)
+      this.userInfo.avatarUrl = getAttachmentPreviewUrl(this.sysConfig, this.userInfo.avatar)
       this.$refs['form'].validate((valid) => {
         if (valid) {
           if (isNotEmpty(this.userInfo.avatarId)) {

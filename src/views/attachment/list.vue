@@ -10,7 +10,7 @@
         :show-file-list="showFileList"
         :on-success="handleUploadSuccess"
         :on-progress="handleUploadProgress"
-        :action="attachmentConfig.zuulUploadUrl"
+        :action="sysConfig.zuulUploadUrl"
         :headers="headers"
         :data="params"
         class="upload-demo"
@@ -171,7 +171,7 @@ export default {
   },
   computed: {
     ...mapState({
-      attachmentConfig: state => state.attachment.attachmentConfig
+      sysConfig: state => state.sysConfig.sysConfig
     })
   },
   methods: {

@@ -21,6 +21,6 @@ const getters = {
   addRouters: state => state.permission.addRouters,
   menu: state => state.user.menu,
   isCollapse: state => state.common.isCollapse,
-  attachmentConfig: state => state.attachment.attachmentConfig
+  sysConfig: state => state.sysConfig.sysConfig
 }
 export default getters

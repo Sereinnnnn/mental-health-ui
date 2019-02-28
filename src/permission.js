@@ -35,8 +35,8 @@ router.beforeEach((to, from, next) => {
     } else {
       if (store.getters.roles.length === 0) { // 判断当前用户是否已拉取完user_info信息
         // 获取附件配置信息
-        if (store.getters.attachmentConfig.host === undefined) {
-          store.dispatch('GetAttachmentConfig').then(res => {
+        if (store.getters.sysConfig.fdfsHttpHost === undefined) {
+          store.dispatch('GetSysConfig').then(res => {
             store.dispatch('GetUserInfo').then(res => { // 拉取user_info
               next({ ...to, replace: true }) // hack方法 确保addRoutes已完成 ,set the replace: true so the navigation will not leave a history record
             }).catch((err) => {

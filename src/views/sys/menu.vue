@@ -10,6 +10,7 @@
       <el-row>
         <el-col :span="5" style ="margin-top:10px;">
           <el-tree
+            ref="tree"
             :data="treeData"
             :filter-node-method="filterNode"
             :props="defaultProps"
@@ -204,7 +205,7 @@ export default {
       dialogExportVisible: false,
       // 选择的菜单
       multipleSelection: [],
-      importUrl: '/admin/menu/import',
+      importUrl: '/admin/api/v1/menu/import',
       headers: {
         Authorization: 'Bearer ' + getToken()
       },
@@ -230,6 +231,12 @@ export default {
     getList() {
       fetchTree(this.listQuery).then(response => {
         this.treeData = response.data
+        // 加载后默认选中第一个菜单
+        if (response.data && response.data.length > 0) {
+          const firstNode = response.data[0]
+          this.$refs.tree.setCheckedNodes([].concat(firstNode))
+          this.getNodeData(firstNode)
+        }
       })
     },
     filterNode(value, data) {
@@ -270,7 +277,6 @@ export default {
         }
       }
     },
-
     getNodeData(data) {
       this.formStatus = 'update'
       getObj(data.id).then(response => {

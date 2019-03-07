@@ -72,7 +72,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         examinationName: undefined,
-        sort: 'id',
+        sort: 'create_date',
         order: 'descending'
       },
       temp: {

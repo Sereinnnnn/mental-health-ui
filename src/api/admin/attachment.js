@@ -1,15 +1,17 @@
 import request from '@/router/axios'
 
+const baseAttachmentUrl = '/admin/api/v1/attachment/'
+
 export function attachmentList() {
   return request({
-    url: '/admin/attachment/attachmentList',
+    url: baseAttachmentUrl + 'attachmentList',
     method: 'get'
   })
 }
 
 export function fetchList(query) {
   return request({
-    url: '/admin/attachment/attachmentList',
+    url: baseAttachmentUrl + 'attachmentList',
     method: 'get',
     params: query
   })
@@ -17,14 +19,14 @@ export function fetchList(query) {
 
 export function getObj(id) {
   return request({
-    url: '/admin/attachment/' + id,
+    url: baseAttachmentUrl + id,
     method: 'get'
   })
 }
 
 export function addObj(obj) {
   return request({
-    url: '/admin/attachment/',
+    url: baseAttachmentUrl,
     method: 'post',
     data: obj
   })
@@ -32,7 +34,7 @@ export function addObj(obj) {
 
 export function putObj(obj) {
   return request({
-    url: '/admin/attachment/',
+    url: baseAttachmentUrl,
     method: 'put',
     data: obj
   })
@@ -40,14 +42,14 @@ export function putObj(obj) {
 
 export function delAttachment(id) {
   return request({
-    url: '/admin/attachment/' + id,
+    url: baseAttachmentUrl + id,
     method: 'delete'
   })
 }
 
 export function delAllObj(obj) {
   return request({
-    url: '/admin/attachment/deleteAll',
+    url: baseAttachmentUrl + 'deleteAll',
     method: 'post',
     data: obj
   })

@@ -170,7 +170,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         roleName: undefined,
-        sort: 'id',
+        sort: 'create_date',
         order: 'descending'
       },
       temp: {

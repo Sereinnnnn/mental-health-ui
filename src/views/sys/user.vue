@@ -13,7 +13,6 @@
       ref="multipleTable"
       :key="tableKey"
       :data="list"
-      :default-sort="{ prop: 'username', order: 'descending' }"
       border
       highlight-current-row
       style="width: 100%;"
@@ -221,7 +220,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         username: undefined,
-        sort: 'id',
+        sort: 'create_date',
         order: 'descending'
       },
       temp: {
@@ -265,7 +264,7 @@ export default {
       user_btn_del: false,
       user_btn_import: false,
       user_btn_export: false,
-      importUrl: '/admin/user/import',
+      importUrl: '/admin/api/v1/user/import',
       headers: {
         Authorization: 'Bearer ' + getToken()
       },

@@ -1,15 +1,17 @@
 import request from '@/router/axios'
 
+const baseCourseUrl = '/exam/api/v1/course/'
+
 export function courseList() {
   return request({
-    url: '/exam/course/courseList',
+    url: baseCourseUrl + 'courseList',
     method: 'get'
   })
 }
 
 export function fetchCourseList(query) {
   return request({
-    url: '/exam/course/courseList',
+    url: baseCourseUrl + 'courseList',
     method: 'get',
     params: query
   })
@@ -17,14 +19,14 @@ export function fetchCourseList(query) {
 
 export function getObj(id) {
   return request({
-    url: '/exam/course/' + id,
+    url: baseCourseUrl + id,
     method: 'get'
   })
 }
 
 export function addObj(obj) {
   return request({
-    url: '/exam/course/',
+    url: baseCourseUrl,
     method: 'post',
     data: obj
   })
@@ -32,7 +34,7 @@ export function addObj(obj) {
 
 export function putObj(obj) {
   return request({
-    url: '/exam/course/',
+    url: baseCourseUrl,
     method: 'put',
     data: obj
   })
@@ -40,14 +42,14 @@ export function putObj(obj) {
 
 export function delObj(id) {
   return request({
-    url: '/exam/course/' + id,
+    url: baseCourseUrl + id,
     method: 'delete'
   })
 }
 
 export function delAllObj(obj) {
   return request({
-    url: '/exam/course/deleteAll',
+    url: baseCourseUrl + 'deleteAll',
     method: 'post',
     data: obj
   })

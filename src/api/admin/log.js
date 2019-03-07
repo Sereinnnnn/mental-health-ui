@@ -1,8 +1,10 @@
 import request from '@/router/axios'
 
+const baseLogUrl = '/admin/api/v1/log/'
+
 export function fetchList(query) {
   return request({
-    url: '/admin/log/logList',
+    url: baseLogUrl + 'logList',
     method: 'get',
     params: query
   })
@@ -10,14 +12,14 @@ export function fetchList(query) {
 
 export function delObj(id) {
   return request({
-    url: '/admin/log/' + id,
+    url: baseLogUrl + id,
     method: 'delete'
   })
 }
 
 export function delAllObj(obj) {
   return request({
-    url: '/admin/log/deleteAll',
+    url: baseLogUrl + 'deleteAll',
     method: 'post',
     data: obj
   })

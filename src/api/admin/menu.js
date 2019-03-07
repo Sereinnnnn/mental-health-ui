@@ -1,16 +1,18 @@
 import request from '@/router/axios'
 
+const baseMenuUrl = '/admin/api/v1/menu/'
+
 /* 获取菜单 */
 export function GetMenu() {
   return request({
-    url: '/admin/menu/userMenu',
+    url: baseMenuUrl + 'userMenu',
     method: 'get'
   })
 }
 
 export function fetchTree(query) {
   return request({
-    url: '/admin/menu/menus',
+    url: baseMenuUrl + 'menus',
     method: 'get',
     params: query
   })
@@ -18,7 +20,7 @@ export function fetchTree(query) {
 
 export function addObj(obj) {
   return request({
-    url: '/admin/menu/',
+    url: baseMenuUrl,
     method: 'post',
     data: obj
   })
@@ -26,21 +28,21 @@ export function addObj(obj) {
 
 export function getObj(id) {
   return request({
-    url: '/admin/menu/' + id,
+    url: baseMenuUrl + id,
     method: 'get'
   })
 }
 
 export function delObj(id) {
   return request({
-    url: '/admin/menu/' + id,
+    url: baseMenuUrl + id,
     method: 'delete'
   })
 }
 
 export function putObj(obj) {
   return request({
-    url: '/admin/menu/',
+    url: baseMenuUrl,
     method: 'put',
     data: obj
   })
@@ -49,7 +51,7 @@ export function putObj(obj) {
 // 导出
 export function exportObj(obj) {
   return request({
-    url: '/admin/menu/export',
+    url: baseMenuUrl + 'export',
     method: 'post',
     responseType: 'arraybuffer',
     headers: { 'filename': 'utf-8' },

@@ -82,7 +82,7 @@ export default {
         rememberMe: false
       },
       code: {
-        src: '/admin/code',
+        src: '/admin/api/v1/code',
         value: '',
         len: 4,
         type: 'image'
@@ -126,7 +126,7 @@ export default {
       this.loginForm.randomStr = randomLenNum(this.code.len, true)
       this.code.type === 'text'
         ? (this.code.value = randomLenNum(this.code.len))
-        : (this.code.src = `/admin/code/${this.loginForm.randomStr}`)
+        : (this.code.src = `/admin/api/v1/code/${this.loginForm.randomStr}`)
     },
     showPwd() {
       if (this.passwordType === 'password') {

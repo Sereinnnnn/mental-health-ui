@@ -1,8 +1,10 @@
 import request from '@/router/axios'
 
+const baseUserUrl = '/admin/api/v1/user/'
+
 export function fetchList(query) {
   return request({
-    url: '/admin/user/userList',
+    url: baseUserUrl + 'userList',
     method: 'get',
     params: query
   })
@@ -10,7 +12,7 @@ export function fetchList(query) {
 
 export function addObj(obj) {
   return request({
-    url: '/admin/user',
+    url: baseUserUrl,
     method: 'post',
     data: obj
   })
@@ -18,21 +20,21 @@ export function addObj(obj) {
 
 export function getObj(id) {
   return request({
-    url: '/admin/user/' + id,
+    url: baseUserUrl + id,
     method: 'get'
   })
 }
 
 export function delObj(id) {
   return request({
-    url: '/admin/user/' + id,
+    url: baseUserUrl + id,
     method: 'delete'
   })
 }
 
 export function putObj(obj) {
   return request({
-    url: '/admin/user',
+    url: baseUserUrl,
     method: 'put',
     data: obj
   })
@@ -40,7 +42,7 @@ export function putObj(obj) {
 
 export function updateObjInfo(obj) {
   return request({
-    url: '/admin/user/updateInfo',
+    url: baseUserUrl + 'updateInfo',
     method: 'put',
     data: obj
   })
@@ -48,7 +50,7 @@ export function updateObjInfo(obj) {
 
 export function delAllObj(obj) {
   return request({
-    url: '/admin/user/deleteAll',
+    url: baseUserUrl + 'deleteAll',
     method: 'post',
     data: obj
   })
@@ -57,7 +59,7 @@ export function delAllObj(obj) {
 // 导出
 export function exportObj(obj) {
   return request({
-    url: '/admin/user/export',
+    url: baseUserUrl + 'export',
     method: 'post',
     responseType: 'arraybuffer',
     headers: { 'filename': 'utf-8' },

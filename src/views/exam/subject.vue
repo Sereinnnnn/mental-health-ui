@@ -45,7 +45,6 @@
           <el-table
             v-loading="listLoading"
             :data="list"
-            :default-sort="{ prop: 'serial_number', order: 'descending' }"
             border
             highlight-current-row
             style="width: 100%;"
@@ -391,7 +390,7 @@ export default {
       dialogExportVisible: false,
       // 选择的菜单
       multipleSelection: [],
-      importUrl: '/exam/subjectBank/import',
+      importUrl: '/exam/api/v1/subjectBank/import',
       // 题目类型
       subjectTypeData: [
         { id: 0, subjectTypeName: '选择题' },

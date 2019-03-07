@@ -1,15 +1,17 @@
 import request from '@/router/axios'
 
+const baseRoleUrl = '/admin/api/v1/role/'
+
 export function roleList() {
   return request({
-    url: '/admin/role/roleList',
+    url: baseRoleUrl + 'roleList',
     method: 'get'
   })
 }
 
 export function fetchList(query) {
   return request({
-    url: '/admin/role/roleList',
+    url: baseRoleUrl + 'roleList',
     method: 'get',
     params: query
   })
@@ -17,21 +19,21 @@ export function fetchList(query) {
 
 export function deptRoleList(deptId) {
   return request({
-    url: '/admin/role/roleList/' + deptId,
+    url: baseRoleUrl + 'roleList/' + deptId,
     method: 'get'
   })
 }
 
 export function getObj(id) {
   return request({
-    url: '/admin/role/' + id,
+    url: baseRoleUrl + id,
     method: 'get'
   })
 }
 
 export function addObj(obj) {
   return request({
-    url: '/admin/role/',
+    url: baseRoleUrl,
     method: 'post',
     data: obj
   })
@@ -39,7 +41,7 @@ export function addObj(obj) {
 
 export function putObj(obj) {
   return request({
-    url: '/admin/role/',
+    url: baseRoleUrl,
     method: 'put',
     data: obj
   })
@@ -47,14 +49,14 @@ export function putObj(obj) {
 
 export function delObj(id) {
   return request({
-    url: '/admin/role/' + id,
+    url: baseRoleUrl + id,
     method: 'delete'
   })
 }
 
 export function permissionUpdate(id, menus) {
   return request({
-    url: '/admin/role/roleMenuUpdate',
+    url: baseRoleUrl + 'roleMenuUpdate',
     method: 'put',
     data: {
       id: id,
@@ -65,14 +67,14 @@ export function permissionUpdate(id, menus) {
 
 export function fetchRoleTree(roleName) {
   return request({
-    url: '/admin/menu/roleTree/' + roleName,
+    url: '/admin/api/v1/menu/roleTree/' + roleName,
     method: 'get'
   })
 }
 
 export function fetchDeptTree(query) {
   return request({
-    url: '/admin/dept/depts',
+    url: '/admin/api/v1/dept/depts',
     method: 'get',
     params: query
   })
@@ -80,7 +82,7 @@ export function fetchDeptTree(query) {
 
 export function delAllObj(obj) {
   return request({
-    url: '/admin/role/deleteAll',
+    url: baseRoleUrl + 'deleteAll',
     method: 'post',
     data: obj
   })

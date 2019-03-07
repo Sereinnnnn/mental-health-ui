@@ -130,7 +130,7 @@ export default {
       listQuery: {
         pageNum: 1,
         pageSize: 10,
-        sort: 'id',
+        sort: 'create_date',
         order: 'descending',
         busiType: '0'
       },

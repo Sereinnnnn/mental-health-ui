@@ -7,7 +7,7 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">用户数</div>
-          <count-to :start-val="0" :end-val="102400" :duration="2600" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="onlineUserNumber" :duration="2000" class="card-panel-num"/>
         </div>
       </div>
     </el-col>
@@ -18,7 +18,7 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">考试数</div>
-          <count-to :start-val="0" :end-val="81212" :duration="3000" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="examinationNumber" :duration="2200" class="card-panel-num"/>
         </div>
       </div>
     </el-col>
@@ -29,7 +29,7 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">及格率</div>
-          <count-to :start-val="0" :end-val="9280" :duration="3200" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="9280" :duration="2400" class="card-panel-num"/>
         </div>
       </div>
     </el-col>
@@ -40,7 +40,7 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">测试</div>
-          <count-to :start-val="0" :end-val="13600" :duration="3600" class="card-panel-num"/>
+          <count-to :start-val="0" :end-val="13600" :duration="2600" class="card-panel-num"/>
         </div>
       </div>
     </el-col>
@@ -49,14 +49,41 @@
 
 <script>
 import CountTo from 'vue-count-to'
+import { getDashboard } from '@/api/admin/sys'
+import { notifyFail, isNotEmpty } from '@/utils/util'
 
 export default {
   components: {
     CountTo
   },
+  data() {
+    return {
+      onlineUserNumber: 0,
+      examinationNumber: 0
+    }
+  },
+  created() {
+    // 获取首页数据
+    this.getDashboardData()
+  },
   methods: {
     handleSetLineChartData(type) {
       this.$emit('handleSetLineChartData', type)
+    },
+    getDashboardData() {
+      getDashboard().then(response => {
+        if (isNotEmpty(response.data) && isNotEmpty(response.data.data)) {
+          const data = response.data.data
+          if (isNotEmpty(data.onlineUserNumber)) {
+            this.onlineUserNumber = parseInt(data.onlineUserNumber)
+          }
+          if (isNotEmpty(data.examinationNumber)) {
+            this.examinationNumber = parseInt(data.examinationNumber)
+          }
+        }
+      }).catch(error => {
+        console.error(error)
+      })
     }
   }
 }

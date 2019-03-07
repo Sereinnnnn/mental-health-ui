@@ -1,15 +1,17 @@
 import request from '@/router/axios'
 
+const baseSubjectBankUrl = '/exam/api/v1/subjectBank/'
+
 export function subjectBankList() {
   return request({
-    url: '/exam/subjectBank/subjectBankList',
+    url: baseSubjectBankUrl + 'subjectBankList',
     method: 'get'
   })
 }
 
 export function fetchSubjectBankList(query) {
   return request({
-    url: '/exam/subjectBank/subjectBankList',
+    url: baseSubjectBankUrl + 'subjectBankList',
     method: 'get',
     params: query
   })
@@ -17,14 +19,14 @@ export function fetchSubjectBankList(query) {
 
 export function getObj(id) {
   return request({
-    url: '/exam/subjectBank/' + id,
+    url: baseSubjectBankUrl + id,
     method: 'get'
   })
 }
 
 export function addSubjectBank(obj) {
   return request({
-    url: '/exam/subjectBank/',
+    url: baseSubjectBankUrl,
     method: 'post',
     data: obj
   })
@@ -32,7 +34,7 @@ export function addSubjectBank(obj) {
 
 export function putSubjectBank(obj) {
   return request({
-    url: '/exam/subjectBank/',
+    url: baseSubjectBankUrl,
     method: 'put',
     data: obj
   })
@@ -40,14 +42,14 @@ export function putSubjectBank(obj) {
 
 export function delSubjectBank(id) {
   return request({
-    url: '/exam/subjectBank/' + id,
+    url: baseSubjectBankUrl + id,
     method: 'delete'
   })
 }
 
 export function delAllSubjectBank(obj) {
   return request({
-    url: '/exam/subjectBank/deleteAll',
+    url: baseSubjectBankUrl + 'deleteAll',
     method: 'post',
     data: obj
   })
@@ -56,7 +58,7 @@ export function delAllSubjectBank(obj) {
 // 导出
 export function exportSubjectBank(obj) {
   return request({
-    url: '/exam/subjectBank/export',
+    url: baseSubjectBankUrl + 'export',
     method: 'post',
     responseType: 'arraybuffer',
     headers: { 'filename': 'utf-8' },

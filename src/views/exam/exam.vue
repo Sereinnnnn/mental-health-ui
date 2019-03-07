@@ -544,7 +544,7 @@ export default {
         pageNum: 1,
         pageSize: 10,
         courseId: '',
-        sort: 'id',
+        sort: 'create_date',
         order: 'descending'
       },
       // 课程
@@ -552,7 +552,7 @@ export default {
         listQuery: {
           pageNum: 1,
           pageSize: 10,
-          sort: 'id',
+          sort: 'create_date',
           order: 'descending'
         },
         list: null,
@@ -566,7 +566,7 @@ export default {
           pageSize: 10,
           examinationId: '',
           categoryId: '',
-          sort: 'id',
+          sort: 'create_date',
           order: 'descending'
         },
         list: null,
@@ -671,7 +671,7 @@ export default {
       // 导入弹窗状态
       dialogImportVisible: false,
       // 导入题目的url
-      importUrl: '/exam/subject/import',
+      importUrl: '/exam/api/v1/subject/import',
       headers: {
         Authorization: 'Bearer ' + getToken()
       },

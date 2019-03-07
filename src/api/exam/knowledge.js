@@ -1,8 +1,10 @@
 import request from '@/router/axios'
 
+const baseKnowledgeUrl = '/exam/api/v1/knowledge/'
+
 export function fetchKnowledgeList(query) {
   return request({
-    url: '/exam/knowledge/knowledgeList',
+    url: baseKnowledgeUrl + 'knowledgeList',
     method: 'get',
     params: query
   })
@@ -10,14 +12,14 @@ export function fetchKnowledgeList(query) {
 
 export function getObj(id) {
   return request({
-    url: '/exam/knowledge/' + id,
+    url: baseKnowledgeUrl + id,
     method: 'get'
   })
 }
 
 export function addObj(obj) {
   return request({
-    url: '/exam/knowledge/',
+    url: baseKnowledgeUrl,
     method: 'post',
     data: obj
   })
@@ -25,7 +27,7 @@ export function addObj(obj) {
 
 export function putObj(obj) {
   return request({
-    url: '/exam/knowledge/',
+    url: baseKnowledgeUrl,
     method: 'put',
     data: obj
   })
@@ -33,14 +35,14 @@ export function putObj(obj) {
 
 export function delObj(id) {
   return request({
-    url: '/exam/knowledge/' + id,
+    url: baseKnowledgeUrl + id,
     method: 'delete'
   })
 }
 
 export function delAllObj(obj) {
   return request({
-    url: '/exam/knowledge/deleteAll',
+    url: baseKnowledgeUrl + 'deleteAll',
     method: 'post',
     data: obj
   })

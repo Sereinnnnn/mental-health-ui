@@ -44,7 +44,7 @@
 <script>
 import { updateObjInfo } from '@/api/admin/user'
 import { mapState } from 'vuex'
-import { notifySuccess, notifyFail } from '@/utils/util'
+import { notifySuccess, notifyFail, isNotEmpty } from '@/utils/util'
 
 export default {
   name: 'PersonalPassword',
@@ -52,7 +52,7 @@ export default {
   data() {
     const validatePass = (rule, value, callback) => {
       if (this.userInfo.oldPassword !== '') {
-        if (value === '') {
+        if (!isNotEmpty(value)) {
           callback(new Error('请输入新密码'))
         } else if (value.length < 6) {
           callback(new Error('密码不能小于6位'))
@@ -65,7 +65,7 @@ export default {
     }
     const validatePass1 = (rule, value, callback) => {
       if (this.userInfo.oldPassword !== '') {
-        if (value === '') {
+        if (!isNotEmpty(value)) {
           callback(new Error('请再次输入密码'))
         } else if (value !== this.userInfo.newPassword) {
           callback(new Error('两次输入密码不一致!'))

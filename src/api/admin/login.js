@@ -1,5 +1,7 @@
 import request from '@/router/axios'
 
+const baseAuthenticationUrl = '/auth/api/v1/authentication/'
+
 export function loginByUsername(username, password, code, randomStr) {
   const grant_type = 'password'
   const scope = 'server'
@@ -15,7 +17,7 @@ export function loginByUsername(username, password, code, randomStr) {
 
 export function logout(accesstoken, refreshToken) {
   return request({
-    url: '/auth/authentication/removeToken',
+    url: baseAuthenticationUrl + 'removeToken',
     method: 'post',
     params: { accesstoken, refreshToken }
   })
@@ -23,7 +25,7 @@ export function logout(accesstoken, refreshToken) {
 
 export function getUserInfo(token) {
   return request({
-    url: '/admin/user/info',
+    url: '/admin/api/v1/user/info',
     method: 'get'
   })
 }

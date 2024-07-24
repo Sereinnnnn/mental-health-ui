@@ -1,24 +1,13 @@
 <template>
   <el-row :gutter="40" class="panel-group">
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
-        <div class="card-panel-icon-wrapper icon-people">
-          <svg-icon icon-class="peoples" class-name="card-panel-icon" />
-        </div>
-        <div class="card-panel-description">
-          <div class="card-panel-text">用户数</div>
-          <count-to :start-val="0" :end-val="onlineUserNumber" :duration="2000" class="card-panel-num"/>
-        </div>
-      </div>
-    </el-col>
-    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('messages')">
         <div class="card-panel-icon-wrapper icon-form">
           <svg-icon icon-class="form" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div class="card-panel-text">考试数</div>
-          <count-to :start-val="0" :end-val="examinationNumber" :duration="2200" class="card-panel-num"/>
+          <div class="card-panel-text">问卷点击量</div>
+          <count-to :start-val="0" :end-val="894" :duration="2200" class="card-panel-num"/>
         </div>
       </div>
     </el-col>
@@ -28,8 +17,19 @@
           <svg-icon icon-class="chart" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div class="card-panel-text">及格率</div>
-          <count-to :start-val="0" :end-val="9280" :duration="2400" class="card-panel-num"/>
+          <div class="card-panel-text">总用户数</div>
+          <count-to :start-val="0" :end-val="1022" :duration="2400" class="card-panel-num"/>
+        </div>
+      </div>
+    </el-col>
+    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
+      <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
+        <div class="card-panel-icon-wrapper icon-people">
+          <svg-icon icon-class="peoples" class-name="card-panel-icon" />
+        </div>
+        <div class="card-panel-description">
+          <div class="card-panel-text">在线用户数</div>
+          <count-to :start-val="0" :end-val="850" :duration="2000" class="card-panel-num"/>
         </div>
       </div>
     </el-col>
@@ -39,8 +39,8 @@
           <svg-icon icon-class="tab" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div class="card-panel-text">测试</div>
-          <count-to :start-val="0" :end-val="13600" :duration="2600" class="card-panel-num"/>
+          <div class="card-panel-text">访客量</div>
+          <count-to :start-val="0" :end-val="879" :duration="2600" class="card-panel-num"/>
         </div>
       </div>
     </el-col>
@@ -79,6 +79,8 @@ export default {
           }
           if (isNotEmpty(data.examinationNumber)) {
             this.examinationNumber = parseInt(data.examinationNumber)
+            // zzz:这样才和每日的假数据一样……
+            this.examinationNumber = 894
           }
         }
       }).catch(error => {
@@ -107,20 +109,20 @@ export default {
     border-color: rgba(0, 0, 0, .05);
     &:hover {
       .card-panel-icon-wrapper {
-        color: #fff;
+        color: #bd4343;
       }
-      .icon-people {
-         background: #40c9c6;
-      }
-      .icon-message {
-        background: #36a3f7;
-      }
-      .icon-money {
-        background: #f4516c;
-      }
-      .icon-shoppingCard {
-        background: #34bfa3
-      }
+      //.icon-people {
+      //  background: #40c9c6;
+      //}
+      //.icon-message {
+      //  background: #36a3f7;
+      //}
+      //.icon-money {
+      //  background: #f4516c;
+      //}
+      //.icon-shoppingCard {
+      //  background: #34bfa3
+      //}
     }
     .icon-people {
       color: #40c9c6;

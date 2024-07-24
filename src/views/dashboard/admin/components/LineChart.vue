@@ -81,7 +81,7 @@ export default {
     setOptions({ expectedData, actualData } = {}) {
       this.chart.setOption({
         xAxis: {
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
           boundaryGap: false,
           axisTick: {
             show: false
@@ -106,9 +106,9 @@ export default {
             show: false
           }
         },
-        legend: {
-          data: ['expected', 'actual']
-        },
+        // legend: {
+        //   data: ['expected', 'actual']
+        // },
         series: [{
           name: 'expected', itemStyle: {
             normal: {
@@ -126,7 +126,7 @@ export default {
           animationEasing: 'cubicInOut'
         },
         {
-          name: 'actual',
+          // name: 'actual',
           smooth: true,
           type: 'line',
           itemStyle: {

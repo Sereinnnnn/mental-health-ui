@@ -23,41 +23,41 @@
       @selection-change="handleSelectionChange"
       @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column :label="$t('table.examinationName')" sortable prop="examination_name" min-width="90" align="center">
+      <el-table-column label="问卷名称" sortable prop="examination_name" min-width="180" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.examinationName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.type')" sortable prop="type" min-width="90" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.type | typeFilter }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('table.course')" min-width="90" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.course.courseName }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('table.startTime')" sortable prop="start_time" min-width="90" align="center">
+<!--      <el-table-column :label="$t('table.type')" sortable prop="type" min-width="90" align="center">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span>{{ scope.row.type | typeFilter }}</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+<!--      <el-table-column :label="$t('table.course')" min-width="90" align="center">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span>{{ scope.row.course.courseName }}</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+      <el-table-column :label="$t('table.startTime')" sortable prop="start_time" min-width="180" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.startTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.endTime')" sortable prop="end_time" min-width="90" align="center">
+      <el-table-column :label="$t('table.endTime')" sortable prop="end_time" min-width="180" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.endTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.totalSubject')" sortable prop="total_subject" align="center" width="120px">
+      <el-table-column :label="$t('table.totalSubject')" sortable prop="total_subject" align="center" width="90">
         <template slot-scope="scope">
           <span>{{ scope.row.totalSubject }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.totalScore')" sortable prop="total_score" align="center" width="120px">
-        <template slot-scope="scope">
-          <span>{{ scope.row.totalScore }}</span>
-        </template>
-      </el-table-column>
+<!--      <el-table-column :label="$t('table.totalScore')" sortable prop="total_score" align="center" width="120px">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span>{{ scope.row.totalScore }}</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
       <el-table-column :label="$t('table.status')" sortable prop="status" align="center" width="120px">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>

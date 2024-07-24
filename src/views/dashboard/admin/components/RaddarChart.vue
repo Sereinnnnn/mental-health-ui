@@ -51,6 +51,14 @@ export default {
       this.chart = echarts.init(this.$el, 'macarons')
 
       this.chart.setOption({
+        title: {
+          text: '热门问卷雷达图', // 设置图表标题文本
+          left: 'center',          // 设置标题位置，可以是'left', 'center', 'right'
+          top: 'top',              // 设置标题位置，可以是'top', 'middle', 'bottom'
+          textStyle: {
+            fontSize: 14,          // 设置标题字体大小
+          }
+        },
         tooltip: {
           trigger: 'axis',
           axisPointer: { // 坐标轴指示器，坐标轴触发有效
@@ -60,10 +68,11 @@ export default {
         radar: {
           radius: '66%',
           center: ['50%', '42%'],
+          startAngle: 45, // 旋转雷达图90度
           splitNumber: 8,
           splitArea: {
             areaStyle: {
-              color: 'rgba(127,95,132,.3)',
+              color: 'rgba(114,174,215,.5)',
               opacity: 1,
               shadowBlur: 45,
               shadowColor: 'rgba(0,0,0,.5)',
@@ -72,18 +81,31 @@ export default {
             }
           },
           indicator: [
-            { name: 'Sales', max: 10000 },
-            { name: 'Administration', max: 20000 },
-            { name: 'Information Techology', max: 20000 },
-            { name: 'Customer Support', max: 20000 },
-            { name: 'Development', max: 20000 },
-            { name: 'Marketing', max: 20000 }
-          ]
+            { name: '情感状态评估', max: 10 },
+            { name: '心理健康评估', max: 10 },
+            { name: '生活质量评估', max: 10 },
+            { name: '社会功能评估', max: 10 },
+            // { name: 'Development', max: 10 },
+            // { name: 'Marketing', max: 10 }
+          ],
+          name: {
+            textStyle: {
+              color: '#565252' // 设置指示器名称的颜色
+            }
+          },
         },
         legend: {
           left: 'center',
-          bottom: '10',
-          data: ['Allocated Budget', 'Expected Spending', 'Actual Spending']
+          bottom: '20',
+          data: ['正念五因素量表', '日常生活能力评定量表', '社会支持评定量表'],
+          itemWidth: 10,        // 调整图例项的宽度
+          itemHeight: 10,       // 调整图例项的高度
+          textStyle: {
+            fontSize: 10        // 调整字体大小
+          },
+          padding: [0, 0, 0, 5], // 调整图例的内边距
+          itemGap: 10,          // 调整图例项之间的间距
+          orient: 'horizontal',
         },
         series: [{
           type: 'radar',
@@ -99,16 +121,16 @@ export default {
           },
           data: [
             {
-              value: [5000, 7000, 12000, 11000, 15000, 14000],
-              name: 'Allocated Budget'
+              value: [9, 7, 6, 5],
+              name: '正念五因素量表'
             },
             {
-              value: [4000, 9000, 15000, 15000, 13000, 11000],
-              name: 'Expected Spending'
+              value: [5, 5, 9, 8],
+              name: '日常生活能力评定量表'
             },
             {
-              value: [5500, 11000, 12000, 15000, 12000, 12000],
-              name: 'Actual Spending'
+              value: [6, 5, 7, 9],
+              name: '社会支持评定量表'
             }
           ],
           animationDuration: animationDuration

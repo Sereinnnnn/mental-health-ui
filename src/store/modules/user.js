@@ -78,12 +78,8 @@ const user = {
           const data = response.data.data
           // 获取系统配置
           const sysConfig = getStore({ name: 'sys_config' })
-          if (!isNotEmpty(data.user.avatarId)) {
-            // 采用默认头像
-            data.user.avatarUrl = sysConfig.defaultAvatar
-          } else {
-            data.user.avatarUrl = getAttachmentPreviewUrl(sysConfig, data.user.avatar)
-          }
+          // zzz:头像
+          data.user.avatarUrl = data.user.avatar
           commit('SET_ROLES', data.roles)
           commit('SET_USER_INFO', data.user)
           commit('SET_PERMISSIONS', data.permissions)

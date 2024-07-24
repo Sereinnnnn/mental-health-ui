@@ -20,32 +20,32 @@
       @selection-change="handleSelectionChange"
       @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column :label="$t('table.username')" sortable prop="username" min-width="110">
+      <el-table-column label="用户名" sortable prop="username" min-width="110" width="250">
         <template slot-scope="scope">
           <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.name')" sortable prop="name" min-width="110">
+      <el-table-column :label="$t('table.name')" sortable prop="name" min-width="110" width="250">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.ownDept')" width="210px" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.deptName }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('table.role')" width="210px" align="center">
+<!--      <el-table-column :label="$t('table.ownDept')" width="210px" align="center">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span>{{ scope.row.deptName }}</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+      <el-table-column :label="$t('table.role')" align="center" width="200">
         <template slot-scope="scope">
           <span v-for="role in scope.row.roleList" :key="role.id">{{ role.roleName }} </span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.status')" sortable prop="status" align="center" width="95px">
+      <el-table-column :label="$t('table.status')" sortable prop="status" align="center" width="200">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
+      <el-table-column :label="$t('table.actions')" class-name="status-col">
         <template slot-scope="scope">
           <el-button v-if="user_btn_edit" type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
           <el-button v-if="user_btn_del" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
@@ -62,7 +62,7 @@
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" style="width: 90%;">
         <el-row>
           <el-col :span="12">
-            <el-form-item :label="$t('table.username')" prop="username">
+            <el-form-item label="用户名" prop="username">
               <el-input v-model="temp.username" :readonly="temp.readonly" placeholder="账号"/>
             </el-form-item>
           </el-col>
@@ -73,15 +73,15 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.ownDept')" prop="deptName">
-              <el-input v-model="temp.deptName" placeholder="请选择所属部门" @focus="handleSelectDept"/>
-              <input v-model="temp.deptId" type="hidden">
-            </el-form-item>
-          </el-col>
+<!--          <el-col :span="12">-->
+<!--            <el-form-item :label="$t('table.ownDept')" prop="deptName">-->
+<!--              <el-input v-model="temp.deptName" placeholder="请选择所属部门" @focus="handleSelectDept"/>-->
+<!--              <input v-model="temp.deptId" type="hidden">-->
+<!--            </el-form-item>-->
+<!--          </el-col>-->
           <el-col :span="12">
             <el-form-item :label="$t('table.role')" prop="role">
-              <el-select v-model="temp.role" class="filter-item" placeholder="请选择角色" multiple width="100%">
+              <el-select v-model="temp.role" class="filter-item" placeholder="请选择角色" multiple style="width: 285px">
                 <el-option v-for="item in roleData" :key="item.id" :label="item.roleName" :value="item.id">
                   <span style="float: left">{{ item.roleName }}</span>
                 </el-option>
@@ -550,3 +550,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+
+
+.el-input--medium /deep/{
+  width: 289px;
+}
+</style>

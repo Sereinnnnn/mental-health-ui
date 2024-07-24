@@ -18,27 +18,27 @@
       @selection-change="handleSelectionChange"
       @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column :label="$t('table.examinationName')" min-width="90" align="center">
+        <el-table-column label="问卷名称" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.examinationName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.examRecord.userName')" min-width="90" align="center">
+      <el-table-column label="测评人" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.userName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.examRecord.deptName')" min-width="90" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.deptName }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('table.examRecord.score')" min-width="90" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.score }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('table.examRecord.examTime')" min-width="90" align="center">
+<!--      <el-table-column :label="$t('table.examRecord.deptName')" min-width="90" align="center">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span>{{ scope.row.deptName }}</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+<!--      <el-table-column :label="$t('table.examRecord.score')" min-width="90" align="center">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span>{{ scope.row.score }}</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+      <el-table-column label="完成问卷时间" min-width="90" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.startTime }}</span>
         </template>

@@ -428,4 +428,12 @@ export default {
   .tab-container{
     margin: 30px;
   }
+
+  .el-input--medium /deep/{
+     width: 289px;
+  }
+
+  .filter-item {
+    width: 289px;
+  }
 </style>

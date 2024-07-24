@@ -18,12 +18,12 @@
       @selection-change="handleSelectionChange"
       @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column :label="$t('table.log.type')" width="120px" align="center">
+      <el-table-column :label="$t('table.log.type')" width="80" align="center">
         <template slot-scope="scope">
           <el-tag :type="scope.row.type | statusTypeFilter">{{ scope.row.type | statusFilter }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.log.title')" prop="title" min-width="90" align="center">
+      <el-table-column :label="$t('table.log.title')" prop="title" min-width="150" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.title }}</span>
         </template>
@@ -33,22 +33,22 @@
           <span>{{ scope.row.ip }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.log.requestUri')" min-width="90" align="center">
+      <el-table-column :label="$t('table.log.requestUri')" min-width="200" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.requestUri }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.log.method')" width="120px" align="center">
+      <el-table-column :label="$t('table.log.method')" width="80" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.method }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.log.time')" align="center" width="160px">
+      <el-table-column :label="$t('table.log.time')" align="center" width="80">
         <template slot-scope="scope">
           <span>{{ scope.row.time }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.log.creator')" align="center" min-width="90">
+      <el-table-column :label="$t('table.log.creator')" align="center" min-width="120">
         <template slot-scope="scope">
           <span>{{ scope.row.creator }}</span>
         </template>

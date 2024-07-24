@@ -9,8 +9,8 @@
                 <el-col :span="12">
                   <el-row>
                     <el-col :span="24">
-                      <el-form-item label="账号：" prop="username">
-                        <el-input :disabled="disabled" v-model="userInfo.username"/>
+                      <el-form-item label="用户名：" prop="username">
+                        <el-input v-model="userInfo.username"/>
                       </el-form-item>
                     </el-col>
                   </el-row>
@@ -119,6 +119,8 @@ export default {
   },
   created() {
     this.userInfo.sex = parseInt(this.userInfo.sex)
+    console.log('User Info:', this.userInfo);
+    console.log('Sys Config:', this.sysConfig);
   },
   computed: {
     ...mapState({
@@ -214,5 +216,9 @@ export default {
     width: 178px;
     height: 178px;
     display: block;
+  }
+
+  .el-input--medium /deep/{
+    width: 289px;
   }
 </style>

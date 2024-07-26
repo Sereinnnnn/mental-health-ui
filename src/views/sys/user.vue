@@ -63,7 +63,7 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="用户名" prop="username">
-              <el-input v-model="temp.username" :readonly="temp.readonly" placeholder="账号"/>
+              <el-input v-model="temp.username" :readonly="temp.readonly" placeholder="用户名"/>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -82,7 +82,7 @@
           <el-col :span="12">
             <el-form-item :label="$t('table.role')" prop="role">
               <el-select v-model="temp.role" class="filter-item" placeholder="请选择角色" multiple style="width: 285px">
-                <el-option v-for="item in roleData" :key="item.id" :label="item.roleName" :value="item.id">
+                <el-option v-for="item in newRoleData" :key="item.id" :label="item.roleName" :value="item.id">
                   <span style="float: left">{{ item.roleName }}</span>
                 </el-option>
               </el-select>
@@ -184,7 +184,7 @@
 import { fetchList, addObj, putObj, delObj, delAllObj, exportObj } from '@/api/admin/user'
 import waves from '@/directive/waves'
 import { fetchTree } from '@/api/admin/dept'
-import { deptRoleList } from '@/api/admin/role'
+import { deptRoleList,roles } from '@/api/admin/role'
 import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
 import { checkMultipleSelect, exportExcel, isNotEmpty, notifySuccess, messageSuccess } from '@/utils/util'
@@ -253,6 +253,7 @@ export default {
       downloadLoading: false,
       treeDeptData: [],
       roleData: [],
+      newRoleData: [],
       role: [],
       defaultDeptProps: {
         children: 'children',
@@ -272,6 +273,12 @@ export default {
       percentage: 0
     }
   },
+  mounted() {
+    // zzz：新增用户 - “角色”下拉列表
+    roles().then(response => {
+      this.newRoleData = response.data
+    })
+  },
   created() {
     this.getList()
     this.user_btn_add = this.permissions['sys:user:add']
@@ -279,6 +286,7 @@ export default {
     this.user_btn_del = this.permissions['sys:user:del']
     this.user_btn_import = this.permissions['sys:user:import']
     this.user_btn_export = this.permissions['sys:user:export']
+
   },
   computed: {
     ...mapGetters([

@@ -106,7 +106,9 @@ export default {
   watch: {
     $route: {
       handler: function(route) {
-        this.redirect = route.query && route.query.redirect
+        // this.redirect = route.query && route.query.redirect
+        // zzz：修改，不然有时候会跳转到空白页
+        this.redirect = '/dashboard';
       },
       immediate: true
     }

@@ -34,21 +34,21 @@
           <span>{{ scope.row.roleDesc }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.ownDept')" min-width="90" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.deptName }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('table.isDefault')" align="center" width="120px">
-        <template slot-scope="scope">
-          {{ scope.row.isDefault | isDefaultFilter }}
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('table.status')" align="center" width="120px">
-        <template slot-scope="scope">
-          <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
-        </template>
-      </el-table-column>
+<!--      <el-table-column :label="$t('table.ownDept')" min-width="90" align="center">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span>{{ scope.row.deptName }}</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+<!--      <el-table-column :label="$t('table.isDefault')" align="center" width="120px">-->
+<!--        <template slot-scope="scope">-->
+<!--          {{ scope.row.isDefault | isDefaultFilter }}-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+<!--      <el-table-column :label="$t('table.status')" align="center" width="120px">-->
+<!--        <template slot-scope="scope">-->
+<!--          <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
       <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
         <template slot-scope="scope">
           <el-button v-if="role_btn_edit" type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
@@ -75,22 +75,22 @@
         <el-form-item :label="$t('table.roleDesc')" prop="roleDesc">
           <el-input v-model="temp.roleDesc"/>
         </el-form-item>
-        <el-form-item :label="$t('table.isDefault')">
-          <el-radio-group v-model="temp.isDefault">
-            <el-radio :label="1">是</el-radio>
-            <el-radio :label="0">否</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item :label="$t('table.status')">
-          <el-radio-group v-model="temp.status">
-            <el-radio :label="0">启用</el-radio>
-            <el-radio :label="1">禁用</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item :label="$t('table.ownDept')" prop="deptName">
-          <el-input v-model="temp.deptName" @focus="handleSelectDept"/>
-          <el-input v-model="temp.deptId" type="hidden"/>
-        </el-form-item>
+<!--        <el-form-item :label="$t('table.isDefault')">-->
+<!--          <el-radio-group v-model="temp.isDefault">-->
+<!--            <el-radio :label="1">是</el-radio>-->
+<!--            <el-radio :label="0">否</el-radio>-->
+<!--          </el-radio-group>-->
+<!--        </el-form-item>-->
+<!--        <el-form-item :label="$t('table.status')">-->
+<!--          <el-radio-group v-model="temp.status">-->
+<!--            <el-radio :label="0">启用</el-radio>-->
+<!--            <el-radio :label="1">禁用</el-radio>-->
+<!--          </el-radio-group>-->
+<!--        </el-form-item>-->
+<!--        <el-form-item :label="$t('table.ownDept')" prop="deptName">-->
+<!--          <el-input v-model="temp.deptName" @focus="handleSelectDept"/>-->
+<!--          <el-input v-model="temp.deptId" type="hidden"/>-->
+<!--        </el-form-item>-->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>

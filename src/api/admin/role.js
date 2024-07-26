@@ -2,6 +2,13 @@ import request from '@/router/axios'
 
 const baseRoleUrl = '/admin/api/v1/role/'
 
+export function roles() {
+  return request({
+    url: baseRoleUrl + 'all',
+    method: 'get'
+  })
+}
+
 export function roleList() {
   return request({
     url: baseRoleUrl + 'roleList',

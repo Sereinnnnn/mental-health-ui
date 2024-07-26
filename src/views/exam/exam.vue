@@ -78,70 +78,36 @@
       <el-pagination v-show="total>0" :current-page="listQuery.pageNum" :page-sizes="[10,20,30, 50]" :page-size="listQuery.pageSize" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
 
-    <!--考试信息表单-->
+    <!--新建：考试信息表单-->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="70%" top="10vh">
       <el-form ref="dataForm" :rules="rules" :model="temp" :label-position="labelPosition" label-width="100px">
         <el-row>
           <el-col :span="18">
             <el-row>
               <el-col :span="24">
-                <el-form-item :label="$t('table.examinationName')" prop="examinationName">
+                <el-form-item label="问卷名称" prop="examinationName">
                   <el-input v-model="temp.examinationName" :readonly="temp.readonly"/>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item :label="$t('table.totalScore')" prop="totalScore">
-                  <el-input v-model="temp.totalScore"/>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item :label="$t('table.college')" prop="collegeId">
-                  <el-input v-model="temp.collegeId"/>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item :label="$t('table.major')" prop="majorId">
-                  <el-input v-model="temp.majorId"/>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item :label="$t('table.course')" prop="course.id">
-                  <el-input v-model="temp.course.courseName" @focus="selectCourse"/>
-                  <input v-model="temp.course.id" type="hidden">
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
                 <el-form-item :label="$t('table.startTime')" prop="startTime">
-                  <el-date-picker v-model="temp.startTime" :placeholder="$t('table.startTime')" type="datetime" format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm"/>
+                  <el-date-picker  :style="{ width: dynamicWidth }" v-model="temp.startTime" :placeholder="$t('table.startTime')" type="datetime" format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm"/>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
                 <el-form-item :label="$t('table.endTime')" prop="endTime">
-                  <el-date-picker v-model="temp.endTime" :placeholder="$t('table.endTime')" type="datetime" format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm"/>
+                  <el-date-picker  :style="{ width: dynamicWidth }" v-model="temp.endTime" :placeholder="$t('table.endTime')" type="datetime" format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm"/>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item :label="$t('table.type')" prop="type">
-                  <el-radio-group v-model="temp.type">
-                    <el-radio :label="0">正式考试</el-radio>
-                    <el-radio :label="1">模拟考试</el-radio>
-                    <el-radio :label="2">在线练习</el-radio>
-                  </el-radio-group>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
                 <el-form-item :label="$t('table.status')">
                   <el-radio-group v-model="temp.status">
-                    <el-radio :label="0">已发布</el-radio>
-                    <el-radio :label="1">未发布</el-radio>
+                    <el-radio :label="0">发布</el-radio>
+                    <el-radio :label="1">暂不发布</el-radio>
                   </el-radio-group>
                 </el-form-item>
               </el-col>
@@ -160,19 +126,6 @@
                 </el-form-item>
               </el-col>
             </el-row>
-          </el-col>
-          <el-col :span="5" :offset="1">
-            <el-upload
-              :show-file-list="false"
-              :on-success="handleAvatarSuccess"
-              :before-upload="beforeAvatarUpload"
-              :action="sysConfig.zuulUploadUrl"
-              :headers="headers"
-              :data="params"
-              class="avatar-uploader">
-              <img v-if="temp.avatar" :src="getExaminationAvatar(temp.avatar)" class="avatar">
-              <i v-else class="el-icon-plus avatar-uploader-icon"/>
-            </el-upload>
           </el-col>
         </el-row>
       </el-form>
@@ -215,7 +168,7 @@
         <el-input :placeholder="$t('table.subjectName')" v-model="subject.listQuery.subjectName" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilterSubject"/>
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilterSubject">{{ $t('table.search') }}</el-button>
         <el-button v-if="exam_btn_subject_add" class="filter-item" icon="el-icon-check" plain @click="handleCreateSubject">{{ $t('table.add') }}</el-button>
-        <el-button v-if="exam_btn_subject_add" class="filter-item" icon="el-icon-check" plain @click="handleCreateSubjectFromSubjectBank">{{ $t('table.addFromSubjectBank') }}</el-button>
+<!--        <el-button v-if="exam_btn_subject_add" class="filter-item" icon="el-icon-check" plain @click="handleCreateSubjectFromSubjectBank">{{ $t('table.addFromSubjectBank') }}</el-button>-->
         <el-button v-if="exam_btn_subject_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletesSubject">{{ $t('table.del') }}</el-button>
         <el-button v-if="exam_btn_subject_import" class="filter-item" icon="el-icon-upload2" plain @click="handleImportSubject">{{ $t('table.import') }}</el-button>
         <el-button v-if="exam_btn_subject_export" class="filter-item" icon="el-icon-download" plain @click="handleExportSubject">{{ $t('table.export') }}</el-button>
@@ -341,21 +294,21 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row>
-          <el-col :span="24">
-            <el-form-item :label="$t('table.subject.answer')" prop="answer">
-              <!-- 非选择 -->
-              <el-input v-if="tempSubject.type !== 0" :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.answer" type="textarea"/>
-              <!-- 选择题 -->
-              <el-radio-group v-if="tempSubject.type === 0" v-model="tempSubject.answer">
-                <el-radio :label="'A'">A</el-radio>
-                <el-radio :label="'B'">B</el-radio>
-                <el-radio :label="'C'">C</el-radio>
-                <el-radio :label="'D'">D</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-        </el-row>
+<!--        <el-row>-->
+<!--          <el-col :span="24">-->
+<!--            <el-form-item :label="$t('table.subject.answer')" prop="answer">-->
+<!--              &lt;!&ndash; 非选择 &ndash;&gt;-->
+<!--              <el-input v-if="tempSubject.type !== 0" :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.answer" type="textarea"/>-->
+<!--              &lt;!&ndash; 选择题 &ndash;&gt;-->
+<!--              <el-radio-group v-if="tempSubject.type === 0" v-model="tempSubject.answer">-->
+<!--                <el-radio :label="'A'">A</el-radio>-->
+<!--                <el-radio :label="'B'">B</el-radio>-->
+<!--                <el-radio :label="'C'">C</el-radio>-->
+<!--                <el-radio :label="'D'">D</el-radio>-->
+<!--              </el-radio-group>-->
+<!--            </el-form-item>-->
+<!--          </el-col>-->
+<!--        </el-row>-->
         <el-row>
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.analysis')" prop="analysis">
@@ -529,11 +482,13 @@ export default {
   },
   data() {
     return {
+      dynamicWidth: '275px', // 动态宽度值
       headers: {
         Authorization: 'Bearer ' + getToken()
       },
       params: {
-        busiType: '1'
+        busiType: '1',
+        examinationId: ''
       },
       baseUrl: '/exam',
       tableKey: 0,
@@ -672,12 +627,12 @@ export default {
       dialogImportVisible: false,
       // 导入题目的url
       importUrl: '/exam/api/v1/subject/import',
-      headers: {
-        Authorization: 'Bearer ' + getToken()
-      },
-      params: {
-        examinationId: ''
-      },
+      // headers: {
+      //   Authorization: 'Bearer ' + getToken()
+      // },
+      // params: {
+      //
+      // },
       uploading: false,
       percentage: 0,
       uploadingSubject: false,
@@ -1280,4 +1235,5 @@ export default {
     height: 178px;
     display: block;
   }
+
 </style>

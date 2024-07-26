@@ -28,22 +28,17 @@
           <span>{{ scope.row.examinationName }}</span>
         </template>
       </el-table-column>
-<!--      <el-table-column :label="$t('table.type')" sortable prop="type" min-width="90" align="center">-->
-<!--        <template slot-scope="scope">-->
-<!--          <span>{{ scope.row.type | typeFilter }}</span>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
-<!--      <el-table-column :label="$t('table.course')" min-width="90" align="center">-->
-<!--        <template slot-scope="scope">-->
-<!--          <span>{{ scope.row.course.courseName }}</span>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
-      <el-table-column :label="$t('table.startTime')" sortable prop="start_time" min-width="180" align="center">
+      <el-table-column label="问卷类型" sortable prop="examination_type" min-width="120" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.type }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('table.startTime')" sortable prop="start_time" min-width="150" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.startTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.endTime')" sortable prop="end_time" min-width="180" align="center">
+      <el-table-column :label="$t('table.endTime')" sortable prop="end_time" min-width="150" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.endTime }}</span>
         </template>
@@ -53,11 +48,6 @@
           <span>{{ scope.row.totalSubject }}</span>
         </template>
       </el-table-column>
-<!--      <el-table-column :label="$t('table.totalScore')" sortable prop="total_score" align="center" width="120px">-->
-<!--        <template slot-scope="scope">-->
-<!--          <span>{{ scope.row.totalScore }}</span>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
       <el-table-column :label="$t('table.status')" sortable prop="status" align="center" width="120px">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
@@ -104,6 +94,13 @@
             </el-row>
             <el-row>
               <el-col :span="12">
+                <el-form-item label="问卷类型" prop="examinationType">
+                  <el-select v-model="temp.type" :style="{ width: dynamicWidth }" placeholder="请选择问卷类型">
+                    <el-option v-for="item in tempType" :value="item"/>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
                 <el-form-item :label="$t('table.status')">
                   <el-radio-group v-model="temp.status">
                     <el-radio :label="0">发布</el-radio>
@@ -136,31 +133,6 @@
       </div>
     </el-dialog>
 
-    <!--课程选择弹窗-->
-    <el-dialog :visible.sync="dialogCourseVisible" :title="$t('table.course')">
-      <el-table v-loading="course.listLoading" :data="course.list" @row-dblclick="selectedCourse">
-        <el-table-column :label="$t('table.courseName')" property="courseName" width="150">
-          <template slot-scope="scope">
-            <span>{{ scope.row.courseName }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column :label="$t('table.college')" property="college" width="200">
-          <template slot-scope="scope">
-            <span>{{ scope.row.college }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column :label="$t('table.major')" property="major">
-          <template slot-scope="scope">
-            <span>{{ scope.row.major }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column :label="$t('table.teacher')" property="teacher">'
-          <template slot-scope="scope">
-            <span>{{ scope.row.teacher }}</span>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-dialog>
 
     <!--题目管理列表-->
     <el-dialog :visible.sync="dialogSubjectVisible" :title="$t('table.subjectManagement')" width="80%" top="10vh">
@@ -294,21 +266,6 @@
             </el-form-item>
           </el-col>
         </el-row>
-<!--        <el-row>-->
-<!--          <el-col :span="24">-->
-<!--            <el-form-item :label="$t('table.subject.answer')" prop="answer">-->
-<!--              &lt;!&ndash; 非选择 &ndash;&gt;-->
-<!--              <el-input v-if="tempSubject.type !== 0" :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.answer" type="textarea"/>-->
-<!--              &lt;!&ndash; 选择题 &ndash;&gt;-->
-<!--              <el-radio-group v-if="tempSubject.type === 0" v-model="tempSubject.answer">-->
-<!--                <el-radio :label="'A'">A</el-radio>-->
-<!--                <el-radio :label="'B'">B</el-radio>-->
-<!--                <el-radio :label="'C'">C</el-radio>-->
-<!--                <el-radio :label="'D'">D</el-radio>-->
-<!--              </el-radio-group>-->
-<!--            </el-form-item>-->
-<!--          </el-col>-->
-<!--        </el-row>-->
         <el-row>
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.analysis')" prop="analysis">
@@ -482,6 +439,8 @@ export default {
   },
   data() {
     return {
+      testType: '心理',
+      tempType: ["心理测评",'趣味测试'],
       dynamicWidth: '275px', // 动态宽度值
       headers: {
         Authorization: 'Bearer ' + getToken()
@@ -534,7 +493,7 @@ export default {
       temp: {
         id: '',
         examinationName: '',
-        type: 0,
+        type: '',
         attention: '',
         startTime: '',
         endTime: '',
@@ -558,7 +517,7 @@ export default {
         examinationId: '',
         categoryId: '',
         subjectName: '',
-        type: 0,
+        type: '',
         content: '',
         optionA: '',
         optionB: '',
@@ -627,12 +586,6 @@ export default {
       dialogImportVisible: false,
       // 导入题目的url
       importUrl: '/exam/api/v1/subject/import',
-      // headers: {
-      //   Authorization: 'Bearer ' + getToken()
-      // },
-      // params: {
-      //
-      // },
       uploading: false,
       percentage: 0,
       uploadingSubject: false,
@@ -687,7 +640,8 @@ export default {
     ]),
     ...mapState({
       sysConfig: state => state.sysConfig.sysConfig
-    })
+    }),
+
   },
   methods: {
     // 加载考试列表
@@ -695,6 +649,26 @@ export default {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
         this.list = response.data.list
+        this.list = response.data.list.map(item => {
+          if (item.type === '0') {
+            item.type = '心理测评';
+          } else if (item.type === '1') {
+            item.type = '趣味测试';
+          }
+          else if(item.type === '心理测评'){
+            item.type = '心理测评';
+          }
+          else if (item.type === '趣味测试') {
+            item.type = '趣味测试';
+          }
+          else{
+            item.type = "出错";
+          }
+          return item;
+        });
+        console.log('getList()成功返回')
+        console.log('this.list')
+        console.log(this.list)
         this.total = response.data.total
         // Just to simulate the time of the request
         setTimeout(() => {
@@ -786,7 +760,7 @@ export default {
       this.temp = {
         id: '',
         examinationName: '',
-        type: 0,
+        type: '',
         attention: '',
         startTime: '',
         endTime: '',
@@ -814,9 +788,18 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          if(this.temp.type == '心理测评'){
+            this.temp.type == '0'
+          }
+          else{
+            this.temp.type == '1'
+          }
+          console.log('即将发出addObj请求，发出的参数是：')
+          console.log(this.temp)
           addObj(this.temp).then(() => {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
+            console.log('调用this.getList()')
             this.getList()
             notifySuccess(this, '创建成功')
           })
@@ -824,9 +807,20 @@ export default {
       })
     },
     handleUpdate(row) {
+      console.log(row)
       this.temp = Object.assign({}, row) // copy obj
       this.temp.status = parseInt(this.temp.status)
-      this.temp.type = parseInt(this.temp.type)
+      // this.temp.type = parseInt(this.temp.type)
+      // alert(this.temp.type)
+      console.log(this.temp)
+      if(this.temp.type == 0){
+        this.temp.type == '心理测评'
+      }
+      else {
+        this.temp.type == '趣味测试'
+      }
+
+
       if (!isNotEmpty(this.temp.course)) {
         this.temp.course = {
           id: '',
@@ -842,7 +836,15 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          if(this.temp.type == '心理测评'){
+            this.temp.type == '0'
+          }
+          else{
+            this.temp.type == '1'
+          }
           const tempData = Object.assign({}, this.temp)
+          console.log('即将发出putObj请求，发出的参数是')
+          console.log(tempData)
           putObj(tempData).then(() => {
             for (const v of this.list) {
               if (v.id === this.temp.id) {
@@ -852,6 +854,7 @@ export default {
               }
             }
             this.dialogFormVisible = false
+            console.log('putObj请求成功返回，调用this.getList()')
             this.getList()
             notifySuccess(this, '更新成功')
           })
@@ -975,7 +978,7 @@ export default {
         id: '',
         examinationId: '',
         subjectName: '',
-        type: 0,
+        type: '',
         content: '',
         optionA: '',
         optionB: '',

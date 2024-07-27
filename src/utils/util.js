@@ -237,7 +237,7 @@ export const checkMultipleSelect = (multipleSelection, obj) => {
  * 设置浏览器头部标题
  */
 export const setTitle = function(title) {
-  title = title ? `${title}——在线考试` : '在线考试'
+  title = title ? `${title}——心理健康信息管理系统` : '心理健康信息管理系统'
   window.document.title = title
 }
 

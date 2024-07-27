@@ -24,8 +24,8 @@
         </el-form-item>
         <el-form-item>
           <el-row type="flex" justify="space-between">
-            <el-checkbox v-model="loginForm.rememberMe" style="color:#eee">记住密码</el-checkbox>
-            <a href="" style="color:#eee" @click.prevent="openMsg">{{ $t('login.forget') }}</a>
+            <el-checkbox v-model="loginForm.rememberMe">记住密码</el-checkbox>
+            <a href=""  @click.prevent="openMsg">{{ $t('login.forget') }}</a>
           </el-row>
         </el-form-item>
         <el-form-item>
@@ -171,7 +171,9 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: url('../../../static/img/login_bg.jpg') -20% 10%;
+    background: url('../../../static/img/login.png');
+    background-size: 100px 100px;
+    background-repeat: no-repeat;
     background-size: contain;
     #particles-js {
       position: absolute;
@@ -193,7 +195,7 @@ export default {
     }
     h3 {
       text-align: center;
-      color: #ebedef;
+      //color: #ebedef;
       margin-top: 0px;
       margin-bottom: 5px;
       span {

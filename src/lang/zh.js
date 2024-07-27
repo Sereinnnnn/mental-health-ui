@@ -81,7 +81,7 @@ export default {
     lock: '锁屏'
   },
   login: {
-    title: '欢迎使用考试管理系统',
+    title: '欢迎使用心理健康信息管理系统',
     logIn: '登录',
     username: '账号',
     password: '密码',

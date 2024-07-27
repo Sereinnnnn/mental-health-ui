@@ -1,5 +1,5 @@
 // 网关地址
-const baseUrl = 'http://127.0.0.1:8000'
+const baseUrl = 'http://127.0.0.1:28001'
 
 // 转发配置
 module.exports = {

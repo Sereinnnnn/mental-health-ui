@@ -1,7 +1,7 @@
 {
-  "name": "online-exam-ui",
+  "name": "mental-health-ui",
   "version": "1.0.0",
-  "description": "在线考试",
+  "description": "心理健康信息系统",
   "author": "tangyi <1633736729@qq.com>",
   "private": true,
   "scripts": {
@@ -24,7 +24,7 @@
     "element-ui",
     "admin",
     "management-system",
-    "online-exam"
+    "mental-health"
   ],
   "repository": {
     "type": "git",
